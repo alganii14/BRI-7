@@ -52,7 +52,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Protected Routes (require authentication)
-Route::middleware(['auth', 'check.password.changed'])->group(function () {
+Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->group(function () {
     // Dashboard - accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     

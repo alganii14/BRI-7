@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'password_changed_at',
+        'last_activity',
         'photo',
         'role',
         'rmft_id',
@@ -48,6 +49,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password_changed_at' => 'datetime',
+        'last_activity' => 'datetime',
     ];
     
     /**
@@ -94,5 +96,27 @@ class User extends Authenticatable
         
         // Jika password_changed_at null, berarti belum pernah ganti password
         return is_null($this->password_changed_at);
+    }
+    
+    /**
+     * Check if user is online (active in last 5 minutes)
+     */
+    public function isOnline()
+    {
+        if (is_null($this->last_activity)) {
+            return false;
+        }
+        
+        // User dianggap online jika aktif dalam 5 menit terakhir
+        return $this->last_activity->diffInMinutes(now()) < 5;
+    }
+    
+    /**
+     * Update last activity timestamp
+     */
+    public function updateLastActivity()
+    {
+        $this->last_activity = now();
+        $this->save();
     }
 }

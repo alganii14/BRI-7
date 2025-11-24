@@ -82,6 +82,16 @@
         color: white;
     }
 
+    .badge-online {
+        background-color: #4caf50;
+        color: white;
+    }
+
+    .badge-offline {
+        background-color: #9e9e9e;
+        color: white;
+    }
+
     .section-title {
         font-size: 18px;
         font-weight: 600;
@@ -273,6 +283,7 @@
                     <th>EMAIL</th>
                     <th>ROLE</th>
                     @if(auth()->user()->isAdmin())
+                    <th>STATUS ONLINE</th>
                     <th>STATUS PASSWORD</th>
                     @endif
                     <th>DIBUAT</th>
@@ -289,6 +300,17 @@
                     <td>{{ $manager->email }}</td>
                     <td><span class="badge badge-manager">MANAGER</span></td>
                     @if(auth()->user()->isAdmin())
+                    <td>
+                        @if($manager->isOnline())
+                            <span class="badge badge-online">🟢 Online</span>
+                            <br><small style="color: #666;">Aktif {{ $manager->last_activity->diffForHumans() }}</small>
+                        @else
+                            <span class="badge badge-offline">⚫ Offline</span>
+                            @if($manager->last_activity)
+                            <br><small style="color: #666;">Terakhir {{ $manager->last_activity->diffForHumans() }}</small>
+                            @endif
+                        @endif
+                    </td>
                     <td>
                         @if($manager->password_changed_at)
                             <span class="badge badge-success">✓ Sudah Diubah</span>
@@ -318,7 +340,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="{{ auth()->user()->isAdmin() ? '7' : '5' }}" style="text-align: center; padding: 40px; color: #666;">
+                    <td colspan="{{ auth()->user()->isAdmin() ? '8' : '5' }}" style="text-align: center; padding: 40px; color: #666;">
                         Tidak ada akun manager
                     </td>
                 </tr>
@@ -349,6 +371,7 @@
                     <th>KELOMPOK</th>
                     <th>ROLE</th>
                     @if(auth()->user()->isAdmin())
+                    <th>STATUS ONLINE</th>
                     <th>STATUS PASSWORD</th>
                     @endif
                     <th>DIBUAT</th>
@@ -368,6 +391,17 @@
                     <td>{{ $rmft->rmftData->kelompok_jabatan ?? '-' }}</td>
                     <td><span class="badge badge-rmft">RMFT</span></td>
                     @if(auth()->user()->isAdmin())
+                    <td>
+                        @if($rmft->isOnline())
+                            <span class="badge badge-online">🟢 Online</span>
+                            <br><small style="color: #666;">Aktif {{ $rmft->last_activity->diffForHumans() }}</small>
+                        @else
+                            <span class="badge badge-offline">⚫ Offline</span>
+                            @if($rmft->last_activity)
+                            <br><small style="color: #666;">Terakhir {{ $rmft->last_activity->diffForHumans() }}</small>
+                            @endif
+                        @endif
+                    </td>
                     <td>
                         @if($rmft->password_changed_at)
                             <span class="badge badge-success">✓ Sudah Diubah</span>
@@ -397,7 +431,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="{{ auth()->user()->isAdmin() ? '10' : '8' }}" style="text-align: center; padding: 40px; color: #666;">
+                    <td colspan="{{ auth()->user()->isAdmin() ? '11' : '8' }}" style="text-align: center; padding: 40px; color: #666;">
                         Tidak ada akun RMFT
                     </td>
                 </tr>
@@ -414,3 +448,12 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    // Auto-refresh status online setiap 30 detik
+    setInterval(function() {
+        location.reload();
+    }, 30000); // 30 detik
+</script>
+@endpush

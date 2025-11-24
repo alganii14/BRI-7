@@ -895,8 +895,8 @@
                 </a>
                 @endif
                 
-                @if(auth()->user()->isManager())
-                <!-- Pull Of Pipeline Menu for Manager (Read-only) -->
+                @if(auth()->user()->isManager() || auth()->user()->isRMFT())
+                <!-- Pull Of Pipeline Menu for Manager & RMFT (Read-only) -->
                 <div class="menu-group">
                     <div class="menu-item-dropdown" onclick="toggleDropdown(this)">
                         <span style="display: flex; align-items: center;">
