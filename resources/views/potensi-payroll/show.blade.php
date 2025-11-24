@@ -66,9 +66,6 @@
 
 <div class="detail-container">
     <div class="detail-grid">
-        <div class="detail-label">NO:</div>
-        <div class="detail-value">{{ $potensiPayroll->no ?? '-' }}</div>
-
         <div class="detail-label">Kode Cabang Induk:</div>
         <div class="detail-value">{{ $potensiPayroll->kode_cabang_induk ?? '-' }}</div>
 

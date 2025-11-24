@@ -1167,13 +1167,18 @@
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">AUM</th>';
         } else if (isStrategi8) {
             // Kolom khusus untuk Wingback Penguatan Produk & Fungsi RM
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Uker</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Unit Kerja</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">CIFNO</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">No Rekening</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px;">Nama Nasabah</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">Product Type</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">Segmentasi</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">Jenis Simpanan</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Last EOM</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Terupdate</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px;">Delta</th>';
         } else if (isLayeringWingback) {
             // Kolom khusus untuk Layering Wingback
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Cabang Induk</th>';
@@ -1218,7 +1223,6 @@
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Rekening</th>';
         } else if (isPotensiPayroll) {
             // Kolom khusus untuk Potensi Payroll
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">NO</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px;">Perusahaan</th>';
@@ -1501,20 +1505,26 @@
                     if (!value || value === '-') return 0;
                     if (typeof value === 'number') return value;
                     const cleaned = String(value).replace(/[.,\s]/g, '');
-                    const parsed = parseInt(cleaned);
+                    const parsed = parseFloat(cleaned);
                     return isNaN(parsed) ? 0 : parsed;
                 };
                 
-                const saldoTerupdate = parseValue(nasabah.saldo_terupdate);
-                const saldoTerupdateFormatted = new Intl.NumberFormat('id-ID').format(saldoTerupdate);
+                const saldoLastEom = nasabah.saldo_last_eom || '0';
+                const saldoTerupdate = nasabah.saldo_terupdate || '0';
+                const delta = nasabah.delta || '0';
                 
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_cabang_induk || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.product_type || '-'}</td>`;
-                html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600;">${saldoTerupdateFormatted}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.segmentasi || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.jenis_simpanan || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${saldoLastEom}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${saldoTerupdate}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace; color: ${parseValue(delta) >= 0 ? '#2e7d32' : '#d32f2f'};">${delta}</td>`;
             } else if (isLayeringWingback) {
                 // Tampilan untuk Layering Wingback
                 const parseValue = (value) => {
@@ -1575,10 +1585,9 @@
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.saldo_rekening || '0'}</td>`;
             } else if (isPotensiPayroll) {
                 // Tampilan untuk Potensi Payroll
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.id || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_cabang_induk || '-'}</td>`;
                 html += `<td style="padding: 10px; font-size: 12px; color: #666;">${nasabah.cabang_induk || '-'}</td>`;
-                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.perusahaan || '-'}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600;">${nasabah.estimasi_pekerja || '0'}</td>`;
             } else {
                 // Tampilan untuk strategi lainnya
@@ -1905,7 +1914,7 @@
         const isMerchantSavol = kategori === 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)';
         // Set Norek berdasarkan kategori dan data yang tersedia
         if (isPotensiPayroll) {
-            document.getElementById('norek').value = nasabah.nama_nasabah || '';
+            document.getElementById('norek').value = nasabah.perusahaan || '';
         } else if (isExistingPayroll) {
             document.getElementById('norek').value = nasabah.cifno || '';
         } else if (isMerchantSavol) {
@@ -1916,7 +1925,12 @@
             document.getElementById('norek').value = nasabah.norek || nasabah.no_rekening || nasabah.norekening || nasabah.cifno || '';
         }
         
-        document.getElementById('nama_nasabah').value = nasabah.nama_nasabah;
+        // Set nama nasabah - untuk Potensi Payroll gunakan perusahaan
+        if (isPotensiPayroll) {
+            document.getElementById('nama_nasabah').value = nasabah.perusahaan || '';
+        } else {
+            document.getElementById('nama_nasabah').value = nasabah.nama_nasabah || '';
+        }
         
         // Ambil nilai delta atau estimasi pekerja
         let deltaValue = 0;

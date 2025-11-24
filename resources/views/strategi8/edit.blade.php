@@ -95,14 +95,6 @@
         
         <div class="form-grid">
             <div class="form-group">
-                <label for="regional_office">Regional Office</label>
-                <input type="text" id="regional_office" name="regional_office" value="{{ old('regional_office', $strategi8->regional_office) }}">
-                @error('regional_office')
-                    <span class="error">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="form-group">
                 <label for="kode_cabang_induk">Kode Cabang Induk</label>
                 <input type="text" id="kode_cabang_induk" name="kode_cabang_induk" value="{{ old('kode_cabang_induk', $strategi8->kode_cabang_induk) }}">
                 @error('kode_cabang_induk')
@@ -151,22 +143,6 @@
             </div>
 
             <div class="form-group">
-                <label for="ytd">YTD</label>
-                <input type="text" id="ytd" name="ytd" value="{{ old('ytd', $strategi8->ytd) }}">
-                @error('ytd')
-                    <span class="error">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="product_type">Product Type</label>
-                <input type="text" id="product_type" name="product_type" value="{{ old('product_type', $strategi8->product_type) }}">
-                @error('product_type')
-                    <span class="error">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="form-group">
                 <label for="nama_nasabah">Nama Nasabah</label>
                 <input type="text" id="nama_nasabah" name="nama_nasabah" value="{{ old('nama_nasabah', $strategi8->nama_nasabah) }}">
                 @error('nama_nasabah')
@@ -175,17 +151,9 @@
             </div>
 
             <div class="form-group">
-                <label for="jenis_nasabah">Jenis Nasabah</label>
-                <input type="text" id="jenis_nasabah" name="jenis_nasabah" value="{{ old('jenis_nasabah', $strategi8->jenis_nasabah) }}">
-                @error('jenis_nasabah')
-                    <span class="error">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="segmentasi_bpr">Segmentasi BPR</label>
-                <input type="text" id="segmentasi_bpr" name="segmentasi_bpr" value="{{ old('segmentasi_bpr', $strategi8->segmentasi_bpr) }}">
-                @error('segmentasi_bpr')
+                <label for="segmentasi">Segmentasi</label>
+                <input type="text" id="segmentasi" name="segmentasi" value="{{ old('segmentasi', $strategi8->segmentasi) }}">
+                @error('segmentasi')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
@@ -200,7 +168,7 @@
 
             <div class="form-group">
                 <label for="saldo_last_eom">Saldo Last EOM</label>
-                <input type="number" step="0.01" id="saldo_last_eom" name="saldo_last_eom" value="{{ old('saldo_last_eom', $strategi8->saldo_last_eom) }}">
+                <input type="text" id="saldo_last_eom" name="saldo_last_eom" value="{{ old('saldo_last_eom', $strategi8->saldo_last_eom) }}">
                 @error('saldo_last_eom')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -208,7 +176,7 @@
 
             <div class="form-group">
                 <label for="saldo_terupdate">Saldo Terupdate</label>
-                <input type="number" step="0.01" id="saldo_terupdate" name="saldo_terupdate" value="{{ old('saldo_terupdate', $strategi8->saldo_terupdate) }}">
+                <input type="text" id="saldo_terupdate" name="saldo_terupdate" value="{{ old('saldo_terupdate', $strategi8->saldo_terupdate) }}">
                 @error('saldo_terupdate')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -216,7 +184,7 @@
 
             <div class="form-group">
                 <label for="delta">Delta</label>
-                <input type="number" step="0.01" id="delta" name="delta" value="{{ old('delta', $strategi8->delta) }}">
+                <input type="text" id="delta" name="delta" value="{{ old('delta', $strategi8->delta) }}">
                 @error('delta')
                     <span class="error">{{ $message }}</span>
                 @enderror

@@ -71,7 +71,6 @@ class PotensiPayrollController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'no' => 'nullable|string',
             'kode_cabang_induk' => 'nullable|string',
             'cabang_induk' => 'nullable|string',
             'perusahaan' => 'nullable|string',
@@ -116,7 +115,6 @@ class PotensiPayrollController extends Controller
     public function update(Request $request, PotensiPayroll $potensiPayroll)
     {
         $validated = $request->validate([
-            'no' => 'nullable|string',
             'kode_cabang_induk' => 'nullable|string',
             'cabang_induk' => 'nullable|string',
             'perusahaan' => 'nullable|string',
@@ -175,13 +173,12 @@ class PotensiPayrollController extends Controller
 
             while (($row = fgetcsv($handle, 1000, ';')) !== false) {
                 // Skip rows with empty data or only containing semicolons
-                if (count($row) >= 5 && !empty(trim($row[3]))) { // Check if perusahaan is not empty
+                if (count($row) >= 4 && !empty(trim($row[2]))) { // Check if perusahaan is not empty
                     $batch[] = [
-                        'no' => trim($row[0]) ?: null,
-                        'kode_cabang_induk' => trim($row[1]) ?: null,
-                        'cabang_induk' => trim($row[2]) ?: null,
-                        'perusahaan' => trim($row[3]) ?: null,
-                        'estimasi_pekerja' => trim($row[4]) ?: null,
+                        'kode_cabang_induk' => trim($row[0]) ?: null,
+                        'cabang_induk' => trim($row[1]) ?: null,
+                        'perusahaan' => trim($row[2]) ?: null,
+                        'estimasi_pekerja' => trim($row[3]) ?: null,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

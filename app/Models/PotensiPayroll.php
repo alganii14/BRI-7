@@ -10,7 +10,6 @@ class PotensiPayroll extends Model
     use HasFactory;
 
     protected $fillable = [
-        'no',
         'kode_cabang_induk',
         'cabang_induk',
         'perusahaan',

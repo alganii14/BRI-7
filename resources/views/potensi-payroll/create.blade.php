@@ -83,14 +83,6 @@
         @csrf
         
         <div class="form-group">
-            <label for="no">NO</label>
-            <input type="text" id="no" name="no" value="{{ old('no') }}">
-            @error('no')
-                <span class="error">{{ $message }}</span>
-            @enderror
-        </div>
-
-        <div class="form-group">
             <label for="kode_cabang_induk">Kode Cabang Induk</label>
             <input type="text" id="kode_cabang_induk" name="kode_cabang_induk" value="{{ old('kode_cabang_induk') }}">
             @error('kode_cabang_induk')

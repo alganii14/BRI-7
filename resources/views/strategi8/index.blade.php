@@ -207,14 +207,18 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Regional Office</th>
+                <th>Kode Cabang Induk</th>
                 <th>Cabang Induk</th>
+                <th>Kode Uker</th>
                 <th>Unit Kerja</th>
                 <th>CIFNO</th>
                 <th>No Rekening</th>
                 <th>Nama Nasabah</th>
-                <th>Product Type</th>
+                <th>Segmentasi</th>
+                <th>Jenis Simpanan</th>
+                <th>Saldo Last EOM</th>
                 <th>Saldo Terupdate</th>
+                <th>Delta</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -222,14 +226,18 @@
             @forelse($strategi8 as $index => $item)
             <tr>
                 <td>{{ $strategi8->firstItem() + $index }}</td>
-                <td>{{ $item->regional_office }}</td>
+                <td>{{ $item->kode_cabang_induk }}</td>
                 <td>{{ $item->cabang_induk }}</td>
+                <td>{{ $item->kode_uker }}</td>
                 <td>{{ $item->unit_kerja }}</td>
                 <td>{{ $item->cifno }}</td>
                 <td>{{ $item->no_rekening }}</td>
                 <td>{{ $item->nama_nasabah }}</td>
-                <td>{{ $item->product_type }}</td>
-                <td>{{ number_format((float)str_replace(['.', ',', ' '], '', $item->saldo_terupdate), 0, ',', '.') }}</td>
+                <td>{{ $item->segmentasi }}</td>
+                <td>{{ $item->jenis_simpanan }}</td>
+                <td>{{ $item->saldo_last_eom }}</td>
+                <td>{{ $item->saldo_terupdate }}</td>
+                <td>{{ $item->delta }}</td>
                 <td>
                     <div class="actions">
                         <a href="{{ route('strategi8.show', $item->id) }}" class="btn btn-sm btn-info">👁️ View</a>
@@ -244,7 +252,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="10" style="text-align: center; padding: 40px;">
+                <td colspan="14" style="text-align: center; padding: 40px;">
                     <p style="color: #999; font-size: 16px;">Tidak ada data strategi 8.</p>
                     <a href="{{ route('strategi8.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
                 </td>

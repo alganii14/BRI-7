@@ -207,7 +207,6 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>NO</th>
                 <th>Kode Cabang Induk</th>
                 <th>Cabang Induk</th>
                 <th>Perusahaan</th>
@@ -219,7 +218,6 @@
             @forelse($potensiPayrolls as $index => $item)
             <tr>
                 <td>{{ $potensiPayrolls->firstItem() + $index }}</td>
-                <td>{{ $item->no }}</td>
                 <td>{{ $item->kode_cabang_induk }}</td>
                 <td>{{ $item->cabang_induk }}</td>
                 <td>{{ $item->perusahaan }}</td>
@@ -238,7 +236,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="7" style="text-align: center; padding: 40px;">
+                <td colspan="6" style="text-align: center; padding: 40px;">
                     <p style="color: #999; font-size: 16px;">Tidak ada data potensi payroll.</p>
                     <a href="{{ route('potensi-payroll.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
                 </td>

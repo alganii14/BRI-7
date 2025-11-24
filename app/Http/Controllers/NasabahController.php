@@ -380,8 +380,10 @@ class NasabahController extends Controller
         
         if ($isPotensiPayroll) {
             // Potensi Payroll - struktur field berbeda
-            // Untuk Potensi Payroll, tampilkan semua data tanpa filter KC
-            // karena struktur data berbeda (per perusahaan, bukan per nasabah)
+            // Filter berdasarkan kode_cabang_induk sesuai dengan KC user
+            if ($kode_kc) {
+                $query->where('kode_cabang_induk', $kode_kc);
+            }
             
             // Order by id untuk konsistensi
             $query->orderBy('id', 'asc');
@@ -404,7 +406,6 @@ class NasabahController extends Controller
                             ->take($perPage)
                             ->get([
                                 'id',
-                                'no',
                                 'perusahaan',
                                 'kode_cabang_induk',
                                 'cabang_induk',
@@ -416,6 +417,7 @@ class NasabahController extends Controller
                                     'cifno' => '',
                                     'no_rekening' => '',
                                     'nama_nasabah' => $item->perusahaan,
+                                    'perusahaan' => $item->perusahaan,
                                     'kode_cabang_induk' => $item->kode_cabang_induk,
                                     'cabang_induk' => $item->cabang_induk,
                                     'kode_uker' => '',

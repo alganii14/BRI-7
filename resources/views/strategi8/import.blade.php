@@ -190,7 +190,23 @@
         <ul>
             <li>File harus dalam format CSV (.csv)</li>
             <li>Pastikan format CSV menggunakan semicolon (;) sebagai delimiter</li>
-            <li>Kolom CSV: Regional Office, Kode Cabang Induk, Cabang Induk, Kode Uker, Unit Kerja, CIFNO, No Rekening, YTD, Product Type, Nama Nasabah, Jenis Nasabah, Segmentasi BPR, Jenis Simpanan, Saldo Last EOM, Saldo Terupdate, Delta</li>
+            <li><strong>Kolom CSV (12 kolom):</strong></li>
+            <li style="margin-left: 20px; font-family: monospace; font-size: 13px;">
+                1. Kode Cabang Induk<br>
+                2. Cabang Induk<br>
+                3. Kode Uker<br>
+                4. Unit Kerja<br>
+                5. CIFNO<br>
+                6. No Rekening<br>
+                7. Nama Nasabah<br>
+                8. Segmentasi<br>
+                9. Jenis Simpanan<br>
+                10. Saldo Last EOM<br>
+                11. Saldo Terupdate<br>
+                12. Delta
+            </li>
+            <li>Header baris pertama akan diabaikan (skip)</li>
+            <li>Contoh format saldo: 1.020.786.175,99 atau -668.161.535,00</li>
         </ul>
     </div>
 

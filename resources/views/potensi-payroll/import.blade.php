@@ -190,7 +190,14 @@
         <ul>
             <li>File harus dalam format CSV (.csv)</li>
             <li>Pastikan format CSV sesuai dengan template yang ada</li>
-            <li>Kolom CSV: NO, Kode Cabang Induk, Cabang Induk, PERUSAHAAN, ESTIMASI PEKERJA</li>
+            <li><strong>Kolom CSV (4 kolom):</strong></li>
+            <li style="margin-left: 20px; font-family: monospace; font-size: 13px;">
+                1. Kode Cabang Induk<br>
+                2. Cabang Induk<br>
+                3. Perusahaan<br>
+                4. Estimasi Pekerja
+            </li>
+            <li>Header baris pertama akan diabaikan (skip)</li>
             <li>Gunakan delimiter semicolon (;) untuk memisahkan kolom</li>
         </ul>
     </div>

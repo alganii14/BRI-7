@@ -65,18 +65,14 @@ class Strategi8Controller extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'regional_office' => 'nullable|string',
             'kode_cabang_induk' => 'nullable|string',
             'cabang_induk' => 'nullable|string',
             'kode_uker' => 'nullable|string',
             'unit_kerja' => 'nullable|string',
             'cifno' => 'nullable|string',
             'no_rekening' => 'nullable|string',
-            'ytd' => 'nullable|string',
-            'product_type' => 'nullable|string',
             'nama_nasabah' => 'nullable|string',
-            'jenis_nasabah' => 'nullable|string',
-            'segmentasi_bpr' => 'nullable|string',
+            'segmentasi' => 'nullable|string',
             'jenis_simpanan' => 'nullable|string',
             'saldo_last_eom' => 'nullable|string',
             'saldo_terupdate' => 'nullable|string',
@@ -111,18 +107,14 @@ class Strategi8Controller extends Controller
     public function update(Request $request, Strategi8 $strategi8)
     {
         $validated = $request->validate([
-            'regional_office' => 'nullable|string',
             'kode_cabang_induk' => 'nullable|string',
             'cabang_induk' => 'nullable|string',
             'kode_uker' => 'nullable|string',
             'unit_kerja' => 'nullable|string',
             'cifno' => 'nullable|string',
             'no_rekening' => 'nullable|string',
-            'ytd' => 'nullable|string',
-            'product_type' => 'nullable|string',
             'nama_nasabah' => 'nullable|string',
-            'jenis_nasabah' => 'nullable|string',
-            'segmentasi_bpr' => 'nullable|string',
+            'segmentasi' => 'nullable|string',
             'jenis_simpanan' => 'nullable|string',
             'saldo_last_eom' => 'nullable|string',
             'saldo_terupdate' => 'nullable|string',
@@ -177,24 +169,20 @@ class Strategi8Controller extends Controller
             $totalInserted = 0;
 
             while (($row = fgetcsv($handle, 0, ';')) !== false) {
-                if (count($row) >= 16 && !empty(array_filter($row))) {
+                if (count($row) >= 12 && !empty(array_filter($row))) {
                     $batch[] = [
-                        'regional_office' => trim($row[0]) ?: null,
-                        'kode_cabang_induk' => trim($row[1]) ?: null,
-                        'cabang_induk' => trim($row[2]) ?: null,
-                        'kode_uker' => trim($row[3]) ?: null,
-                        'unit_kerja' => trim($row[4]) ?: null,
-                        'cifno' => trim($row[5]) ?: null,
-                        'no_rekening' => trim($row[6]) ?: null,
-                        'ytd' => trim($row[7]) ?: null,
-                        'product_type' => trim($row[8]) ?: null,
-                        'nama_nasabah' => trim($row[9]) ?: null,
-                        'jenis_nasabah' => trim($row[10]) ?: null,
-                        'segmentasi_bpr' => trim($row[11]) ?: null,
-                        'jenis_simpanan' => trim($row[12]) ?: null,
-                        'saldo_last_eom' => trim($row[13]) ?: null,
-                        'saldo_terupdate' => trim($row[14]) ?: null,
-                        'delta' => trim($row[15]) ?: null,
+                        'kode_cabang_induk' => trim($row[0]) ?: null,
+                        'cabang_induk' => trim($row[1]) ?: null,
+                        'kode_uker' => trim($row[2]) ?: null,
+                        'unit_kerja' => trim($row[3]) ?: null,
+                        'cifno' => trim($row[4]) ?: null,
+                        'no_rekening' => trim($row[5]) ?: null,
+                        'nama_nasabah' => trim($row[6]) ?: null,
+                        'segmentasi' => trim($row[7]) ?: null,
+                        'jenis_simpanan' => trim($row[8]) ?: null,
+                        'saldo_last_eom' => trim($row[9]) ?: null,
+                        'saldo_terupdate' => trim($row[10]) ?: null,
+                        'delta' => trim($row[11]) ?: null,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];
