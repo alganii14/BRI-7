@@ -5,6 +5,233 @@
 
 @push('styles')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+    /* Responsive Dashboard Styles */
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 8px 0 !important;
+        }
+        .page-header h2 {
+            font-size: 16px !important;
+            margin-bottom: 2px !important;
+        }
+        .page-header p {
+            font-size: 11px !important;
+        }
+        .dashboard-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+        }
+        .card {
+            padding: 12px !important;
+            margin-bottom: 12px !important;
+        }
+        .card h3 {
+            font-size: 14px !important;
+            margin-bottom: 8px !important;
+        }
+        .card p {
+            font-size: 12px !important;
+        }
+        .card p:first-of-type {
+            font-size: 28px !important;
+            margin: 8px 0 !important;
+        }
+        .dashboard-grid .card {
+            padding: 14px !important;
+        }
+        .filter-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+        }
+        .date-range-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+        }
+        .summary-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+        }
+        .summary-grid > div {
+            padding: 16px !important;
+        }
+        .summary-grid > div > div:first-child {
+            font-size: 12px !important;
+            margin-bottom: 6px !important;
+        }
+        .summary-grid > div > div:last-child {
+            font-size: 20px !important;
+        }
+        .form-group label {
+            font-size: 12px !important;
+            margin-bottom: 6px !important;
+        }
+        .form-control, select.form-control, input.form-control {
+            padding: 8px 10px !important;
+            font-size: 14px !important;
+        }
+        .btn {
+            width: 100%;
+            margin-bottom: 8px;
+            padding: 10px 20px !important;
+            font-size: 14px !important;
+        }
+        .card > div {
+            padding: 12px !important;
+        }
+        #targetRealisasiChartAdmin {
+            height: 250px !important;
+        }
+        .card > div > div[style*="position: relative; height: 350px"] {
+            height: 250px !important;
+        }
+        svg {
+            width: 14px !important;
+            height: 14px !important;
+        }
+        .filter-card {
+            margin-bottom: 10px !important;
+        }
+        .filter-card-inner {
+            padding: 10px !important;
+        }
+        .filter-card-inner > div:first-child {
+            margin-bottom: 8px !important;
+        }
+        .filter-card-inner > div:first-child svg {
+            width: 16px !important;
+            height: 16px !important;
+            margin-right: 6px !important;
+        }
+        .filter-card-inner h3 {
+            font-size: 14px !important;
+        }
+        .filter-card-inner .form-group {
+            margin-bottom: 8px !important;
+        }
+        .filter-card-inner .btn {
+            padding: 8px 14px !important;
+            font-size: 13px !important;
+        }
+        .filter-card-inner form > div {
+            gap: 8px !important;
+            margin-bottom: 8px !important;
+        }
+        .filter-card-inner form > div:last-child {
+            margin-bottom: 0 !important;
+            gap: 6px !important;
+        }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .filter-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+        .dashboard-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+    }
+    /* iPhone 12 Pro specific */
+    @media (min-width: 381px) and (max-width: 430px) {
+        .filter-grid,
+        .date-range-grid,
+        .dashboard-grid,
+        .summary-grid {
+            grid-template-columns: 1fr !important;
+        }
+        .filter-card-inner {
+            padding: 8px !important;
+        }
+        .filter-card-inner > div:first-child {
+            margin-bottom: 6px !important;
+        }
+        .filter-card-inner h3 {
+            font-size: 13px !important;
+        }
+        .form-group {
+            margin-bottom: 6px !important;
+        }
+        .form-group label {
+            font-size: 11px !important;
+            margin-bottom: 3px !important;
+        }
+        .form-control, select.form-control, input.form-control {
+            padding: 6px 8px !important;
+            font-size: 13px !important;
+        }
+        .filter-card-inner .btn {
+            padding: 7px 12px !important;
+            font-size: 12px !important;
+        }
+        .filter-card-inner form > div {
+            gap: 6px !important;
+            margin-bottom: 6px !important;
+        }
+        .card {
+            padding: 10px !important;
+        }
+        .dashboard-grid .card {
+            padding: 12px !important;
+        }
+    }
+    /* iPhone SE and smaller devices */
+    @media (max-width: 380px) {
+        .page-header h2 {
+            font-size: 14px !important;
+        }
+        .page-header p {
+            font-size: 9px !important;
+        }
+        .filter-card-inner {
+            padding: 6px !important;
+        }
+        .filter-card-inner h3 {
+            font-size: 12px !important;
+        }
+        .filter-card-inner .form-group {
+            margin-bottom: 5px !important;
+        }
+        .form-group label {
+            font-size: 10px !important;
+            margin-bottom: 2px !important;
+        }
+        .form-control, select.form-control, input.form-control {
+            padding: 5px 6px !important;
+            font-size: 12px !important;
+        }
+        .filter-card-inner .btn {
+            padding: 6px 10px !important;
+            font-size: 11px !important;
+        }
+        .card {
+            padding: 8px !important;
+        }
+        .dashboard-grid .card {
+            padding: 10px !important;
+        }
+        .card h3 {
+            font-size: 12px !important;
+        }
+        .card p:first-of-type {
+            font-size: 22px !important;
+        }
+        .summary-grid > div {
+            padding: 10px !important;
+        }
+        .summary-grid > div > div:first-child {
+            font-size: 10px !important;
+        }
+        .summary-grid > div > div:last-child {
+            font-size: 16px !important;
+        }
+        .filter-card-inner form > div {
+            gap: 5px !important;
+            margin-bottom: 5px !important;
+        }
+    }
+</style>
 @endpush
 
 @section('content')
@@ -14,8 +241,8 @@
 </div>
 
 <!-- Filter KC, RMFT, Bulan, dan Tahun -->
-<div class="card" style="margin-bottom: 24px; background: linear-gradient(135deg, #0066AE 0%, #004A7F 100%); border: none; box-shadow: 0 8px 24px rgba(0, 102, 174, 0.25);">
-    <div style="background: white; padding: 24px; border-radius: 8px;">
+<div class="card filter-card" style="margin-bottom: 24px; background: linear-gradient(135deg, #0066AE 0%, #004A7F 100%); border: none; box-shadow: 0 8px 24px rgba(0, 102, 174, 0.25);">
+    <div class="filter-card-inner" style="background: white; padding: 24px; border-radius: 8px;">
         <div style="display: flex; align-items: center; margin-bottom: 20px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#0066AE" viewBox="0 0 16 16" style="margin-right: 12px;">
                 <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
@@ -23,7 +250,7 @@
             <h3 style="margin: 0; color: #0066AE; font-weight: 700; font-size: 20px;">Filter Data</h3>
         </div>
         <form method="GET" action="{{ route('dashboard') }}" id="filterForm">
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="filter-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label for="kode_kc" style="display: block; margin-bottom: 8px; color: #004A7F; font-weight: 600; font-size: 14px;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 4px; vertical-align: text-top;">
@@ -96,7 +323,7 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="date-range-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label for="start_date" style="display: block; margin-bottom: 8px; color: #004A7F; font-weight: 600; font-size: 14px;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 4px; vertical-align: text-top;">
@@ -212,7 +439,7 @@
             $persenRealisasi = $totalTarget > 0 ? round(($totalRealisasi / $totalTarget) * 100, 1) : 0;
         @endphp
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+        <div class="summary-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px;">
             <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
                 <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Total Target</div>
                 <div style="font-size: 24px; font-weight: 700;">Rp {{ number_format($totalTarget / 1000000, 1) }} juta</div>

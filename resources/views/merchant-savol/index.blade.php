@@ -7,6 +7,7 @@
 <style>
     .table-container {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     table {
@@ -42,6 +43,7 @@
         text-decoration: none;
         display: inline-block;
         transition: all 0.3s;
+        white-space: nowrap;
     }
 
     .btn-primary {
@@ -87,6 +89,7 @@
     .actions {
         display: flex;
         gap: 8px;
+        flex-wrap: wrap;
     }
 
     .alert {
@@ -109,15 +112,21 @@
 
     .header-actions {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        flex-direction: column;
+        gap: 15px;
         margin-bottom: 20px;
+    }
+
+    .action-buttons {
+        display: flex;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
     .search-form {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
     .search-form input {
@@ -125,7 +134,13 @@
         border: 1px solid #ddd;
         border-radius: 6px;
         font-size: 14px;
-        min-width: 300px;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .search-form select {
+        flex: 1;
+        min-width: 120px;
     }
 
     .pagination-wrapper {
@@ -142,10 +157,63 @@
         font-size: 14px;
         margin: 0;
     }
+
+    @media (max-width: 768px) {
+        .btn {
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .search-form input,
+        .search-form select {
+            width: 100%;
+            min-width: unset;
+        }
+
+        .action-buttons {
+            width: 100%;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .btn {
+            padding: 8px 10px;
+            font-size: 12px;
+        }
+
+        th, td {
+            padding: 6px;
+            font-size: 11px;
+        }
+
+        .actions {
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .actions .btn-sm {
+            width: 100%;
+        }
+    }
 </style>
 
 <div class="header-actions">
-    <div style="display: flex; gap: 10px;">
+    <div class="action-buttons">
         @if($merchantSavols->total() > 0)
         <form action="{{ route('merchant-savol.delete-all') }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ PERHATIAN!\n\nAnda akan menghapus SEMUA data merchant savol ({{ number_format($merchantSavols->total(), 0, ',', '.') }} baris).\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda yakin ingin melanjutkan?')">
             @csrf
@@ -163,8 +231,8 @@
         </a>
     </div>
     
-    <form method="GET" action="{{ route('merchant-savol.index') }}" class="search-form" style="display:flex;gap:10px;align-items:end;">
-        <div style="flex:1;">
+    <form method="GET" action="{{ route('merchant-savol.index') }}" class="search-form">
+        <div style="flex:1;min-width:120px;">
             <select name="year" style="width:100%;padding:10px 16px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:white;">
                 <option value="">Semua Tahun</option>
                 @foreach($availableYears as $availableYear)
@@ -172,7 +240,7 @@
                 @endforeach
             </select>
         </div>
-        <div style="flex:1;">
+        <div style="flex:1;min-width:120px;">
             <select name="month" style="width:100%;padding:10px 16px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:white;">
                 <option value="">Semua Bulan</option>
                 @for($i=1;$i<=12;$i++)
@@ -180,9 +248,7 @@
                 @endfor
             </select>
         </div>
-        <div style="flex:2;">
-            <input type="text" name="search" placeholder="Cari merchant, TID/Store ID, rekening, CIF, atau unit..." value="{{ request('search') }}" style="width:100%;">
-        </div>
+        <input type="text" name="search" placeholder="Cari merchant, TID/Store ID, rekening, CIF, atau unit..." value="{{ request('search') }}">
         <button type="submit" class="btn btn-primary">🔍 Cari</button>
         @if(request('search') || request('month') || request('year'))
             <a href="{{ route('merchant-savol.index') }}" class="btn btn-warning">✖ Reset</a>

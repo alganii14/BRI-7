@@ -183,10 +183,14 @@ class UkerController extends Controller
     public function deleteAll()
     {
         try {
+            \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
             Uker::truncate();
+            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+            
             return redirect()->route('uker.index')
                 ->with('success', 'Semua data Uker berhasil dihapus!');
         } catch (\Exception $e) {
+            \DB::statement('SET FOREIGN_KEY_CHECKS=1;'); // Pastikan di-enable kembali
             return redirect()->route('uker.index')
                 ->with('error', 'Gagal menghapus data: ' . $e->getMessage());
         }

@@ -146,10 +146,30 @@
     }
 
     .header-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
         margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .btn {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+        
+        .header-actions {
+            gap: 10px !important;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .btn {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
     }
 
     .pagination-wrapper {
@@ -443,7 +463,7 @@ document.getElementById('kode_kc').addEventListener('change', function() {
 @endif
 
 <div class="card">
-    <div class="header-actions">
+    <div class="header-actions" style="display: flex; flex-direction: column; gap: 15px;">
         <div>
             <h3 style="margin: 0 0 5px 0;">Daftar Pipeline</h3>
             <p style="margin: 0; color: #666; font-size: 14px;">
@@ -454,11 +474,11 @@ document.getElementById('kode_kc').addEventListener('change', function() {
                 @endif
             </p>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
             @if(auth()->user()->isAdmin())
-            <button onclick="toggleRekapTable()" class="btn btn-info">📊 Rekap</button>
+            <button onclick="toggleRekapTable()" class="btn btn-info" style="white-space: nowrap;">📊 Rekap</button>
             <div style="position: relative;">
-                <button onclick="toggleExportDropdown()" class="btn btn-success" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); display: flex; align-items: center; gap: 8px; color: white;">
+                <button onclick="toggleExportDropdown()" class="btn btn-success" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); display: flex; align-items: center; gap: 8px; color: white; white-space: nowrap;">
                     <span>📥</span>
                     <span>Export</span>
                     <span style="font-size: 10px;">▼</span>
@@ -473,14 +493,14 @@ document.getElementById('kode_kc').addEventListener('change', function() {
                 </div>
             </div>
             @endif
-            <a href="{{ route('aktivitas.create') }}" class="btn btn-primary">+ Tambah Pipeline</a>
+            <a href="{{ route('aktivitas.create') }}" class="btn btn-primary" style="white-space: nowrap;">+ Tambah Pipeline</a>
             @if(auth()->user()->isRMFT())
-            <a href="{{ route('aktivitas.sick-leave.form') }}" class="btn" style="background: linear-gradient(135deg, #FF6B6B 0%, #EE5A52 100%); color: white;">
+            <a href="{{ route('aktivitas.sick-leave.form') }}" class="btn" style="background: linear-gradient(135deg, #FF6B6B 0%, #EE5A52 100%); color: white; white-space: nowrap;">
                 🏥 Tandai Sakit/Izin
             </a>
             @endif
             @if(auth()->user()->isAdmin())
-            <button onclick="openDeleteAllModal()" class="btn" style="background: linear-gradient(135deg, #e53935 0%, #c62828 100%); color: white;">
+            <button onclick="openDeleteAllModal()" class="btn" style="background: linear-gradient(135deg, #e53935 0%, #c62828 100%); color: white; white-space: nowrap;">
                 🗑️ Hapus Semua Data
             </button>
             @endif
