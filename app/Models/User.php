@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'password_changed_at',
         'photo',
         'role',
         'rmft_id',
@@ -46,6 +47,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password_changed_at' => 'datetime',
     ];
     
     /**
@@ -78,5 +80,19 @@ class User extends Authenticatable
     public function rmftData()
     {
         return $this->belongsTo(RMFT::class, 'rmft_id');
+    }
+    
+    /**
+     * Check if user needs to change password
+     */
+    public function needsPasswordChange()
+    {
+        // Hanya untuk manager dan rmft
+        if (!in_array($this->role, ['manager', 'rmft'])) {
+            return false;
+        }
+        
+        // Jika password_changed_at null, berarti belum pernah ganti password
+        return is_null($this->password_changed_at);
     }
 }

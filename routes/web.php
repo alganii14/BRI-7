@@ -28,6 +28,7 @@ use App\Http\Controllers\AumDpkController;
 use App\Http\Controllers\UserAktifCasaKecilController;
 use App\Http\Controllers\LayeringController;
 use App\Http\Controllers\RekapController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,7 +52,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Protected Routes (require authentication)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'check.password.changed'])->group(function () {
     // Dashboard - accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
@@ -79,6 +80,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::post('profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::post('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    
+    // Notification Routes - All authenticated users
+    Route::get('api/notifications/count', [NotificationController::class, 'getUnreadCount'])->name('api.notifications.count');
+    Route::get('api/notifications', [NotificationController::class, 'getNotifications'])->name('api.notifications');
     
     // API for nasabah autocomplete
     Route::get('api/nasabah/search', [NasabahController::class, 'searchByNorek'])->name('api.nasabah.search');

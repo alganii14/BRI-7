@@ -396,6 +396,142 @@
             min-width: max-content;
         }
 
+        /* Notification Styles */
+        .notification-container {
+            position: relative;
+        }
+
+        .notification-bell {
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-bell:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .notification-bell svg {
+            color: #333;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: #f44336;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 360px;
+            max-height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .notification-dropdown.show {
+            display: block;
+        }
+
+        .notification-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(135deg, #0066CC 0%, #003D82 100%);
+        }
+
+        .notification-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .notification-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item.warning {
+            border-left: 4px solid #ff9800;
+        }
+
+        .notification-item.info {
+            border-left: 4px solid #2196F3;
+        }
+
+        .notification-item.success {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .notification-link {
+            display: inline-block;
+            font-size: 13px;
+            color: #0066CC;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .notification-link:hover {
+            text-decoration: underline;
+        }
+
+        .notification-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+        }
+
         .user-info {
             display: flex;
             align-items: center;
@@ -661,6 +797,20 @@
             .table th,
             .table td {
                 padding: 8px 10px;
+            }
+
+            .notification-dropdown {
+                width: 300px;
+                right: -20px;
+            }
+
+            .notification-bell {
+                padding: 6px;
+            }
+
+            .notification-bell svg {
+                width: 20px;
+                height: 20px;
             }
         }
     </style>
@@ -1196,6 +1346,24 @@
                     <h1>@yield('page-title', 'Dashboard')</h1>
                 </div>
                 <div class="navbar-right">
+                    <!-- Notification Bell -->
+                    <div class="notification-container">
+                        <button class="notification-bell" id="notificationBell" onclick="toggleNotifications()">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                        </button>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="notification-header">
+                                <h3>Notifikasi</h3>
+                            </div>
+                            <div class="notification-list" id="notificationList">
+                                <div class="notification-empty">Tidak ada notifikasi</div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="user-info">
                         <div class="user-avatar">
                             @if(Auth::user()->photo)
@@ -1282,7 +1450,70 @@
                 sidebar.classList.add('hidden');
                 mainContent.classList.add('expanded');
             }
+            
+            // Load notifications
+            loadNotifications();
         });
+
+        // Notification functions
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notificationDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close notification dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const notificationContainer = document.querySelector('.notification-container');
+            const notificationBell = document.getElementById('notificationBell');
+            
+            if (notificationContainer && !notificationContainer.contains(event.target)) {
+                const dropdown = document.getElementById('notificationDropdown');
+                dropdown.classList.remove('show');
+            }
+        });
+
+        function loadNotifications() {
+            // Load notification count
+            fetch('{{ route("api.notifications.count") }}')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('notificationBadge');
+                    if (data.count > 0) {
+                        badge.textContent = data.count;
+                        badge.style.display = 'block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Error loading notification count:', error));
+
+            // Load notifications
+            fetch('{{ route("api.notifications") }}')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationList = document.getElementById('notificationList');
+                    
+                    if (data.notifications && data.notifications.length > 0) {
+                        notificationList.innerHTML = '';
+                        data.notifications.forEach(notification => {
+                            const item = document.createElement('div');
+                            item.className = `notification-item ${notification.type}`;
+                            item.innerHTML = `
+                                <div class="notification-title">${notification.title}</div>
+                                <div class="notification-message">${notification.message}</div>
+                                <a href="${notification.link}" class="notification-link">${notification.link_text}</a>
+                            `;
+                            notificationList.appendChild(item);
+                        });
+                    } else {
+                        notificationList.innerHTML = '<div class="notification-empty">Tidak ada notifikasi</div>';
+                    }
+                })
+                .catch(error => console.error('Error loading notifications:', error));
+        }
+
+        // Reload notifications every 5 minutes
+        setInterval(loadNotifications, 300000);
     </script>
 
     @stack('scripts')

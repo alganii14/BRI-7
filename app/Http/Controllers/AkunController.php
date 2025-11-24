@@ -76,6 +76,8 @@ class AkunController extends Controller
         ]);
         
         $validated['password'] = Hash::make($validated['password']);
+        // Set password_changed_at to null untuk akun baru (password default)
+        $validated['password_changed_at'] = null;
         
         User::create($validated);
         
@@ -122,6 +124,8 @@ class AkunController extends Controller
         // Update password hanya jika diisi
         if (!empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
+            // Reset password_changed_at jika admin mengubah password
+            $validated['password_changed_at'] = null;
         } else {
             unset($validated['password']);
         }

@@ -72,6 +72,16 @@
         color: white;
     }
 
+    .badge-success {
+        background-color: #4caf50;
+        color: white;
+    }
+
+    .badge-warning {
+        background-color: #ff9800;
+        color: white;
+    }
+
     .section-title {
         font-size: 18px;
         font-weight: 600;
@@ -262,6 +272,9 @@
                     <th>NAMA</th>
                     <th>EMAIL</th>
                     <th>ROLE</th>
+                    @if(auth()->user()->isAdmin())
+                    <th>STATUS PASSWORD</th>
+                    @endif
                     <th>DIBUAT</th>
                     @if(auth()->user()->isAdmin())
                     <th>AKSI</th>
@@ -275,6 +288,16 @@
                     <td>{{ $manager->name }}</td>
                     <td>{{ $manager->email }}</td>
                     <td><span class="badge badge-manager">MANAGER</span></td>
+                    @if(auth()->user()->isAdmin())
+                    <td>
+                        @if($manager->password_changed_at)
+                            <span class="badge badge-success">✓ Sudah Diubah</span>
+                            <br><small style="color: #666;">{{ $manager->password_changed_at->format('d/m/Y H:i') }}</small>
+                        @else
+                            <span class="badge badge-warning">⚠ Password Default</span>
+                        @endif
+                    </td>
+                    @endif
                     <td>{{ $manager->created_at->format('d/m/Y H:i') }}</td>
                     @if(auth()->user()->isAdmin())
                     <td>
@@ -295,7 +318,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="{{ auth()->user()->isAdmin() ? '6' : '5' }}" style="text-align: center; padding: 40px; color: #666;">
+                    <td colspan="{{ auth()->user()->isAdmin() ? '7' : '5' }}" style="text-align: center; padding: 40px; color: #666;">
                         Tidak ada akun manager
                     </td>
                 </tr>
@@ -325,6 +348,9 @@
                     <th>KANCA</th>
                     <th>KELOMPOK</th>
                     <th>ROLE</th>
+                    @if(auth()->user()->isAdmin())
+                    <th>STATUS PASSWORD</th>
+                    @endif
                     <th>DIBUAT</th>
                     @if(auth()->user()->isAdmin())
                     <th>AKSI</th>
@@ -341,6 +367,16 @@
                     <td>{{ $rmft->rmftData->kanca ?? '-' }}</td>
                     <td>{{ $rmft->rmftData->kelompok_jabatan ?? '-' }}</td>
                     <td><span class="badge badge-rmft">RMFT</span></td>
+                    @if(auth()->user()->isAdmin())
+                    <td>
+                        @if($rmft->password_changed_at)
+                            <span class="badge badge-success">✓ Sudah Diubah</span>
+                            <br><small style="color: #666;">{{ $rmft->password_changed_at->format('d/m/Y H:i') }}</small>
+                        @else
+                            <span class="badge badge-warning">⚠ Password Default</span>
+                        @endif
+                    </td>
+                    @endif
                     <td>{{ $rmft->created_at->format('d/m/Y H:i') }}</td>
                     @if(auth()->user()->isAdmin())
                     <td>
@@ -361,7 +397,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="{{ auth()->user()->isAdmin() ? '9' : '8' }}" style="text-align: center; padding: 40px; color: #666;">
+                    <td colspan="{{ auth()->user()->isAdmin() ? '10' : '8' }}" style="text-align: center; padding: 40px; color: #666;">
                         Tidak ada akun RMFT
                     </td>
                 </tr>
