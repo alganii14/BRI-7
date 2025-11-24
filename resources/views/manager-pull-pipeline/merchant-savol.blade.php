@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pull of Pipeline - Merchant Savol')
-@section('page-title', 'Pull of Pipeline - Merchant Savol Besar Casa Kecil (Qris & EDC)')
+@section('title', 'Merchant Savol')
+@section('page-title', 'Merchant Savol Besar Casa Kecil (Qris & EDC)')
 
 @section('content')
 <style>

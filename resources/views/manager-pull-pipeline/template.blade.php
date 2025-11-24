@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pull of Pipeline - ' . $title)
-@section('page-title', 'Pull of Pipeline - ' . $title)
+@section('title', $title)
+@section('page-title', $title)
 
 @section('content')
 <style>

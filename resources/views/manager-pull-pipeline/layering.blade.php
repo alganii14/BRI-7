@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pull of Pipeline - Layering')
-@section('page-title', 'Pull of Pipeline - Layering Wingback')
+@section('title', 'Layering')
+@section('page-title', 'Layering Wingback')
 
 @section('content')
 @include('manager-pull-pipeline.partials.read-only-table', [

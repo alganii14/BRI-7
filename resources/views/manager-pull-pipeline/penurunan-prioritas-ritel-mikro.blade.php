@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pull of Pipeline - Penurunan Prioritas Ritel Mikro')
-@section('page-title', 'Pull of Pipeline - Penurunan Prioritas Ritel & Mikro')
+@section('title', 'Penurunan Prioritas Ritel Mikro')
+@section('page-title', 'Penurunan Prioritas Ritel & Mikro')
 
 @section('content')
 @include('manager-pull-pipeline.partials.read-only-table', [

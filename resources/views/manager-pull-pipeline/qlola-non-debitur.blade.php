@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pull of Pipeline - Qlola Non Debitur')
-@section('page-title', 'Pull of Pipeline - Qlola Non Debitur')
+@section('title', 'Qlola Non Debitur')
+@section('page-title', 'Qlola Non Debitur')
 
 @section('content')
 <style>

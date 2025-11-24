@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pull of Pipeline - AUM DPK')
-@section('page-title', 'Pull of Pipeline - AUM>2M DPK<50 juta')
+@section('title', 'AUM DPK')
+@section('page-title', 'AUM>2M DPK<50 juta')
 
 @section('content')
 @include('manager-pull-pipeline.partials.read-only-table', [

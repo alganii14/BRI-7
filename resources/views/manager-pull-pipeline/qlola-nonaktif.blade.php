@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pull of Pipeline - Qlola Nonaktif')
-@section('page-title', 'Pull of Pipeline - Qlola (Belum ada Qlola / ada namun nonaktif)')
+@section('title', 'Qlola Nonaktif')
+@section('page-title', 'Qlola (Belum ada Qlola / ada namun nonaktif)')
 
 @section('content')
 <style>

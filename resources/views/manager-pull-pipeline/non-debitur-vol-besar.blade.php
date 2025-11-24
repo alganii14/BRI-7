@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pull of Pipeline - Non Debitur Vol Besar')
-@section('page-title', 'Pull of Pipeline - Non Debitur Vol Besar CASA Kecil')
+@section('title', 'Non Debitur Vol Besar')
+@section('page-title', 'Non Debitur Vol Besar CASA Kecil')
 
 @section('content')
 <style>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Pull of Pipeline - Existing Payroll')
-@section('page-title', 'Pull of Pipeline - Existing Payroll')
+@section('title', 'Existing Payroll')
+@section('page-title', 'Existing Payroll')
 
 @section('content')
 @include('manager-pull-pipeline.partials.read-only-table', [
