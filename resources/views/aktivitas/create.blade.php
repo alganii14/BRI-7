@@ -381,11 +381,6 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <label>KETERANGAN</label>
-            <textarea name="keterangan" id="keterangan" rows="3" placeholder="Pilih RMFT terlebih dahulu" disabled>{{ old('keterangan') }}</textarea>
-        </div>
-
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Simpan Aktivitas</button>
             <a href="{{ route('aktivitas.index') }}" class="btn btn-secondary">Batal</a>
@@ -683,8 +678,6 @@
         document.getElementById('nama_nasabah_baru').placeholder = 'Pilih RMFT terlebih dahulu';
         document.getElementById('rp_jumlah_baru').disabled = true;
         document.getElementById('rp_jumlah_baru').placeholder = 'Pilih RMFT terlebih dahulu';
-        document.getElementById('keterangan').disabled = true;
-        document.getElementById('keterangan').placeholder = 'Pilih RMFT terlebih dahulu';
     }
     
     // Function to enable Data Aktivitas fields
@@ -752,9 +745,6 @@
         document.getElementById('nama_nasabah_baru').placeholder = 'Masukkan nama nasabah';
         document.getElementById('rp_jumlah_baru').disabled = false;
         document.getElementById('rp_jumlah_baru').placeholder = 'Masukkan jumlah';
-        
-        document.getElementById('keterangan').disabled = false;
-        document.getElementById('keterangan').placeholder = 'Keterangan tambahan (opsional)';
     }
     
     // Function to toggle between Nasabah Baru and Nasabah Lama forms

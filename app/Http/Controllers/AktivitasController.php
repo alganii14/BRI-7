@@ -467,12 +467,13 @@ class AktivitasController extends Controller
         
         $validated = $request->validate([
             'tanggal' => 'required|date',
+            'strategy_pipeline' => 'nullable|string',
             'kategori_strategi' => 'nullable|string',
             'rencana_aktivitas' => 'nullable|string',
             'rencana_aktivitas_id' => 'nullable|exists:rencana_aktivitas,id',
             'segmen_nasabah' => 'required|string',
             'nama_nasabah' => 'required|string',
-            'norek' => 'required|string',
+            'norek' => 'nullable|string',
             'rp_jumlah' => 'required|string',
             'keterangan' => 'nullable|string',
         ]);
@@ -556,7 +557,30 @@ class AktivitasController extends Controller
             'keterangan_realisasi' => 'nullable|string',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
+        ], [
+            'nominal_realisasi.required_if' => 'Nominal realisasi harus diisi.',
         ]);
+        
+        // Validasi custom berdasarkan status realisasi
+        if (isset($validated['nominal_realisasi'])) {
+            // Hapus format Rupiah untuk perbandingan (hapus "Rp", ".", dll)
+            $nominalRealisasi = (int) preg_replace('/[^0-9]/', '', $validated['nominal_realisasi']);
+            $targetNominal = (int) preg_replace('/[^0-9]/', '', $aktivitas->rp_jumlah);
+            
+            // Jika status "tidak_tercapai", nominal tidak boleh melebihi target
+            if ($validated['status_realisasi'] === 'tidak_tercapai' && $nominalRealisasi > $targetNominal) {
+                return back()->withErrors([
+                    'nominal_realisasi' => 'Realisasi tidak boleh melebihi target karena status "Tidak Tercapai"! Target: Rp ' . number_format($targetNominal, 0, ',', '.')
+                ])->withInput();
+            }
+            
+            // Jika status "lebih", nominal harus lebih besar dari target
+            if ($validated['status_realisasi'] === 'lebih' && $nominalRealisasi <= $targetNominal) {
+                return back()->withErrors([
+                    'nominal_realisasi' => 'Realisasi harus lebih besar dari target karena status "Melebihi Target"! Target: Rp ' . number_format($targetNominal, 0, ',', '.')
+                ])->withInput();
+            }
+        }
         
         // Jika tercapai, gunakan rp_jumlah sebagai nominal_realisasi
         if ($validated['status_realisasi'] === 'tercapai') {

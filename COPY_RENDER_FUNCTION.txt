@@ -1,0 +1,12 @@
+Fungsi renderNasabahList dari create.blade.php dimulai dari baris 1014
+Fungsi ini menangani semua strategi dengan kolom yang berbeda-beda
+
+Untuk edit.blade.php, saya perlu replace fungsi renderNasabahList yang sederhana dengan yang kompleks dari create
+
+Lokasi di edit.blade.php: sekitar baris 404-432
+
+Fungsi yang perlu dicopy mencakup:
+1. Deteksi semua strategi (isMerchantSavol, isPenurunanMerchant, dll)
+2. Build header table sesuai strategi
+3. Build body table dengan data sesuai kolom strategi
+4. Tombol pilih dengan selectNasabahByIndex()

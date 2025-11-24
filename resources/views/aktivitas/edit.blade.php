@@ -142,15 +142,25 @@
 
         <div class="form-group">
             <label>STRATEGY PULL OF PIPELINE</label>
-            <input type="text" value="{{ $aktivitas->strategy_pipeline ?? '-' }}" disabled>
+            <select name="strategy_pipeline" id="strategy_pipeline">
+                <option value="">Pilih Strategy Pull of Pipeline</option>
+                <option value="Strategi 1" {{ old('strategy_pipeline', $aktivitas->strategy_pipeline) == 'Strategi 1' ? 'selected' : '' }}>Strategi 1 - Optimalisasi Digital Channel</option>
+                <option value="Strategi 2" {{ old('strategy_pipeline', $aktivitas->strategy_pipeline) == 'Strategi 2' ? 'selected' : '' }}>Strategi 2 - Rekening Debitur Transaksi</option>
+                <option value="Strategi 3" {{ old('strategy_pipeline', $aktivitas->strategy_pipeline) == 'Strategi 3' ? 'selected' : '' }}>Strategi 3 - Optimalisasi Business Cluster</option>
+                <option value="Strategi 4" {{ old('strategy_pipeline', $aktivitas->strategy_pipeline) == 'Strategi 4' ? 'selected' : '' }}>Strategi 4 - Peningkatan Payroll Berkualitas</option>
+                <option value="Strategi 6" {{ old('strategy_pipeline', $aktivitas->strategy_pipeline) == 'Strategi 6' ? 'selected' : '' }}>Strategi 6 - Kolaborasi Perusahaan Anak</option>
+                <option value="Strategi 7" {{ old('strategy_pipeline', $aktivitas->strategy_pipeline) == 'Strategi 7' ? 'selected' : '' }}>Strategi 7 - Reaktivasi Rekening Dormant & Rekening Tidak Berkualitas</option>
+                <option value="Strategi 8" {{ old('strategy_pipeline', $aktivitas->strategy_pipeline) == 'Strategi 8' ? 'selected' : '' }}>Strategi 8 - Penguatan Produk & Fungsi RM</option>
+                <option value="Layering" {{ old('strategy_pipeline', $aktivitas->strategy_pipeline) == 'Layering' ? 'selected' : '' }}>Layering</option>
+            </select>
         </div>
 
-        @if($aktivitas->kategori_strategi)
-        <div class="form-group">
+        <div class="form-group" id="kategori_group" style="{{ $aktivitas->kategori_strategi ? '' : 'display: none;' }}">
             <label>KATEGORI</label>
-            <input type="text" name="kategori_strategi" value="{{ old('kategori_strategi', $aktivitas->kategori_strategi) }}" readonly>
+            <select name="kategori_strategi" id="kategori_strategi">
+                <option value="">Pilih Kategori</option>
+            </select>
         </div>
-        @endif
 
         <div class="form-group">
             <label>RENCANA AKTIVITAS <span style="color: red;">*</span></label>
@@ -170,7 +180,7 @@
         <div class="form-row">
             <div class="form-group">
                 <label>SEGMEN NASABAH <span style="color: red;">*</span></label>
-                <select name="segmen_nasabah" required>
+                <select name="segmen_nasabah" id="segmen_nasabah" required>
                     <option value="">Pilih Segmen</option>
                     <option value="Ritel Badan Usaha" {{ old('segmen_nasabah', $aktivitas->segmen_nasabah) == 'Ritel Badan Usaha' ? 'selected' : '' }}>Ritel Badan Usaha</option>
                     <option value="SME" {{ old('segmen_nasabah', $aktivitas->segmen_nasabah) == 'SME' ? 'selected' : '' }}>SME</option>
@@ -184,18 +194,59 @@
             </div>
 
             <div class="form-group">
-                <label>NAMA NASABAH <span style="color: red;">*</span></label>
-                <input type="text" name="nama_nasabah" value="{{ old('nama_nasabah', $aktivitas->nama_nasabah) }}" required>
+                <label>TIPE PIPELINE <span style="color: red;">*</span></label>
+                <select name="tipe_nasabah" id="tipe_nasabah" required onchange="toggleNasabahForm()">
+                    <option value="">Pilih Tipe</option>
+                    <option value="lama" {{ old('tipe_nasabah', $aktivitas->tipe ?? 'lama') == 'lama' ? 'selected' : '' }}>Di dalam Pipeline</option>
+                    <option value="baru" {{ old('tipe_nasabah', $aktivitas->tipe ?? 'lama') == 'baru' ? 'selected' : '' }}>Di luar Pipeline</option>
+                </select>
             </div>
+        </div>
 
-            <div class="form-group">
-                <label>CIFNO <span style="color: red;">*</span></label>
-                <input type="text" name="norek" value="{{ old('norek', $aktivitas->norek) }}" required placeholder="CIFNO nasabah">
+        <!-- Form untuk Nasabah Lama (dari Pipeline) -->
+        <div id="form_nasabah_lama" style="display: {{ old('tipe_nasabah', $aktivitas->tipe ?? 'lama') == 'lama' ? 'block' : 'none' }};">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>CARI NASABAH</label>
+                    <div style="position: relative;">
+                        <input type="text" id="norek" name="norek" value="{{ old('norek', $aktivitas->norek) }}" placeholder="Klik tombol cari untuk memilih nasabah" autocomplete="off" style="padding-right: 45px;">
+                        <button type="button" onclick="openNasabahModal()" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>NAMA NASABAH <span style="color: red;">*</span></label>
+                    <input type="text" id="nama_nasabah" name="nama_nasabah" value="{{ old('nama_nasabah', $aktivitas->nama_nasabah) }}" placeholder="Masukkan nama nasabah" required>
+                </div>
+
+                <div class="form-group">
+                    <label>RP / JUMLAH <span style="color: red;">*</span></label>
+                    <input type="text" id="rp_jumlah" name="rp_jumlah" value="{{ old('rp_jumlah', $aktivitas->rp_jumlah) }}" placeholder="Masukkan jumlah" required>
+                </div>
             </div>
+        </div>
 
-            <div class="form-group">
-                <label>RP / JUMLAH <span style="color: red;">*</span></label>
-                <input type="text" name="rp_jumlah" value="{{ old('rp_jumlah', $aktivitas->rp_jumlah) }}" required>
+        <!-- Form untuk Nasabah Baru (di luar Pipeline) -->
+        <div id="form_nasabah_baru" style="display: {{ old('tipe_nasabah', $aktivitas->tipe ?? 'lama') == 'baru' ? 'block' : 'none' }};">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>NO. REKENING / CIFNO <span style="color: red;">*</span></label>
+                    <input type="text" id="norek_baru" name="norek_baru" value="{{ old('norek_baru', $aktivitas->norek) }}" placeholder="Masukkan nomor rekening">
+                </div>
+
+                <div class="form-group">
+                    <label>NAMA NASABAH <span style="color: red;">*</span></label>
+                    <input type="text" id="nama_nasabah_baru" name="nama_nasabah_baru" value="{{ old('nama_nasabah_baru', $aktivitas->nama_nasabah) }}" placeholder="Masukkan nama nasabah">
+                </div>
+
+                <div class="form-group">
+                    <label>RP / JUMLAH <span style="color: red;">*</span></label>
+                    <input type="text" id="rp_jumlah_baru" name="rp_jumlah_baru" value="{{ old('rp_jumlah_baru', $aktivitas->rp_jumlah) }}" placeholder="Masukkan jumlah">
+                </div>
             </div>
         </div>
 
@@ -205,18 +256,502 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Update Aktivitas</button>
+            <button type="submit" class="btn btn-primary" onclick="console.log('Submit button clicked')">Update Aktivitas</button>
             <a href="{{ route('aktivitas.index') }}" class="btn btn-secondary">Batal</a>
         </div>
     </form>
 </div>
 
 <script>
+    // Debug form submission dan sync field values
+    document.querySelector('form').addEventListener('submit', function(e) {
+        console.log('Form is being submitted');
+        
+        const tipeNasabah = document.getElementById('tipe_nasabah').value;
+        
+        // Sync values based on tipe nasabah
+        if (tipeNasabah === 'baru') {
+            // Copy dari form baru ke form lama (yang akan di-submit)
+            document.getElementById('norek').value = document.getElementById('norek_baru').value;
+            document.getElementById('nama_nasabah').value = document.getElementById('nama_nasabah_baru').value;
+            document.getElementById('rp_jumlah').value = document.getElementById('rp_jumlah_baru').value;
+        }
+        
+        console.log('norek:', document.getElementById('norek').value);
+        console.log('nama_nasabah:', document.getElementById('nama_nasabah').value);
+        console.log('rp_jumlah:', document.getElementById('rp_jumlah').value);
+    });
+
     // Event listener untuk update hidden field rencana_aktivitas
     document.querySelector('select[name="rencana_aktivitas_id"]').addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         const namaRencana = selectedOption.getAttribute('data-nama') || selectedOption.text;
         document.querySelector('input[name="rencana_aktivitas"]').value = namaRencana;
     });
+
+    // Mapping kategori berdasarkan strategy
+    const kategoriMap = {
+        'Strategi 1': [
+            'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)',
+            'PENURUNAN CASA MERCHANT (QRIS & EDC)',
+            'PENURUNAN CASA BRILINK',
+            'Qlola Non Debitur',
+            'Non Debitur Vol Besar CASA Kecil'
+        ],
+        'Strategi 2': [
+            'Qlola (Belum ada Qlola / ada namun nonaktif)',
+            'User Aktif Casa Kecil'
+        ],
+        'Strategi 3': ['Optimalisasi Business Cluster'],
+        'Strategi 4': ['Existing Payroll', 'Potensi Payroll'],
+        'Strategi 6': ['List Perusahaan Anak'],
+        'Strategi 7': [
+            'Penurunan Prioritas Ritel & Mikro',
+            'AUM>2M DPK<50 juta'
+        ],
+        'Strategi 8': ['Wingback'],
+        'Layering': ['Layering']
+    };
+
+    const strategySelect = document.getElementById('strategy_pipeline');
+    const kategoriSelect = document.getElementById('kategori_strategi');
+    const kategoriGroup = document.getElementById('kategori_group');
+    const currentKategori = '{{ old("kategori_strategi", $aktivitas->kategori_strategi) }}';
+
+    // Update kategori saat strategy berubah
+    strategySelect.addEventListener('change', function() {
+        const strategy = this.value;
+        
+        // Reset kategori
+        kategoriSelect.innerHTML = '<option value="">Pilih Kategori</option>';
+        
+        if (kategoriMap[strategy]) {
+            kategoriGroup.style.display = 'block';
+            kategoriMap[strategy].forEach(function(kategori) {
+                const option = document.createElement('option');
+                option.value = kategori;
+                option.textContent = kategori;
+                kategoriSelect.appendChild(option);
+            });
+        } else {
+            kategoriGroup.style.display = 'none';
+        }
+    });
+
+    // Set kategori saat halaman load
+    function loadKategoriOptions() {
+        if (strategySelect.value) {
+            const strategy = strategySelect.value;
+            
+            // Reset kategori dropdown
+            kategoriSelect.innerHTML = '<option value="">Pilih Kategori</option>';
+            
+            if (kategoriMap[strategy]) {
+                kategoriGroup.style.display = 'block';
+                kategoriMap[strategy].forEach(function(kategori) {
+                    const option = document.createElement('option');
+                    option.value = kategori;
+                    option.textContent = kategori;
+                    if (kategori === currentKategori) {
+                        option.selected = true;
+                    }
+                    kategoriSelect.appendChild(option);
+                });
+            } else {
+                kategoriGroup.style.display = 'none';
+            }
+        }
+    }
+    
+    // Load kategori saat halaman pertama kali dibuka
+    loadKategoriOptions();
+
+    // Toggle between Nasabah Lama and Nasabah Baru forms
+    function toggleNasabahForm() {
+        const tipeNasabah = document.getElementById('tipe_nasabah').value;
+        const formLama = document.getElementById('form_nasabah_lama');
+        const formBaru = document.getElementById('form_nasabah_baru');
+        
+        if (tipeNasabah === 'lama') {
+            formLama.style.display = 'block';
+            formBaru.style.display = 'none';
+        } else if (tipeNasabah === 'baru') {
+            formLama.style.display = 'none';
+            formBaru.style.display = 'block';
+        } else {
+            formLama.style.display = 'none';
+            formBaru.style.display = 'none';
+        }
+    }
+
+    // Open Nasabah Modal
+    let allNasabahData = [];
+    let filteredNasabahData = [];
+    
+    function openNasabahModal() {
+        const strategy = document.getElementById('strategy_pipeline').value;
+        const kategoriSelect = document.getElementById('kategori_strategi');
+        const kategori = kategoriSelect ? kategoriSelect.value : '';
+        
+        if (!strategy) {
+            alert('Pilih Strategy Pull of Pipeline terlebih dahulu');
+            return;
+        }
+        
+        document.getElementById('nasabahModal').style.display = 'flex';
+        loadNasabahData();
+    }
+
+    function closeNasabahModal() {
+        document.getElementById('nasabahModal').style.display = 'none';
+    }
+
+    function loadNasabahData() {
+        const strategy = document.getElementById('strategy_pipeline').value;
+        const kategoriSelect = document.getElementById('kategori_strategi');
+        let kategori = kategoriSelect ? kategoriSelect.value : '';
+        const kodeKC = '{{ $aktivitas->kode_kc }}';
+        
+        // Untuk strategi yang tidak punya kategori dropdown, gunakan default kategori
+        if (strategy === 'Strategi 8' && !kategori) {
+            kategori = 'Wingback';
+        } else if (strategy === 'Layering' && !kategori) {
+            kategori = 'Layering';
+        }
+        
+        const nasabahList = document.getElementById('nasabahList');
+        nasabahList.innerHTML = '<div style="text-align: center; padding: 40px; color: #0066CC;"><div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #0066CC; border-radius: 50%; animation: spin 1s linear infinite;"></div><p style="margin-top: 16px;">Memuat data...</p></div>';
+        
+        const url = `/api/nasabah?strategy=${encodeURIComponent(strategy)}&kategori=${encodeURIComponent(kategori)}&kode_kc=${encodeURIComponent(kodeKC)}&load_all=1`;
+        console.log('Fetching URL:', url);
+        
+        fetch(url)
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('Data received:', result);
+                // Handle both array and object with data property
+                const dataArray = Array.isArray(result) ? result : (result.data || []);
+                allNasabahData = dataArray;
+                filteredNasabahData = dataArray;
+                renderNasabahList(dataArray);
+            })
+            .catch(error => {
+                console.error('Error details:', error);
+                nasabahList.innerHTML = `<div style="text-align: center; padding: 40px; color: #dc3545;"><p>Terjadi kesalahan saat memuat data</p><p style="font-size: 12px; margin-top: 10px;">${error.message}</p></div>`;
+            });
+    }
+
+    function renderNasabahList(data) {
+        const nasabahList = document.getElementById('nasabahList');
+        
+        if (data.length === 0) {
+            nasabahList.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;"><p>Tidak ada data nasabah</p></div>';
+            return;
+        }
+        
+        const strategy = document.getElementById('strategy_pipeline').value;
+        const kategoriSelect = document.getElementById('kategori_strategi');
+        const kategori = kategoriSelect ? kategoriSelect.value : '';
+        
+        // Deteksi jenis strategi - SEMUA STRATEGI
+        const isMerchantSavol = kategori === 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)';
+        const isQlolaNonDebitur = kategori === 'Qlola Non Debitur';
+        const isQlolaNonaktif = kategori === 'Qlola (Belum ada Qlola / ada namun nonaktif)';
+        const isPotensiPayroll = kategori === 'Potensi Payroll';
+        const isExistingPayroll = kategori === 'Existing Payroll';
+        const isPerusahaanAnak = kategori === 'List Perusahaan Anak';
+        const isPenurunanBrilink = kategori === 'PENURUNAN CASA BRILINK';
+        const isPenurunanMerchant = kategori === 'PENURUNAN CASA MERCHANT (QRIS & EDC)';
+        const isNonDebiturVolBesar = kategori === 'Non Debitur Vol Besar CASA Kecil';
+        const isUserAktifCasaKecil = kategori === 'User Aktif Casa Kecil';
+        const isPenurunanPrioritasRitelMikro = kategori === 'PENURUNAN PRIORITAS RITEL MIKRO' || kategori === 'Penurunan Prioritas Ritel & Mikro';
+        const isAumDpk = kategori === 'AUM>2M DPK<50 juta';
+        const isStrategi8 = kategori === 'Wingback' || strategy === 'Strategi 8';
+        const isLayering = kategori === 'Wingback' || strategy === 'Layering';
+        const isOptimalisasiBusinessCluster = kategori === 'Optimalisasi Business Cluster' || strategy === 'Strategi 3';
+        
+        let html = '<table style="width: 100%; border-collapse: collapse; font-size: 13px;"><thead><tr style="background: #f8f9fa; position: sticky; top: 0; z-index: 1;">';
+        
+        // Build header berdasarkan strategi - LENGKAP SEMUA STRATEGI
+        if (isMerchantSavol) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Jenis Merchant</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">TID / Store ID</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Merchant</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">No. Rekening</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIF</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Savol Bulan Lalu</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">CASA Akhir Bulan</th>';
+        } else if (isPenurunanMerchant || isPenurunanBrilink) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Last EOM</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Terupdate</th>';
+        } else if (isQlolaNonDebitur) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Segmentasi</th>';
+        } else if (isNonDebiturVolBesar) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo</th>';
+        } else if (isQlolaNonaktif) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Debitur</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Plafon</th>';
+        } else if (isUserAktifCasaKecil) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Bulan Berjalan</th>';
+        } else if (isPenurunanPrioritasRitelMikro) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Kode Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Unit Kerja</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">No. Rekening</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Segmentasi BPR</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Jenis Simpanan</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Last EOM</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Terupdate</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Delta</th>';
+        } else if (isAumDpk) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIF</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">AUM</th>';
+        } else if (isStrategi8 || isLayering) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Kode Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Unit Kerja</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">No. Rekening</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Segmentasi</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Jenis Simpanan</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Last EOM</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Terupdate</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Delta</th>';
+        } else if (isOptimalisasiBusinessCluster) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Kode Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Unit Kerja</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Tag Zona Unggulan</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Nomor Rekening</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Usaha Pusat Bisnis</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Nama Tenaga Pemasar</th>';
+        } else if (isPotensiPayroll) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Perusahaan</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Estimasi Pekerja</th>';
+        } else if (isExistingPayroll) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Perusahaan</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Jumlah Rekening</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Rekening</th>';
+        } else if (isPerusahaanAnak) {
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Partner/Vendor</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Cabang Induk</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Nama PIC</th>';
+        } else {
+            // Default columns untuk strategi lainnya
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">No. Rekening</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Target</th>';
+        }
+        
+        html += '<th style="padding: 10px; text-align: center; font-size: 13px; min-width: 80px; border-bottom: 2px solid #dee2e6;">Aksi</th>';
+        html += '</tr></thead><tbody>';
+        
+        data.forEach((nasabah, index) => {
+            html += '<tr style="border-bottom: 1px solid #f0f0f0;" onmouseover="this.style.background=\'#f8f9fa\'" onmouseout="this.style.background=\'white\'">';
+            
+            // Build body berdasarkan strategi - LENGKAP SEMUA STRATEGI
+            if (isMerchantSavol) {
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_kanca || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.kanca || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.uker || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.jenis_merchant || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.tid_storeid || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_merchant || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cif || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.savol_bulan_lalu ? parseFloat(nasabah.savol_bulan_lalu).toLocaleString('id-ID') : '0'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.casa_akhir_bulan ? parseFloat(nasabah.casa_akhir_bulan).toLocaleString('id-ID') : '0'}</td>`;
+            } else if (isPenurunanMerchant || isPenurunanBrilink) {
+                html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cifno || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.saldo_last_eom ? parseFloat(nasabah.saldo_last_eom).toLocaleString('id-ID') : '0'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.saldo_terupdate ? parseFloat(nasabah.saldo_terupdate).toLocaleString('id-ID') : '0'}</td>`;
+            } else if (isQlolaNonDebitur) {
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_kanca || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cifno || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.segmentasi || '-'}</td>`;
+            } else if (isNonDebiturVolBesar) {
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_kanca || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cifno || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.saldo ? parseFloat(nasabah.saldo).toLocaleString('id-ID') : '0'}</td>`;
+            } else if (isQlolaNonaktif) {
+                html += `<td style="padding: 10px;">${nasabah.kanca || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cifno || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_debitur || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.plafon ? parseFloat(nasabah.plafon).toLocaleString('id-ID') : '0'}</td>`;
+            } else if (isUserAktifCasaKecil) {
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_kanca || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cifno || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.saldo_bulan_berjalan ? parseFloat(nasabah.saldo_bulan_berjalan).toLocaleString('id-ID') : '0'}</td>`;
+            } else if (isPenurunanPrioritasRitelMikro) {
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cifno || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.segmentasi_bpr || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.jenis_simpanan || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.saldo_last_eom ? parseFloat(nasabah.saldo_last_eom).toLocaleString('id-ID') : '0'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.saldo_terupdate ? parseFloat(nasabah.saldo_terupdate).toLocaleString('id-ID') : '0'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.delta ? parseFloat(nasabah.delta).toLocaleString('id-ID') : '0'}</td>`;
+            } else if (isAumDpk) {
+                html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cif || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.aum ? parseFloat(nasabah.aum).toLocaleString('id-ID') : '0'}</td>`;
+            } else if (isStrategi8 || isLayering) {
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cifno || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.segmentasi || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.jenis_simpanan || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.saldo_last_eom ? parseFloat(nasabah.saldo_last_eom).toLocaleString('id-ID') : '0'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.saldo_terupdate ? parseFloat(nasabah.saldo_terupdate).toLocaleString('id-ID') : '0'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.delta ? parseFloat(nasabah.delta).toLocaleString('id-ID') : '0'}</td>`;
+            } else if (isOptimalisasiBusinessCluster) {
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.tag_zona_unggulan || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.nomor_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_usaha_pusat_bisnis || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.nama_tenaga_pemasar || '-'}</td>`;
+            } else if (isPotensiPayroll) {
+                html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.perusahaan || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.estimasi_pekerja || '-'}</td>`;
+            } else if (isExistingPayroll) {
+                html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_perusahaan || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.jumlah_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.saldo_rekening ? parseFloat(nasabah.saldo_rekening).toLocaleString('id-ID') : '0'}</td>`;
+            } else if (isPerusahaanAnak) {
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_partner_vendor || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.nama_pic || '-'}</td>`;
+            } else {
+                // Default display
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cifno || nasabah.norek || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || nasabah.norek || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.rp_jumlah || nasabah.saldo_terupdate || '-'}</td>`;
+            }
+            
+            html += `<td style="padding: 10px; text-align: center;"><button type="button" onclick="selectNasabahByIndex(${index})" style="background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 12px;">Pilih</button></td>`;
+            html += '</tr>';
+        });
+        
+        html += '</tbody></table>';
+        nasabahList.innerHTML = html;
+    }
+
+    function searchNasabahList() {
+        const searchValue = document.getElementById('searchNasabah').value.toLowerCase();
+        
+        if (searchValue === '') {
+            filteredNasabahData = allNasabahData;
+        } else {
+            filteredNasabahData = allNasabahData.filter(nasabah => {
+                return (nasabah.nama_nasabah && nasabah.nama_nasabah.toLowerCase().includes(searchValue)) ||
+                       (nasabah.norek && nasabah.norek.toLowerCase().includes(searchValue));
+            });
+        }
+        
+        renderNasabahList(filteredNasabahData);
+    }
+
+    function selectNasabahByIndex(index) {
+        const nasabah = filteredNasabahData[index];
+        if (nasabah) {
+            document.getElementById('norek').value = nasabah.norek || '';
+            document.getElementById('nama_nasabah').value = nasabah.nama_nasabah || '';
+            document.getElementById('rp_jumlah').value = nasabah.rp_jumlah || '';
+        }
+        closeNasabahModal();
+    }
+    
+    function selectNasabah(nasabah) {
+        document.getElementById('norek').value = nasabah.norek || '';
+        document.getElementById('nama_nasabah').value = nasabah.nama_nasabah || '';
+        document.getElementById('rp_jumlah').value = nasabah.rp_jumlah || '';
+        
+        closeNasabahModal();
+    }
 </script>
+
+<!-- Modal Nasabah -->
+<div id="nasabahModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; border-radius: 12px; width: 95%; max-width: 1400px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+        <div style="padding: 20px; border-bottom: 2px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); flex-shrink: 0;">
+            <h3 style="margin: 0; color: white;">Pilih Nasabah dari Pull of Pipeline</h3>
+            <button onclick="closeNasabahModal()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0; width: 30px; height: 30px;">&times;</button>
+        </div>
+        
+        <div style="padding: 20px; display: flex; flex-direction: column; overflow: hidden; flex: 1;">
+            <input type="text" id="searchNasabah" placeholder="Cari nasabah berdasarkan nama atau CIFNO..." style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; flex-shrink: 0;" onkeyup="searchNasabahList()">
+            
+            <div id="nasabahList" style="flex: 1; overflow-y: auto; overflow-x: auto;">
+                <div style="text-align: center; padding: 40px; color: #0066CC;">
+                    <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #0066CC; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <p style="margin-top: 16px;">Memuat data...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
 @endsection

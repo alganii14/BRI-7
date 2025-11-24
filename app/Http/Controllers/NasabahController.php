@@ -53,7 +53,12 @@ class NasabahController extends Controller
                 $model = OptimalisasiBusinessCluster::class;
                 break;
             case 'Strategi 8':
+            case 'Wingback Penguatan Produk & Fungsi RM':
                 $model = Strategi8::class;
+                break;
+            case 'Wingback':
+            case 'Layering':
+                $model = \App\Models\Layering::class;
                 break;
             case 'Existing Payroll':
                 $model = ExistingPayroll::class;
@@ -208,8 +213,8 @@ class NasabahController extends Controller
             case 'Wingback Penguatan Produk & Fungsi RM':
                 $model = Strategi8::class;
                 break;
-            case 'Layering':
             case 'Wingback':
+            case 'Layering':
                 $model = \App\Models\Layering::class;
                 break;
             case 'Existing Payroll':
@@ -596,7 +601,7 @@ class NasabahController extends Controller
             }
             
             // Exclude data yang sudah digunakan di aktivitas dengan kategori yang sama
-            $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', 'Wingback Penguatan Produk & Fungsi RM')
+            $aktivitasUsed = \App\Models\Aktivitas::whereIn('kategori_strategi', ['Wingback Penguatan Produk & Fungsi RM', 'Wingback'])
                 ->select('norek', 'nama_nasabah')
                 ->get();
             
@@ -633,7 +638,8 @@ class NasabahController extends Controller
                                     'cabang_induk' => $item->cabang_induk,
                                     'kode_uker' => $item->kode_uker,
                                     'unit_kerja' => $item->unit_kerja,
-                                    'product_type' => $item->product_type,
+                                    'segmentasi' => $item->segmentasi,
+                                    'jenis_simpanan' => $item->jenis_simpanan,
                                     'saldo_terupdate' => $item->saldo_terupdate,
                                     'saldo_last_eom' => $item->saldo_last_eom,
                                     'delta' => $item->delta,

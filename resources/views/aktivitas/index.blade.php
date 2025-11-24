@@ -611,13 +611,24 @@ document.getElementById('kode_kc').addEventListener('change', function() {
                         <div class="action-buttons">
                             <a href="{{ route('aktivitas.show', $item->id) }}" class="btn btn-info btn-sm" title="Lihat Detail">👁️</a>
                             
-                            @if(auth()->user()->isManager() || auth()->user()->isAdmin())
-                            <a href="{{ route('aktivitas.edit', $item->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                            <form action="{{ route('aktivitas.destroy', $item->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus aktivitas ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                            </form>
+                            @if(auth()->user()->isAdmin())
+                                {{-- Admin bisa edit/hapus kapan saja --}}
+                                <a href="{{ route('aktivitas.edit', $item->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                <form action="{{ route('aktivitas.destroy', $item->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus aktivitas ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                                </form>
+                            @elseif(auth()->user()->isManager())
+                                {{-- Manager hanya bisa edit/hapus jika status masih belum --}}
+                                @if($item->status_realisasi == 'belum')
+                                <a href="{{ route('aktivitas.edit', $item->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                <form action="{{ route('aktivitas.destroy', $item->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus aktivitas ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                                </form>
+                                @endif
                             @elseif(auth()->user()->isRMFT())
                                 @if($item->status_realisasi == 'belum')
                                 <a href="{{ route('aktivitas.feedback', $item->id) }}" class="btn btn-primary btn-sm">Feedback</a>

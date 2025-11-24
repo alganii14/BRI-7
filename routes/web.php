@@ -95,6 +95,9 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
     // API for pipeline available years
     Route::get('api/pipeline/years', [NasabahController::class, 'getAvailableYears'])->name('api.pipeline.years');
     
+    // API for nasabah by strategy and kategori
+    Route::get('api/nasabah', [NasabahController::class, 'searchPipeline'])->name('api.nasabah.index');
+    
     // API for uker by KC
     Route::get('api/uker/by-kc', [UkerController::class, 'getByKC'])->name('api.uker.by-kc');
     
