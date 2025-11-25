@@ -1300,7 +1300,7 @@
                 html += `<td style="padding: 10px;">${nasabah.jenis_merchant || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.tid_store_id || '-'}</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_merchant || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cif || '-'}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.savol_bulan_lalu || '-'}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.casa_akhir_bulan || '-'}</td>`;
@@ -1312,7 +1312,7 @@
                 html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px;"><span style="padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; background-color: ${nasabah.segmentasi === 'MIKRO' ? '#fff3cd' : '#d1ecf1'}; color: ${nasabah.segmentasi === 'MIKRO' ? '#856404' : '#0c5460'};">${nasabah.segmentasi || '-'}</span></td>`;
                 html += `<td style="padding: 10px;">${nasabah.jenis_simpanan || '-'}</td>`;
@@ -1329,7 +1329,7 @@
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.jenis_simpanan || '-'}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.saldo_last_eom || '-'}</td>`;
@@ -1342,7 +1342,7 @@
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.uker || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.segmentasi || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.cek_qcash || '-'}</td>`;
@@ -1374,7 +1374,7 @@
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.uker || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.segmentasi || '-'}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${volQcashFormatted}</td>`;
@@ -1396,7 +1396,7 @@
                 html += `<td style="padding: 10px;">${nasabah.cabang_induk || nasabah.kanca || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || nasabah.unit || nasabah.uker || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek || nasabah.norek_pinjaman || nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek_simpanan || '-'}</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || nasabah.nama_debitur || '-'}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600;">${plafonFormatted}</td>`;
@@ -1427,7 +1427,7 @@
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || nasabah.uker || '-'}</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek || nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${saldoBulanLaluFormatted}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${saldoBulanBerjalanFormatted}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600; color: ${deltaColor};">${deltaSaldoFormatted}</td>`;
@@ -1458,7 +1458,7 @@
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.segmentasi_bpr || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.jenis_simpanan || '-'}</td>`;
@@ -1487,7 +1487,7 @@
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.id_prioritas || '-'}</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600;">${aumFormatted}</td>`;
             } else if (isStrategi8) {
                 // Tampilan untuk Wingback Penguatan Produk & Fungsi RM
@@ -1508,7 +1508,7 @@
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.segmentasi || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.jenis_simpanan || '-'}</td>`;
@@ -1538,7 +1538,7 @@
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.segmentasi || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.jenis_simpanan || '-'}</td>`;
@@ -1552,7 +1552,7 @@
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.tag_zona_unggulan || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || nasabah.norek || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.nama_tenaga_pemasar || '-'}</td>`;
             } else if (isPerusahaanAnak) {
@@ -1590,7 +1590,7 @@
                 
                 // No. Rekening - untuk BC dan strategi lain
                 if (isOptimalisasiBC || isStrategiLain) {
-                    html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek || nasabah.no_rekening || '-'}</td>`;
+                    html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 }
                 
                 html += `<td style="padding: 10px;">${nasabah.nama_nasabah || '-'}</td>`;
@@ -1908,11 +1908,11 @@
         } else if (isExistingPayroll) {
             document.getElementById('norek').value = nasabah.cifno || '';
         } else if (isMerchantSavol) {
-            // Untuk Merchant Savol, ambil dari norekening
-            document.getElementById('norek').value = nasabah.norekening || nasabah.no_rekening || nasabah.norek || '';
+            // Untuk Merchant Savol, hide nomor rekening
+            document.getElementById('norek').value = '-';
         } else {
-            // Untuk kategori lainnya, coba berbagai field nomor rekening
-            document.getElementById('norek').value = nasabah.norek || nasabah.no_rekening || nasabah.norekening || nasabah.cifno || '';
+            // Untuk kategori lainnya, hide nomor rekening
+            document.getElementById('norek').value = '-';
         }
         
         // Set nama nasabah - untuk Potensi Payroll gunakan perusahaan

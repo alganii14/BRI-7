@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Aktivitas')
-@section('page-title', 'Detail Aktivitas')
+@section('title', 'Detail Pipeline')
+@section('page-title', 'Detail Pipeline')
 
 @section('content')
 <style>
@@ -192,7 +192,7 @@
 
 <div class="detail-card">
     <div class="detail-header">
-        <h2>📋 Detail Aktivitas #{{ $aktivitas->id }}</h2>
+        <h2>📋 Detail Pipeline #{{ $aktivitas->id }}</h2>
         <span class="badge {{ $aktivitas->tipe == 'assigned' ? 'badge-assigned' : 'badge-self' }}">
             {{ $aktivitas->tipe == 'assigned' ? 'Assigned by Manager' : 'Self Entry' }}
         </span>
@@ -285,7 +285,7 @@
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">No. Rekening</div>
-                    <div class="detail-value">{{ $aktivitas->norek ?? '-' }}</div>
+                    <div class="detail-value">-</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Nama Nasabah</div>
@@ -373,7 +373,7 @@
             @if(auth()->user()->isManager() || auth()->user()->isAdmin())
                 @if(auth()->user()->isAdmin() || (auth()->user()->isManager() && $aktivitas->kode_kc == auth()->user()->kode_kanca))
                     <a href="{{ route('aktivitas.edit', $aktivitas->id) }}" class="btn btn-primary">
-                        ✏️ Edit Aktivitas
+                        ✏️ Edit Pipeline
                     </a>
                 @endif
             @endif
