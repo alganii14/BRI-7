@@ -476,6 +476,8 @@ class AktivitasController extends Controller
             'norek' => 'nullable|string',
             'rp_jumlah' => 'required|string',
             'keterangan' => 'nullable|string',
+            'kode_uker' => 'nullable|string',
+            'nama_uker' => 'nullable|string',
         ]);
 
         $aktivitas->update($validated);

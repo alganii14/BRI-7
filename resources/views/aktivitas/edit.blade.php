@@ -127,6 +127,41 @@
         <p><strong>Kanca:</strong> {{ $aktivitas->nama_kc }}</p>
     </div>
 
+    <!-- Form Unit Kerja -->
+    @php
+        $currentUker = $aktivitas->nama_uker ?? '';
+        $currentUkerUpper = strtoupper($currentUker);
+        $isKCP = str_starts_with($currentUkerUpper, 'KCP ');
+        $canChangeUker = !$isKCP; // KCP tidak bisa ganti unit
+    @endphp
+    
+    <div class="form-row" style="margin-bottom: 20px;">
+        <div class="form-group">
+            <label>KODE UKER</label>
+            <input type="text" id="kode_uker_display" value="{{ $aktivitas->kode_uker }}" readonly style="background-color: #f5f5f5;">
+            <input type="hidden" id="kode_uker" name="kode_uker" value="{{ $aktivitas->kode_uker }}">
+        </div>
+        
+        <div class="form-group">
+            <label>NAMA UKER @if($canChangeUker)<span style="color: #0066CC; font-size: 12px;">(Klik untuk ganti)</span>@endif</label>
+            @if($canChangeUker)
+            <div style="position: relative;">
+                <input type="text" id="nama_uker_display" value="{{ $aktivitas->nama_uker }}" readonly 
+                       style="background-color: #f0f8ff; cursor: pointer;" 
+                       onclick="openUnitModal()" title="Klik untuk memilih unit">
+                <input type="hidden" id="nama_uker" name="nama_uker" value="{{ $aktivitas->nama_uker }}">
+            </div>
+            @else
+            <input type="text" id="nama_uker_display" value="{{ $aktivitas->nama_uker }}" readonly style="background-color: #f5f5f5;">
+            <input type="hidden" id="nama_uker" name="nama_uker" value="{{ $aktivitas->nama_uker }}">
+            <small style="color: #666;">KCP tidak dapat diganti unit kerjanya</small>
+            @endif
+        </div>
+    </div>
+    
+    <input type="hidden" id="kode_kc" value="{{ $aktivitas->kode_kc }}">
+    <input type="hidden" id="nama_kc" value="{{ $aktivitas->nama_kc }}">
+
     <form action="{{ route('aktivitas.update', $aktivitas->id) }}" method="POST">
         @csrf
         @method('PUT')
@@ -899,5 +934,176 @@
     100% { transform: rotate(360deg); }
 }
 </style>
+
+<!-- Modal Unit Selection -->
+<div id="unitModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; border-radius: 12px; width: 90%; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+        <div style="padding: 20px; border-bottom: 2px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); flex-shrink: 0;">
+            <h3 style="margin: 0; color: white;">Pilih Unit di <span id="modal_kc_name">{{ $aktivitas->nama_kc }}</span></h3>
+            <button onclick="closeUnitModal()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0; width: 30px; height: 30px;">&times;</button>
+        </div>
+        
+        <div style="padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+            <div style="margin-bottom: 15px; flex-shrink: 0;">
+                <input type="text" id="searchUnit" placeholder="Cari nama unit..." style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;" onkeyup="filterUnitList()">
+            </div>
+            
+            <div id="selected_count" style="margin-bottom: 10px; padding: 8px 12px; background: #e3f2fd; border-radius: 6px; color: #1976d2; font-size: 13px; font-weight: 600; flex-shrink: 0;">
+                <span id="count_text">Unit saat ini: {{ $aktivitas->nama_uker }}</span>
+            </div>
+            
+            <div id="unitList" style="flex: 1; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 10px; min-height: 200px; max-height: 350px;">
+                <div style="text-align: center; padding: 40px; color: #666;">
+                    <p>Memuat daftar unit...</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end; flex-shrink: 0;">
+                <button onclick="closeUnitModal()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">Batal</button>
+                <button onclick="applySelectedUnit()" style="padding: 10px 20px; background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Terapkan Pilihan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Unit Modal Functions
+let allUnits = [];
+let selectedUnit = null;
+
+function openUnitModal() {
+    const kodeKc = document.getElementById('kode_kc').value;
+    const namaKc = document.getElementById('nama_kc').value;
+    
+    if (!kodeKc) {
+        alert('Kode KC tidak tersedia');
+        return;
+    }
+    
+    document.getElementById('modal_kc_name').textContent = namaKc;
+    document.getElementById('unitModal').style.display = 'flex';
+    
+    // Load units dari KC ini
+    loadUnitsForKC(kodeKc);
+}
+
+function closeUnitModal() {
+    document.getElementById('unitModal').style.display = 'none';
+    document.getElementById('searchUnit').value = '';
+}
+
+function loadUnitsForKC(kodeKc) {
+    document.getElementById('unitList').innerHTML = `
+        <div style="text-align: center; padding: 40px; color: #666;">
+            <p>Memuat daftar unit...</p>
+        </div>
+    `;
+    
+    fetch(`{{ route('api.uker.by-kc') }}?kode_kc=${kodeKc}`)
+        .then(response => response.json())
+        .then(units => {
+            allUnits = units;
+            displayUnits(units);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('unitList').innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #d32f2f;">
+                    <p>Terjadi kesalahan saat memuat data unit</p>
+                </div>
+            `;
+        });
+}
+
+function displayUnits(units) {
+    const currentUkerName = document.getElementById('nama_uker').value;
+    
+    if (units.length === 0) {
+        document.getElementById('unitList').innerHTML = `
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <p>Tidak ada unit ditemukan untuk KC ini</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '<div style="display: flex; flex-direction: column; gap: 4px;">';
+    
+    units.forEach(unit => {
+        const isSelected = unit.sub_kanca === currentUkerName;
+        if (isSelected) {
+            selectedUnit = unit;
+        }
+        
+        html += `
+            <label style="padding: 12px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s; background: ${isSelected ? '#e3f2fd' : 'white'};"
+                   onmouseenter="this.style.backgroundColor='#f0f8ff';"
+                   onmouseleave="this.style.backgroundColor='${isSelected ? '#e3f2fd' : 'white'}';">
+                <input type="radio" 
+                       name="unit_selection"
+                       value="${unit.kode_sub_kanca}" 
+                       data-nama="${unit.sub_kanca}"
+                       data-id="${unit.id}"
+                       ${isSelected ? 'checked' : ''}
+                       onchange="selectUnit(this)"
+                       style="width: 18px; height: 18px; cursor: pointer;">
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: #333;">${unit.sub_kanca}</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 2px;">Kode: ${unit.kode_sub_kanca}</div>
+                </div>
+            </label>
+        `;
+    });
+    
+    html += '</div>';
+    document.getElementById('unitList').innerHTML = html;
+}
+
+function selectUnit(radio) {
+    selectedUnit = {
+        id: radio.dataset.id,
+        kode_sub_kanca: radio.value,
+        sub_kanca: radio.dataset.nama
+    };
+    document.getElementById('count_text').textContent = `Unit dipilih: ${selectedUnit.sub_kanca}`;
+}
+
+function filterUnitList() {
+    const searchValue = document.getElementById('searchUnit').value.toLowerCase();
+    const filteredUnits = allUnits.filter(unit => 
+        unit.sub_kanca.toLowerCase().includes(searchValue) ||
+        unit.kode_sub_kanca.toLowerCase().includes(searchValue)
+    );
+    displayUnits(filteredUnits);
+}
+
+function applySelectedUnit() {
+    if (!selectedUnit) {
+        alert('Harap pilih unit terlebih dahulu');
+        return;
+    }
+    
+    document.getElementById('nama_uker_display').value = selectedUnit.sub_kanca;
+    document.getElementById('nama_uker').value = selectedUnit.sub_kanca;
+    document.getElementById('kode_uker_display').value = selectedUnit.kode_sub_kanca;
+    document.getElementById('kode_uker').value = selectedUnit.kode_sub_kanca;
+    
+    closeUnitModal();
+    
+    // Visual feedback
+    const displayField = document.getElementById('nama_uker_display');
+    displayField.style.borderColor = '#28a745';
+    setTimeout(() => {
+        displayField.style.borderColor = '#ddd';
+    }, 1500);
+}
+
+// Close modal when clicking outside
+document.getElementById('unitModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeUnitModal();
+    }
+});
+</script>
 
 @endsection
