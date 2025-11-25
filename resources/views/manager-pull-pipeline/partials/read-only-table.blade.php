@@ -87,10 +87,32 @@
     <span class="read-only-badge">📊 View Only - Read-Only Access</span>
     
     <div class="search-box">
-        <form action="{{ $route }}" method="GET">
+        <form action="{{ $route }}" method="GET" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
             <input type="text" name="search" placeholder="Cari norek, nama, atau PN..." value="{{ request('search') }}">
+            
+            <select name="year" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 120px;">
+                <option value="">Semua Tahun</option>
+                <option value="2026" {{ request('year') == '2026' ? 'selected' : '' }}>2026</option>
+                <option value="2025" {{ request('year') == '2025' ? 'selected' : '' }}>2025</option>
+            </select>
+            
+            <select name="month" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; min-width: 140px;">
+                <option value="">Semua Bulan</option>
+                @php
+                    $months = [
+                        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+                    ];
+                    foreach ($months as $num => $name) {
+                        $selected = request('month') == $num ? 'selected' : '';
+                        echo "<option value=\"$num\" $selected>$name</option>";
+                    }
+                @endphp
+            </select>
+            
             <button type="submit" class="btn-search">🔍 Cari</button>
-            @if(request('search'))
+            @if(request('search') || request('year') || request('month'))
                 <a href="{{ $route }}" class="btn-search" style="background: #6c757d;">Reset</a>
             @endif
         </form>

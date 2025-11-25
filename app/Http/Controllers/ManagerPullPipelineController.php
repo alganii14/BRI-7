@@ -71,6 +71,22 @@ class ManagerPullPipelineController extends Controller
     }
 
     /**
+     * Apply date filters (year and month) to query
+     */
+    private function applyDateFilters($query, Request $request)
+    {
+        if ($request->filled('year')) {
+            $query->whereYear('created_at', $request->year);
+        }
+        
+        if ($request->filled('month')) {
+            $query->whereMonth('created_at', $request->month);
+        }
+        
+        return $query;
+    }
+
+    /**
      * Merchant Savol - Strategi 1
      */
     public function merchantSavol(Request $request)
@@ -83,6 +99,9 @@ class ManagerPullPipelineController extends Controller
         
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = MerchantSavol::where('kode_kanca', $kodeKanca);
+        
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
         
         // Filter by search
         if ($request->filled('search')) {
@@ -113,6 +132,9 @@ class ManagerPullPipelineController extends Controller
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = PenurunanMerchant::where('kode_cabang_induk', $kodeKanca);
         
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -140,6 +162,9 @@ class ManagerPullPipelineController extends Controller
         
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = PenurunanCasaBrilink::where('kode_cabang_induk', $kodeKanca);
+        
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -169,6 +194,9 @@ class ManagerPullPipelineController extends Controller
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = QlolaNonDebitur::where('kode_kanca', $kodeKanca);
         
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -196,6 +224,9 @@ class ManagerPullPipelineController extends Controller
         
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = NonDebiturVolBesar::where('kode_kanca', $kodeKanca);
+        
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -225,6 +256,9 @@ class ManagerPullPipelineController extends Controller
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = QlolaNonaktif::where('kode_kanca', $kodeKanca);
         
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -252,6 +286,9 @@ class ManagerPullPipelineController extends Controller
         
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = UserAktifCasaKecil::where('kode_kanca', $kodeKanca);
+        
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -281,6 +318,9 @@ class ManagerPullPipelineController extends Controller
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = OptimalisasiBusinessCluster::where('kode_cabang_induk', $kodeKanca);
         
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -309,6 +349,9 @@ class ManagerPullPipelineController extends Controller
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = ExistingPayroll::where('kode_cabang_induk', $kodeKanca);
         
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -336,6 +379,9 @@ class ManagerPullPipelineController extends Controller
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = PotensiPayroll::where('kode_cabang_induk', $kodeKanca);
         
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -361,6 +407,9 @@ class ManagerPullPipelineController extends Controller
         
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = PerusahaanAnak::where('kode_cabang_induk', $kodeKanca);
+        
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -388,6 +437,9 @@ class ManagerPullPipelineController extends Controller
         
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = PenurunanPrioritasRitelMikro::where('kode_cabang_induk', $kodeKanca);
+        
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -417,6 +469,9 @@ class ManagerPullPipelineController extends Controller
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = AumDpk::where('kode_cabang_induk', $kodeKanca);
         
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -445,6 +500,9 @@ class ManagerPullPipelineController extends Controller
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = Strategi8::where('kode_cabang_induk', $kodeKanca);
         
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -472,6 +530,9 @@ class ManagerPullPipelineController extends Controller
         
         $kodeKanca = $this->getUserKodeKanca($user);
         $query = Layering::where('kode_cabang_induk', $kodeKanca);
+        
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
         
         if ($request->filled('search')) {
             $search = $request->search;
