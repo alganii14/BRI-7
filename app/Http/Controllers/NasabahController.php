@@ -23,6 +23,7 @@ use App\Models\PenurunanRitel;
 use App\Models\PenurunanSmeRitel;
 use App\Models\Top10QrisPerUnit;
 use App\Models\AumDpk;
+use App\Models\PerusahaanAnak;
 use Illuminate\Support\Facades\DB;
 
 class NasabahController extends Controller
@@ -267,7 +268,12 @@ class NasabahController extends Controller
         $query = $model::query();
         
         if ($isPerusahaanAnak) {
-            // Perusahaan Anak - tampilkan semua data tanpa filter KC
+            // Perusahaan Anak - filter berdasarkan kode_cabang_induk sesuai KC user/RMFT
+            // Filter by kode_cabang_induk jika ada
+            if ($kode_kc) {
+                $query->where('kode_cabang_induk', $kode_kc);
+            }
+            
             // Order by id untuk konsistensi
             $query->orderBy('id', 'asc');
             
@@ -292,6 +298,7 @@ class NasabahController extends Controller
                                 'nama_partner_vendor',
                                 'jenis_usaha',
                                 'alamat',
+                                'kode_cabang_induk',
                                 'cabang_induk_terdekat',
                                 'nama_pic_partner',
                                 'hp_pic_partner',
@@ -304,7 +311,9 @@ class NasabahController extends Controller
                                     'nama_partner_vendor' => $item->nama_partner_vendor,
                                     'jenis_usaha' => $item->jenis_usaha,
                                     'alamat' => $item->alamat,
+                                    'kode_cabang_induk' => $item->kode_cabang_induk,
                                     'cabang_induk_terdekat' => $item->cabang_induk_terdekat,
+                                    'cabang_induk' => $item->cabang_induk_terdekat, // alias untuk kompatibilitas
                                     'nama_pic_partner' => $item->nama_pic_partner,
                                     'hp_pic_partner' => $item->hp_pic_partner,
                                     'nama_perusahaan_anak' => $item->nama_perusahaan_anak,

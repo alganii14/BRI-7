@@ -1902,6 +1902,7 @@
         const isPotensiPayroll = kategori === 'Potensi Payroll';
         const isExistingPayroll = kategori === 'Existing Payroll';
         const isMerchantSavol = kategori === 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)';
+        const isPerusahaanAnak = kategori === 'List Perusahaan Anak';
         // Set Norek berdasarkan kategori dan data yang tersedia
         if (isPotensiPayroll) {
             document.getElementById('norek').value = nasabah.perusahaan || '';
@@ -1915,9 +1916,11 @@
             document.getElementById('norek').value = '-';
         }
         
-        // Set nama nasabah - untuk Potensi Payroll gunakan perusahaan
+        // Set nama nasabah - untuk Potensi Payroll gunakan perusahaan, untuk Perusahaan Anak gunakan nama_partner_vendor
         if (isPotensiPayroll) {
             document.getElementById('nama_nasabah').value = nasabah.perusahaan || '';
+        } else if (isPerusahaanAnak) {
+            document.getElementById('nama_nasabah').value = nasabah.nama_partner_vendor || '';
         } else {
             document.getElementById('nama_nasabah').value = nasabah.nama_nasabah || '';
         }

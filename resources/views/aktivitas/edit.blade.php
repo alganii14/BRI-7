@@ -736,8 +736,8 @@
                 html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.saldo_rekening ? parseFloat(nasabah.saldo_rekening).toLocaleString('id-ID') : '0'}</td>`;
             } else if (isPerusahaanAnak) {
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_partner_vendor || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.nama_pic || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.cabang_induk_terdekat || nasabah.cabang_induk || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.nama_pic_partner || nasabah.nama_pic || '-'}</td>`;
             } else {
                 // Default display
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
@@ -772,16 +772,76 @@
     function selectNasabahByIndex(index) {
         const nasabah = filteredNasabahData[index];
         if (nasabah) {
-            document.getElementById('norek').value = nasabah.norek || '';
-            document.getElementById('nama_nasabah').value = nasabah.nama_nasabah || '';
+            const kategoriSelect = document.getElementById('kategori_strategi');
+            const kategori = kategoriSelect ? kategoriSelect.value : '';
+            const isPerusahaanAnak = kategori === 'List Perusahaan Anak';
+            const isPotensiPayroll = kategori === 'Potensi Payroll';
+            const isExistingPayroll = kategori === 'Existing Payroll';
+            const isQlolaNonaktif = kategori === 'Qlola (Belum ada Qlola / ada namun nonaktif)';
+            
+            // Set norek berdasarkan kategori
+            if (isPerusahaanAnak) {
+                document.getElementById('norek').value = '-';
+            } else if (isPotensiPayroll) {
+                document.getElementById('norek').value = nasabah.perusahaan || '';
+            } else if (isExistingPayroll) {
+                document.getElementById('norek').value = nasabah.cifno || '';
+            } else {
+                document.getElementById('norek').value = nasabah.norek || nasabah.cifno || '-';
+            }
+            
+            // Set nama nasabah berdasarkan kategori
+            if (isPerusahaanAnak) {
+                document.getElementById('nama_nasabah').value = nasabah.nama_partner_vendor || '';
+            } else if (isPotensiPayroll) {
+                document.getElementById('nama_nasabah').value = nasabah.perusahaan || '';
+            } else if (isExistingPayroll) {
+                document.getElementById('nama_nasabah').value = nasabah.nama_perusahaan || nasabah.nama_nasabah || '';
+            } else if (isQlolaNonaktif) {
+                document.getElementById('nama_nasabah').value = nasabah.nama_debitur || nasabah.nama_nasabah || '';
+            } else {
+                document.getElementById('nama_nasabah').value = nasabah.nama_nasabah || nasabah.nama_merchant || '';
+            }
+            
+            // Set rp_jumlah - biarkan kosong untuk user input
             document.getElementById('rp_jumlah').value = nasabah.rp_jumlah || '';
         }
         closeNasabahModal();
     }
     
     function selectNasabah(nasabah) {
-        document.getElementById('norek').value = nasabah.norek || '';
-        document.getElementById('nama_nasabah').value = nasabah.nama_nasabah || '';
+        const kategoriSelect = document.getElementById('kategori_strategi');
+        const kategori = kategoriSelect ? kategoriSelect.value : '';
+        const isPerusahaanAnak = kategori === 'List Perusahaan Anak';
+        const isPotensiPayroll = kategori === 'Potensi Payroll';
+        const isExistingPayroll = kategori === 'Existing Payroll';
+        const isQlolaNonaktif = kategori === 'Qlola (Belum ada Qlola / ada namun nonaktif)';
+        
+        // Set norek berdasarkan kategori
+        if (isPerusahaanAnak) {
+            document.getElementById('norek').value = '-';
+        } else if (isPotensiPayroll) {
+            document.getElementById('norek').value = nasabah.perusahaan || '';
+        } else if (isExistingPayroll) {
+            document.getElementById('norek').value = nasabah.cifno || '';
+        } else {
+            document.getElementById('norek').value = nasabah.norek || nasabah.cifno || '-';
+        }
+        
+        // Set nama nasabah berdasarkan kategori
+        if (isPerusahaanAnak) {
+            document.getElementById('nama_nasabah').value = nasabah.nama_partner_vendor || '';
+        } else if (isPotensiPayroll) {
+            document.getElementById('nama_nasabah').value = nasabah.perusahaan || '';
+        } else if (isExistingPayroll) {
+            document.getElementById('nama_nasabah').value = nasabah.nama_perusahaan || nasabah.nama_nasabah || '';
+        } else if (isQlolaNonaktif) {
+            document.getElementById('nama_nasabah').value = nasabah.nama_debitur || nasabah.nama_nasabah || '';
+        } else {
+            document.getElementById('nama_nasabah').value = nasabah.nama_nasabah || nasabah.nama_merchant || '';
+        }
+        
+        // Set rp_jumlah - biarkan kosong untuk user input
         document.getElementById('rp_jumlah').value = nasabah.rp_jumlah || '';
         
         closeNasabahModal();
