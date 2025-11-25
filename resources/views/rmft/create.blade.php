@@ -36,45 +36,47 @@
 
             <div class="form-group">
                 <label for="esgdesc">Status</label>
-                <input type="text" id="esgdesc" name="esgdesc" value="{{ old('esgdesc') }}" class="form-control" placeholder="PT/Kontrak">
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group">
-                <label for="kanca">Kanca</label>
-                <input type="text" id="kanca" name="kanca" value="{{ old('kanca') }}" class="form-control">
-            </div>
-
-            <div class="form-group">
-                <label for="uker_id">Relasi Uker (Optional)</label>
-                <select id="uker_id" name="uker_id" class="form-control">
-                    <option value="">Pilih Uker Kanca</option>
-                    @foreach($ukers as $uker)
-                        <option value="{{ $uker->id }}" {{ old('uker_id') == $uker->id ? 'selected' : '' }}>
-                            {{ $uker->kanca }}
-                        </option>
-                    @endforeach
+                <select id="esgdesc" name="esgdesc" class="form-control">
+                    <option value="">Pilih Status</option>
+                    <option value="PT (peserta pens.)" {{ old('esgdesc') == 'PT (peserta pens.)' ? 'selected' : '' }}>PT (peserta pens.)</option>
+                    <option value="Pekerja Kontrak" {{ old('esgdesc') == 'Pekerja Kontrak' ? 'selected' : '' }}>Pekerja Kontrak</option>
                 </select>
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label for="uker">Uker Saat Ini</label>
-                <input type="text" id="uker" name="uker" value="{{ old('uker') }}" class="form-control">
+                <label for="kode_kanca">Kode KC <span class="required">*</span></label>
+                <select id="kode_kanca" name="kode_kanca" class="form-control" onchange="loadUkerByKC(this.value)">
+                    <option value="">Pilih KC</option>
+                    @foreach($kcList as $kc)
+                        <option value="{{ $kc->kode_kanca }}" data-nama="{{ $kc->kanca }}" {{ old('kode_kanca') == $kc->kode_kanca ? 'selected' : '' }}>
+                            {{ $kc->kode_kanca }} - {{ $kc->kanca }}
+                        </option>
+                    @endforeach
+                </select>
+                <input type="hidden" id="kanca" name="kanca" value="{{ old('kanca') }}">
             </div>
 
             <div class="form-group">
-                <label for="uker_tujuan">Uker Tujuan</label>
-                <input type="text" id="uker_tujuan" name="uker_tujuan" value="{{ old('uker_tujuan') }}" class="form-control">
+                <label for="uker_id">Unit Kerja</label>
+                <select id="uker_id" name="uker_id" class="form-control" onchange="setUkerName(this)">
+                    <option value="">Pilih KC terlebih dahulu</option>
+                </select>
+                <input type="hidden" id="uker" name="uker" value="{{ old('uker') }}">
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label for="kelompok_jabatan">Kelompok Jabatan</label>
-                <input type="text" id="kelompok_jabatan" name="kelompok_jabatan" value="{{ old('kelompok_jabatan') }}" class="form-control" placeholder="RMFT Individu Branch, RMFT Business, dll">
+                <label for="kelompok_jabatan">Kelompok Jabatan <span class="required">*</span></label>
+                <select id="kelompok_jabatan" name="kelompok_jabatan" class="form-control" required>
+                    <option value="">Pilih Kelompok Jabatan</option>
+                    <option value="RMFT Individu Branch" {{ old('kelompok_jabatan') == 'RMFT Individu Branch' ? 'selected' : '' }}>RMFT Individu Branch</option>
+                    <option value="RMFT Individu Unit" {{ old('kelompok_jabatan') == 'RMFT Individu Unit' ? 'selected' : '' }}>RMFT Individu Unit</option>
+                    <option value="RMFT Generalis" {{ old('kelompok_jabatan') == 'RMFT Generalis' ? 'selected' : '' }}>RMFT Generalis</option>
+                    <option value="RMFT Business" {{ old('kelompok_jabatan') == 'RMFT Business' ? 'selected' : '' }}>RMFT Business</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -89,6 +91,51 @@
         </div>
     </form>
 </div>
+
+<script>
+function loadUkerByKC(kodeKanca) {
+    const ukerSelect = document.getElementById('uker_id');
+    const kancaInput = document.getElementById('kanca');
+    const ukerInput = document.getElementById('uker');
+    const kodeKancaSelect = document.getElementById('kode_kanca');
+    
+    // Set nama kanca dari data attribute
+    const selectedOption = kodeKancaSelect.options[kodeKancaSelect.selectedIndex];
+    kancaInput.value = selectedOption.dataset.nama || '';
+    
+    // Reset uker
+    ukerSelect.innerHTML = '<option value="">Memuat unit...</option>';
+    ukerInput.value = '';
+    
+    if (!kodeKanca) {
+        ukerSelect.innerHTML = '<option value="">Pilih KC terlebih dahulu</option>';
+        return;
+    }
+    
+    // Untuk dropdown, tampilkan pilihan sederhana: KC atau Unit
+    ukerSelect.innerHTML = '<option value="">Pilih Unit Kerja</option>';
+    
+    // Option 1: KC (Branch) - nama KC
+    ukerSelect.innerHTML += `<option value="kc" data-nama="${kancaInput.value}">${kancaInput.value}</option>`;
+    
+    // Option 2: Unit
+    ukerSelect.innerHTML += `<option value="unit" data-nama="Unit">Unit</option>`;
+}
+
+function setUkerName(select) {
+    const ukerInput = document.getElementById('uker');
+    const selectedOption = select.options[select.selectedIndex];
+    ukerInput.value = selectedOption.dataset.nama || '';
+}
+
+// Load uker if kode_kanca is already selected (for old value)
+document.addEventListener('DOMContentLoaded', function() {
+    const kodeKanca = document.getElementById('kode_kanca').value;
+    if (kodeKanca) {
+        loadUkerByKC(kodeKanca);
+    }
+});
+</script>
 @endsection
 
 @push('styles')

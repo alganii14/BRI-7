@@ -40,8 +40,14 @@ class RMFTController extends Controller
      */
     public function create()
     {
-        $ukers = Uker::select('id', 'kanca')->distinct()->orderBy('kanca')->get()->unique('kanca');
-        return view('rmft.create', compact('ukers'));
+        // Get unique KC list
+        $kcList = Uker::select('kode_kanca', 'kanca')
+            ->distinct()
+            ->orderBy('kanca')
+            ->get()
+            ->unique('kode_kanca');
+        
+        return view('rmft.create', compact('kcList'));
     }
 
     /**
@@ -81,8 +87,21 @@ class RMFTController extends Controller
      */
     public function edit(RMFT $rmft)
     {
-        $ukers = Uker::select('id', 'kanca')->distinct()->orderBy('kanca')->get()->unique('kanca');
-        return view('rmft.edit', compact('rmft', 'ukers'));
+        // Get unique KC list
+        $kcList = Uker::select('kode_kanca', 'kanca')
+            ->distinct()
+            ->orderBy('kanca')
+            ->get()
+            ->unique('kode_kanca');
+        
+        // Find current kode_kanca based on kanca name
+        $currentKodeKanca = null;
+        if ($rmft->kanca) {
+            $ukerData = Uker::where('kanca', $rmft->kanca)->first();
+            $currentKodeKanca = $ukerData ? $ukerData->kode_kanca : null;
+        }
+        
+        return view('rmft.edit', compact('rmft', 'kcList', 'currentKodeKanca'));
     }
 
     /**
