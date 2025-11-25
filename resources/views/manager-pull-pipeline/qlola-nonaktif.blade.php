@@ -106,9 +106,11 @@
                 <thead>
                     <tr>
                         <th>No</th>
+                        @if(auth()->user()->isAdmin())
                         <th>CIF</th>
                         <th>Norek Pinjaman</th>
                         <th>Norek Simpanan</th>
+                        @endif
                         <th>Nama Debitur</th>
                         <th>Plafon</th>
                         <th>PN Pengelola</th>
@@ -122,9 +124,11 @@
                     @foreach($data as $index => $item)
                         <tr>
                             <td>{{ $data->firstItem() + $index }}</td>
+                            @if(auth()->user()->isAdmin())
                             <td>{{ $item->cifno }}</td>
                             <td>{{ $item->norek_pinjaman }}</td>
                             <td>{{ $item->norek_simpanan }}</td>
+                            @endif
                             <td>{{ $item->nama_debitur }}</td>
                             <td>{{ $item->plafon }}</td>
                             <td>{{ $item->pn_pengelola }}</td>

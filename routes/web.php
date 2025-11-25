@@ -104,8 +104,8 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
     // API for RMFT by KC
     Route::get('api/rmft/by-kc', [RMFTController::class, 'getByKC'])->name('api.rmft.by-kc');
     
-    // Manager Pipeline Routes (Read-only view per KC)
-    Route::middleware(['role:manager'])->group(function () {
+    // Manager & RMFT Pipeline Routes (Read-only view per KC)
+    Route::middleware(['role:manager,rmft'])->group(function () {
         // Strategi 1
         Route::get('manager-pull-pipeline/merchant-savol', [ManagerPullPipelineController::class, 'merchantSavol'])->name('manager-pull-pipeline.merchant-savol');
         Route::get('manager-pull-pipeline/penurunan-merchant', [ManagerPullPipelineController::class, 'penurunanMerchant'])->name('manager-pull-pipeline.penurunan-merchant');

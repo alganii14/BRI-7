@@ -106,11 +106,15 @@
                 <thead>
                     <tr>
                         <th>No</th>
+                        @if(auth()->user()->isAdmin())
                         <th>Norekening</th>
+                        @endif
                         <th>Nama Merchant</th>
                         <th>Jenis Merchant</th>
                         <th>TID/Store ID</th>
+                        @if(auth()->user()->isAdmin())
                         <th>CIF</th>
+                        @endif
                         <th>Kode KC</th>
                         <th>Nama KC</th>
                         <th>Uker</th>
@@ -122,11 +126,15 @@
                     @foreach($data as $index => $item)
                         <tr>
                             <td>{{ $data->firstItem() + $index }}</td>
+                            @if(auth()->user()->isAdmin())
                             <td>{{ $item->norekening }}</td>
+                            @endif
                             <td>{{ $item->nama_merchant }}</td>
                             <td>{{ $item->jenis_merchant }}</td>
                             <td>{{ $item->tid_store_id }}</td>
+                            @if(auth()->user()->isAdmin())
                             <td>{{ $item->cif }}</td>
+                            @endif
                             <td>{{ $item->kode_kanca }}</td>
                             <td>{{ $item->kanca }}</td>
                             <td>{{ $item->uker }}</td>

@@ -24,17 +24,65 @@ use App\Models\Layering;
 class ManagerPullPipelineController extends Controller
 {
     /**
+     * Check if user can access pull pipeline (Manager or RMFT)
+     */
+    private function canAccessPullPipeline($user)
+    {
+        return $user->isManager() || $user->isRMFT();
+    }
+
+    /**
+     * Get kode_kanca for user (handles RMFT case where kode_kanca might be in rmftData)
+     */
+    private function getUserKodeKanca($user)
+    {
+        // If user already has kode_kanca, use it
+        if ($user->kode_kanca) {
+            return $user->kode_kanca;
+        }
+        
+        // For RMFT, try to get kode_kanca from rmftData relation
+        if ($user->isRMFT() && $user->rmft_id) {
+            $rmftData = $user->rmftData;
+            if ($rmftData) {
+                // Try from uker relation first
+                if ($rmftData->uker_id) {
+                    $uker = \App\Models\Uker::find($rmftData->uker_id);
+                    if ($uker && $uker->kode_kanca) {
+                        return $uker->kode_kanca;
+                    }
+                }
+                // Try to find kode_kanca by kanca name
+                if ($rmftData->kanca) {
+                    // Check if kanca is already a code (numeric)
+                    if (is_numeric($rmftData->kanca)) {
+                        return $rmftData->kanca;
+                    }
+                    // Otherwise, search by kanca name in uker table
+                    $uker = \App\Models\Uker::where('kanca', 'LIKE', '%' . $rmftData->kanca . '%')->first();
+                    if ($uker && $uker->kode_kanca) {
+                        return $uker->kode_kanca;
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    /**
      * Merchant Savol - Strategi 1
      */
     public function merchantSavol(Request $request)
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = MerchantSavol::where('kode_kanca', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = MerchantSavol::where('kode_kanca', $kodeKanca);
         
         // Filter by search
         if ($request->filled('search')) {
@@ -58,11 +106,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = PenurunanMerchant::where('kode_cabang_induk', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = PenurunanMerchant::where('kode_cabang_induk', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -85,11 +134,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = PenurunanCasaBrilink::where('kode_cabang_induk', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = PenurunanCasaBrilink::where('kode_cabang_induk', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -112,11 +162,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = QlolaNonDebitur::where('kode_kanca', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = QlolaNonDebitur::where('kode_kanca', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -139,11 +190,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = NonDebiturVolBesar::where('kode_kanca', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = NonDebiturVolBesar::where('kode_kanca', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -166,11 +218,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = QlolaNonaktif::where('kode_kanca', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = QlolaNonaktif::where('kode_kanca', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -193,11 +246,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = UserAktifCasaKecil::where('kode_kanca', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = UserAktifCasaKecil::where('kode_kanca', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -220,11 +274,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = OptimalisasiBusinessCluster::where('kode_cabang_induk', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = OptimalisasiBusinessCluster::where('kode_cabang_induk', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -247,11 +302,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = ExistingPayroll::where('kode_cabang_induk', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = ExistingPayroll::where('kode_cabang_induk', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -273,11 +329,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = PotensiPayroll::where('kode_cabang_induk', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = PotensiPayroll::where('kode_cabang_induk', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -298,11 +355,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = PerusahaanAnak::where('kode_cabang_induk', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = PerusahaanAnak::where('kode_cabang_induk', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -324,11 +382,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = PenurunanPrioritasRitelMikro::where('kode_cabang_induk', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = PenurunanPrioritasRitelMikro::where('kode_cabang_induk', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -351,11 +410,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = AumDpk::where('kode_cabang_induk', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = AumDpk::where('kode_cabang_induk', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -378,11 +438,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = Strategi8::where('kode_cabang_induk', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = Strategi8::where('kode_cabang_induk', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;
@@ -405,11 +466,12 @@ class ManagerPullPipelineController extends Controller
     {
         $user = Auth::user();
         
-        if (!$user->isManager()) {
+        if (!$this->canAccessPullPipeline($user)) {
             abort(403, 'Unauthorized action.');
         }
         
-        $query = Layering::where('kode_cabang_induk', $user->kode_kanca);
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = Layering::where('kode_cabang_induk', $kodeKanca);
         
         if ($request->filled('search')) {
             $search = $request->search;

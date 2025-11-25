@@ -105,9 +105,14 @@
                         @php
                             $firstItem = $data->first();
                             $columns = array_keys($firstItem->getAttributes());
+                            // Kolom yang disembunyikan untuk non-admin
+                            $hiddenColumns = ['id', 'created_at', 'updated_at'];
+                            if (!auth()->user()->isAdmin()) {
+                                $hiddenColumns = array_merge($hiddenColumns, ['no_rekening', 'norekening', 'nomor_rekening', 'norek', 'cif', 'cifno']);
+                            }
                         @endphp
                         @foreach($columns as $column)
-                            @if(!in_array($column, ['id', 'created_at', 'updated_at']))
+                            @if(!in_array($column, $hiddenColumns))
                                 <th>{{ ucwords(str_replace('_', ' ', $column)) }}</th>
                             @endif
                         @endforeach
@@ -118,7 +123,7 @@
                         <tr>
                             <td>{{ $data->firstItem() + $index }}</td>
                             @foreach($columns as $column)
-                                @if(!in_array($column, ['id', 'created_at', 'updated_at']))
+                                @if(!in_array($column, $hiddenColumns))
                                     <td>
                                         @php
                                             $value = $item->{$column};
