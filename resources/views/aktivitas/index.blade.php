@@ -583,7 +583,7 @@ document.getElementById('kode_kc').addEventListener('change', function() {
                     <td>{{ $item->segmen_nasabah }}</td>
                     <td>{{ $item->nama_nasabah }}</td>
                     <td>{{ $item->nasabah->cifno ?? '-' }}</td>
-                    <td>{{ $item->norek ?? '-' }}</td>
+                    <td>-</td>
                     <td>Rp {{ number_format($item->rp_jumlah, 0, ',', '.') }}</td>
                     <td>
                         @if($item->status_realisasi == 'belum')
