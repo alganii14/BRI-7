@@ -205,22 +205,19 @@
 
         <!-- Form untuk Nasabah Lama (dari Pipeline) -->
         <div id="form_nasabah_lama" style="display: {{ old('tipe_nasabah', $aktivitas->tipe ?? 'lama') == 'lama' ? 'block' : 'none' }};">
+            <input type="hidden" id="norek" name="norek" value="{{ old('norek', $aktivitas->norek) }}">
             <div class="form-row">
                 <div class="form-group">
-                    <label>CARI NASABAH</label>
-                    <div style="position: relative;">
-                        <input type="text" id="norek" name="norek" value="{{ old('norek', $aktivitas->norek) }}" placeholder="Klik tombol cari untuk memilih nasabah" autocomplete="off" style="padding-right: 45px;">
-                        <button type="button" onclick="openNasabahModal()" style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                    <label>NAMA NASABAH <span style="color: red;">*</span></label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="nama_nasabah" name="nama_nasabah" value="{{ old('nama_nasabah', $aktivitas->nama_nasabah) }}" placeholder="Masukkan nama nasabah" required style="flex: 1;">
+                        <button type="button" onclick="openNasabahModal()" style="background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-size: 12px; white-space: nowrap;" title="Cari dari Pipeline">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
+                            Cari
                         </button>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label>NAMA NASABAH <span style="color: red;">*</span></label>
-                    <input type="text" id="nama_nasabah" name="nama_nasabah" value="{{ old('nama_nasabah', $aktivitas->nama_nasabah) }}" placeholder="Masukkan nama nasabah" required>
                 </div>
 
                 <div class="form-group">
@@ -309,8 +306,8 @@
             'Penurunan Prioritas Ritel & Mikro',
             'AUM>2M DPK<50 juta'
         ],
-        'Strategi 8': ['Wingback'],
-        'Layering': ['Layering']
+        'Strategi 8': ['Wingback Penguatan Produk & Fungsi RM'],
+        'Layering': ['Wingback']
     };
 
     const strategySelect = document.getElementById('strategy_pipeline');
@@ -352,7 +349,9 @@
                     const option = document.createElement('option');
                     option.value = kategori;
                     option.textContent = kategori;
-                    if (kategori === currentKategori) {
+                    // Handle backward compatibility - "Wingback" lama untuk Strategi 8
+                    if (kategori === currentKategori || 
+                        (strategy === 'Strategi 8' && currentKategori === 'Wingback' && kategori === 'Wingback Penguatan Produk & Fungsi RM')) {
                         option.selected = true;
                     }
                     kategoriSelect.appendChild(option);
@@ -398,6 +397,15 @@
             return;
         }
         
+        // Strategi yang tidak memerlukan kategori (langsung bisa cari)
+        const strategiTanpaKategori = ['Strategi 8', 'Layering'];
+        
+        // Jika strategi memerlukan kategori tapi belum dipilih
+        if (!strategiTanpaKategori.includes(strategy) && !kategori) {
+            alert('Pilih Kategori terlebih dahulu');
+            return;
+        }
+        
         document.getElementById('nasabahModal').style.display = 'flex';
         loadNasabahData();
     }
@@ -410,20 +418,39 @@
         const strategy = document.getElementById('strategy_pipeline').value;
         const kategoriSelect = document.getElementById('kategori_strategi');
         let kategori = kategoriSelect ? kategoriSelect.value : '';
-        const kodeKC = '{{ $aktivitas->kode_kc }}';
+        // Gunakan kode_kc dari aktivitas, atau dari user jika kosong
+        const kodeKC = '{{ $aktivitas->kode_kc ?? auth()->user()->kode_kanca }}';
+        const kodeUker = '{{ $aktivitas->kode_uker ?? '' }}';
+        const filterMonth = document.getElementById('filterMonth')?.value || '';
+        const filterYear = document.getElementById('filterYear')?.value || '';
         
         // Untuk strategi yang tidak punya kategori dropdown, gunakan default kategori
         if (strategy === 'Strategi 8' && !kategori) {
-            kategori = 'Wingback';
+            kategori = 'Wingback Penguatan Produk & Fungsi RM';
         } else if (strategy === 'Layering' && !kategori) {
-            kategori = 'Layering';
+            kategori = 'Wingback';
         }
+        
+        // Populate filter tahun jika belum ada
+        populateYearFilter();
         
         const nasabahList = document.getElementById('nasabahList');
         nasabahList.innerHTML = '<div style="text-align: center; padding: 40px; color: #0066CC;"><div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #0066CC; border-radius: 50%; animation: spin 1s linear infinite;"></div><p style="margin-top: 16px;">Memuat data...</p></div>';
         
-        const url = `/api/nasabah?strategy=${encodeURIComponent(strategy)}&kategori=${encodeURIComponent(kategori)}&kode_kc=${encodeURIComponent(kodeKC)}&load_all=1`;
+        // Build URL with filters
+        let url = `/api/nasabah?strategy=${encodeURIComponent(strategy)}&kategori=${encodeURIComponent(kategori)}&kode_kc=${encodeURIComponent(kodeKC)}&load_all=1`;
+        if (kodeUker) {
+            url += `&kode_uker=${encodeURIComponent(kodeUker)}`;
+        }
+        if (filterYear) {
+            url += `&year=${filterYear}`;
+        }
+        if (filterMonth) {
+            url += `&month=${filterMonth}`;
+        }
+        
         console.log('Fetching URL:', url);
+        console.log('Strategy:', strategy, 'Kategori:', kategori, 'Kode KC:', kodeKC, 'Year:', filterYear, 'Month:', filterMonth);
         
         fetch(url)
             .then(response => {
@@ -439,15 +466,34 @@
                 const dataArray = Array.isArray(result) ? result : (result.data || []);
                 allNasabahData = dataArray;
                 filteredNasabahData = dataArray;
-                renderNasabahList(dataArray);
+                renderNasabahList(dataArray, result);
             })
             .catch(error => {
                 console.error('Error details:', error);
                 nasabahList.innerHTML = `<div style="text-align: center; padding: 40px; color: #dc3545;"><p>Terjadi kesalahan saat memuat data</p><p style="font-size: 12px; margin-top: 10px;">${error.message}</p></div>`;
             });
     }
+    
+    // Function to populate year filter
+    function populateYearFilter() {
+        const filterYear = document.getElementById('filterYear');
+        if (filterYear && filterYear.options.length <= 1) {
+            const currentYear = new Date().getFullYear();
+            for (let year = currentYear; year >= currentYear - 5; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                filterYear.appendChild(option);
+            }
+        }
+    }
+    
+    // Function to apply filter changes (month/year)
+    function applyPipelineFilter() {
+        loadNasabahData();
+    }
 
-    function renderNasabahList(data) {
+    function renderNasabahList(data, response = null) {
         const nasabahList = document.getElementById('nasabahList');
         
         if (data.length === 0) {
@@ -458,6 +504,12 @@
         const strategy = document.getElementById('strategy_pipeline').value;
         const kategoriSelect = document.getElementById('kategori_strategi');
         const kategori = kategoriSelect ? kategoriSelect.value : '';
+        
+        // Info header - jumlah data ditemukan
+        const totalData = response?.total || data.length;
+        let infoHtml = `<div style="margin-bottom: 10px; padding: 10px; background: #e3f2fd; border-radius: 6px; color: #1976d2; font-size: 13px; font-weight: 600;">`;
+        infoHtml += `<span>Ditemukan ${totalData} nasabah</span>`;
+        infoHtml += `</div>`;
         
         // Deteksi jenis strategi - SEMUA STRATEGI
         const isMerchantSavol = kategori === 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)';
@@ -472,7 +524,7 @@
         const isUserAktifCasaKecil = kategori === 'User Aktif Casa Kecil';
         const isPenurunanPrioritasRitelMikro = kategori === 'PENURUNAN PRIORITAS RITEL MIKRO' || kategori === 'Penurunan Prioritas Ritel & Mikro';
         const isAumDpk = kategori === 'AUM>2M DPK<50 juta';
-        const isStrategi8 = kategori === 'Wingback' || strategy === 'Strategi 8';
+        const isStrategi8 = kategori === 'Wingback Penguatan Produk & Fungsi RM' || strategy === 'Strategi 8';
         const isLayering = kategori === 'Wingback' || strategy === 'Layering';
         const isOptimalisasiBusinessCluster = kategori === 'Optimalisasi Business Cluster' || strategy === 'Strategi 3';
         
@@ -480,14 +532,12 @@
         
         // Build header berdasarkan strategi - LENGKAP SEMUA STRATEGI
         if (isMerchantSavol) {
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Kanca</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Kanca</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Uker</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Uker</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Jenis Merchant</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">TID / Store ID</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Merchant</th>';
+            @if(auth()->user()->isAdmin())
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">No. Rekening</th>';
+            @endif
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIF</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Savol Bulan Lalu</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">CASA Akhir Bulan</th>';
@@ -523,7 +573,9 @@
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Uker</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Unit Kerja</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            @if(auth()->user()->isAdmin())
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">No. Rekening</th>';
+            @endif
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Segmentasi BPR</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Jenis Simpanan</th>';
@@ -541,7 +593,9 @@
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Uker</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Unit Kerja</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            @if(auth()->user()->isAdmin())
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">No. Rekening</th>';
+            @endif
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Segmentasi</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Jenis Simpanan</th>';
@@ -554,8 +608,10 @@
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Uker</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Unit Kerja</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Tag Zona Unggulan</th>';
+            @if(auth()->user()->isAdmin())
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Nomor Rekening</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Usaha Pusat Bisnis</th>';
+            @endif
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Usaha/Pusat Bisnis</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Nama Tenaga Pemasar</th>';
         } else if (isPotensiPayroll) {
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Cabang Induk</th>';
@@ -574,8 +630,10 @@
             // Default columns untuk strategi lainnya
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            @if(auth()->user()->isAdmin())
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">No. Rekening</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Target</th>';
+            @endif
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo</th>';
         }
         
         html += '<th style="padding: 10px; text-align: center; font-size: 13px; min-width: 80px; border-bottom: 2px solid #dee2e6;">Aksi</th>';
@@ -586,14 +644,12 @@
             
             // Build body berdasarkan strategi - LENGKAP SEMUA STRATEGI
             if (isMerchantSavol) {
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_kanca || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.kanca || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.jenis_merchant || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.tid_storeid || '-'}</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_merchant || '-'}</td>`;
+                @if(auth()->user()->isAdmin())
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norekening || '-'}</td>`;
+                @endif
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cif || '-'}</td>`;
                 html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.savol_bulan_lalu ? parseFloat(nasabah.savol_bulan_lalu).toLocaleString('id-ID') : '0'}</td>`;
                 html += `<td style="padding: 10px; text-align: right;">Rp ${nasabah.casa_akhir_bulan ? parseFloat(nasabah.casa_akhir_bulan).toLocaleString('id-ID') : '0'}</td>`;
@@ -629,7 +685,9 @@
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cifno || '-'}</td>`;
+                @if(auth()->user()->isAdmin())
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                @endif
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.segmentasi_bpr || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.jenis_simpanan || '-'}</td>`;
@@ -647,7 +705,9 @@
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cifno || '-'}</td>`;
+                @if(auth()->user()->isAdmin())
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || '-'}</td>`;
+                @endif
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.segmentasi || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.jenis_simpanan || '-'}</td>`;
@@ -660,8 +720,10 @@
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.tag_zona_unggulan || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.nomor_rekening || '-'}</td>`;
-                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_usaha_pusat_bisnis || '-'}</td>`;
+                @if(auth()->user()->isAdmin())
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rekening || nasabah.norek || '-'}</td>`;
+                @endif
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.nama_tenaga_pemasar || '-'}</td>`;
             } else if (isPotensiPayroll) {
                 html += `<td style="padding: 10px;">${nasabah.cabang_induk || '-'}</td>`;
@@ -689,7 +751,7 @@
         });
         
         html += '</tbody></table>';
-        nasabahList.innerHTML = html;
+        nasabahList.innerHTML = infoHtml + html;
     }
 
     function searchNasabahList() {
@@ -735,7 +797,31 @@
         </div>
         
         <div style="padding: 20px; display: flex; flex-direction: column; overflow: hidden; flex: 1;">
-            <input type="text" id="searchNasabah" placeholder="Cari nasabah berdasarkan nama atau CIFNO..." style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; flex-shrink: 0;" onkeyup="searchNasabahList()">
+            <!-- Filter Bulan dan Tahun -->
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-shrink: 0;">
+                <select id="filterYear" style="flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; background: white;" onchange="applyPipelineFilter()">
+                    <option value="">Semua Tahun</option>
+                    <!-- Tahun akan di-load secara dinamis -->
+                </select>
+                
+                <select id="filterMonth" style="flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; background: white;" onchange="applyPipelineFilter()">
+                    <option value="">Semua Bulan</option>
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">Agustus</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+            </div>
+            
+            <input type="text" id="searchNasabah" placeholder="Cari nasabah berdasarkan nama, CIFNO, atau nomor rekening..." style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; flex-shrink: 0;" onkeyup="searchNasabahList()">
             
             <div id="nasabahList" style="flex: 1; overflow-y: auto; overflow-x: auto;">
                 <div style="text-align: center; padding: 40px; color: #0066CC;">

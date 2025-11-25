@@ -106,8 +106,8 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        @if(auth()->user()->isAdmin())
                         <th>CIF</th>
+                        @if(auth()->user()->isAdmin())
                         <th>Norek Pinjaman</th>
                         <th>Norek Simpanan</th>
                         @endif
@@ -124,8 +124,8 @@
                     @foreach($data as $index => $item)
                         <tr>
                             <td>{{ $data->firstItem() + $index }}</td>
-                            @if(auth()->user()->isAdmin())
                             <td>{{ $item->cifno }}</td>
+                            @if(auth()->user()->isAdmin())
                             <td>{{ $item->norek_pinjaman }}</td>
                             <td>{{ $item->norek_simpanan }}</td>
                             @endif

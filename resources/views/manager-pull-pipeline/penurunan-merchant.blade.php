@@ -108,8 +108,8 @@
                         <th>No</th>
                         @if(auth()->user()->isAdmin())
                         <th>No Rekening</th>
-                        <th>CIF</th>
                         @endif
+                        <th>CIF</th>
                         <th>Nama Nasabah</th>
                         <th>Segmentasi</th>
                         <th>Jenis Simpanan</th>
@@ -127,8 +127,8 @@
                             <td>{{ $data->firstItem() + $index }}</td>
                             @if(auth()->user()->isAdmin())
                             <td>{{ $item->no_rekening }}</td>
-                            <td>{{ $item->cifno }}</td>
                             @endif
+                            <td>{{ $item->cifno }}</td>
                             <td>{{ $item->nama_nasabah }}</td>
                             <td>{{ $item->segmentasi }}</td>
                             <td>{{ $item->jenis_simpanan }}</td>

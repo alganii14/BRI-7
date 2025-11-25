@@ -105,10 +105,10 @@
                         @php
                             $firstItem = $data->first();
                             $columns = array_keys($firstItem->getAttributes());
-                            // Kolom yang disembunyikan untuk non-admin
+                            // Kolom yang disembunyikan untuk non-admin (hanya no rekening, CIF tetap tampil)
                             $hiddenColumns = ['id', 'created_at', 'updated_at'];
                             if (!auth()->user()->isAdmin()) {
-                                $hiddenColumns = array_merge($hiddenColumns, ['no_rekening', 'norekening', 'nomor_rekening', 'norek', 'cif', 'cifno']);
+                                $hiddenColumns = array_merge($hiddenColumns, ['no_rekening', 'norekening', 'nomor_rekening', 'norek']);
                             }
                         @endphp
                         @foreach($columns as $column)
