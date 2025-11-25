@@ -60,13 +60,20 @@ class RMFTController extends Controller
             'completename' => 'required',
             'jg' => 'nullable',
             'esgdesc' => 'nullable',
+            'kode_kanca' => 'nullable',
             'kanca' => 'nullable',
-            'uker_id' => 'nullable|exists:ukers,id',
+            'uker_id' => 'nullable',
             'uker' => 'nullable',
             'uker_tujuan' => 'nullable',
             'keterangan' => 'nullable',
             'kelompok_jabatan' => 'nullable',
         ]);
+        
+        // Handle uker_id jika nilainya 'unit' (bukan ID valid)
+        if (isset($validated['uker_id']) && $validated['uker_id'] === 'unit') {
+            $validated['uker_id'] = null;
+            $validated['uker'] = 'Unit';
+        }
 
         RMFT::create($validated);
 
@@ -114,13 +121,20 @@ class RMFTController extends Controller
             'completename' => 'required',
             'jg' => 'nullable',
             'esgdesc' => 'nullable',
+            'kode_kanca' => 'nullable',
             'kanca' => 'nullable',
-            'uker_id' => 'nullable|exists:ukers,id',
+            'uker_id' => 'nullable',
             'uker' => 'nullable',
             'uker_tujuan' => 'nullable',
             'keterangan' => 'nullable',
             'kelompok_jabatan' => 'nullable',
         ]);
+        
+        // Handle uker_id jika nilainya 'unit' (bukan ID valid)
+        if (isset($validated['uker_id']) && $validated['uker_id'] === 'unit') {
+            $validated['uker_id'] = null;
+            $validated['uker'] = 'Unit';
+        }
 
         $rmft->update($validated);
 

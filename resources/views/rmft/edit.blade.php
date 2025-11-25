@@ -116,16 +116,65 @@ function loadUkerByKC(kodeKanca, selectCurrentUker = false) {
         return;
     }
     
-    // Untuk dropdown, tampilkan pilihan sederhana: KC atau Unit
-    ukerSelect.innerHTML = '<option value="">Pilih Unit Kerja</option>';
-    
-    // Option 1: KC (Branch) - nama KC
-    const branchSelected = selectCurrentUker && currentUkerName === kancaInput.value;
-    ukerSelect.innerHTML += `<option value="kc" data-nama="${kancaInput.value}" ${branchSelected ? 'selected' : ''}>${kancaInput.value}</option>`;
-    
-    // Option 2: Unit
-    const unitSelected = selectCurrentUker && currentUkerName === 'Unit';
-    ukerSelect.innerHTML += `<option value="unit" data-nama="Unit" ${unitSelected ? 'selected' : ''}>Unit</option>`;
+    // Fetch unit kerja dari API
+    fetch(`{{ route('api.uker.by-kc') }}?kode_kc=${kodeKanca}`)
+        .then(response => response.json())
+        .then(units => {
+            ukerSelect.innerHTML = '<option value="">Pilih Unit Kerja</option>';
+            
+            if (units.length === 0) {
+                ukerSelect.innerHTML += '<option value="" disabled>Tidak ada unit kerja ditemukan</option>';
+                return;
+            }
+            
+            // Kelompokkan unit berdasarkan tipe (KC, KCP, KK, UNIT)
+            let hasUnit = false;
+            const currentIsUnit = currentUkerName && currentUkerName.toUpperCase().startsWith('UNIT ');
+            
+            units.forEach(unit => {
+                const nama = unit.sub_kanca.toUpperCase();
+                
+                // Jika UNIT, tandai saja, nanti tambahkan satu opsi "Unit"
+                if (nama.startsWith('UNIT ')) {
+                    hasUnit = true;
+                    return; // Skip, akan ditambahkan sebagai satu opsi "Unit"
+                }
+                
+                // Untuk KC, KCP, KK tampilkan langsung
+                const option = document.createElement('option');
+                option.value = unit.id;
+                option.dataset.nama = unit.sub_kanca;
+                option.dataset.kode = unit.kode_sub_kanca;
+                option.textContent = unit.sub_kanca;
+                
+                // Select current uker if matching
+                if (selectCurrentUker && (unit.id == currentUkerId || unit.sub_kanca === currentUkerName)) {
+                    option.selected = true;
+                }
+                
+                ukerSelect.appendChild(option);
+            });
+            
+            // Tambahkan satu opsi "Unit" jika ada unit
+            if (hasUnit) {
+                const unitOption = document.createElement('option');
+                unitOption.value = 'unit';
+                unitOption.dataset.nama = 'Unit';
+                unitOption.dataset.kode = '';
+                unitOption.textContent = 'Unit';
+                
+                // Select jika current uker adalah UNIT
+                if (selectCurrentUker && currentIsUnit) {
+                    unitOption.selected = true;
+                }
+                
+                ukerSelect.appendChild(unitOption);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading unit kerja:', error);
+            ukerSelect.innerHTML = '<option value="">Gagal memuat unit kerja</option>';
+        });
 }
 
 function setUkerName(select) {
