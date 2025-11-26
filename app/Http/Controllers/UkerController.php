@@ -39,7 +39,15 @@ class UkerController extends Controller
      */
     public function create()
     {
-        return view('uker.create');
+        // Ambil daftar Kanca yang unique
+        $kancaList = Uker::select('kode_kanca', 'kanca', 'kanwil', 'kode_kanwil')
+            ->whereNotNull('kode_kanca')
+            ->where('kode_kanca', '!=', '')
+            ->groupBy('kode_kanca', 'kanca', 'kanwil', 'kode_kanwil')
+            ->orderBy('kanca', 'asc')
+            ->get();
+        
+        return view('uker.create', compact('kancaList'));
     }
 
     /**
