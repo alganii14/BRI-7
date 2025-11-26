@@ -476,7 +476,7 @@ document.getElementById('kode_kc').addEventListener('change', function() {
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
             @if(auth()->user()->isAdmin())
-            <button onclick="toggleRekapTable()" class="btn btn-info" style="white-space: nowrap;">📊 Rekap</button>
+            <button onclick="toggleRekapTable()" class="btn btn-info" style="white-space: nowrap;">📊 View Rekap</button>
             <div style="position: relative;">
                 <button onclick="toggleExportDropdown()" class="btn btn-success" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); display: flex; align-items: center; gap: 8px; color: white; white-space: nowrap;">
                     <span>📥</span>

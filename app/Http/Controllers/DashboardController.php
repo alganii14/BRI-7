@@ -83,6 +83,11 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
         
+        // Pipeline Tervalidasi - filter berdasarkan KC dan nama RMFT
+        $totalPipelineValidasi = \App\Models\Rekap::where('nama_kc', $rmft->kanca)
+            ->where('nama_rmft', $rmft->completename)
+            ->sum('validasi');
+        
         return view('dashboard.rmft', compact(
             'totalAktivitasBulanIni',
             'aktivitasHariIni',
@@ -90,6 +95,7 @@ class DashboardController extends Controller
             'totalTidakTercapai',
             'totalLebih',
             'aktivitasTerbaru',
+            'totalPipelineValidasi',
             'selectedMonth',
             'selectedYear',
             'startDate',
@@ -161,6 +167,16 @@ class DashboardController extends Controller
         }
         $aktivitasTerbaru = $aktivitasTerbaruQuery->limit(5)->get();
         
+        // Pipeline Tervalidasi - filter berdasarkan KC Manager dan RMFT jika dipilih
+        $rekapQuery = \App\Models\Rekap::where('nama_kc', $managerKc);
+        if ($selectedRmftId) {
+            $selectedRmft = RMFT::find($selectedRmftId);
+            if ($selectedRmft) {
+                $rekapQuery->where('nama_rmft', $selectedRmft->completename);
+            }
+        }
+        $totalPipelineValidasi = $rekapQuery->sum('validasi');
+        
         return view('dashboard.manager', compact(
             'totalAktivitasBulanIni',
             'aktivitasHariIni',
@@ -168,6 +184,7 @@ class DashboardController extends Controller
             'totalTidakTercapai',
             'totalLebih',
             'aktivitasTerbaru',
+            'totalPipelineValidasi',
             'rmftList',
             'selectedRmftId',
             'selectedMonth',
@@ -264,6 +281,19 @@ class DashboardController extends Controller
         }
         $aktivitasTerbaru = $aktivitasTerbaruQuery->limit(5)->get();
         
+        // Pipeline Tervalidasi - filter berdasarkan KC dan RMFT yang dipilih
+        $rekapQuery = \App\Models\Rekap::query();
+        if ($selectedNamaKc) {
+            $rekapQuery->where('nama_kc', $selectedNamaKc);
+        }
+        if ($selectedRmftId) {
+            $selectedRmft = RMFT::find($selectedRmftId);
+            if ($selectedRmft) {
+                $rekapQuery->where('nama_rmft', $selectedRmft->completename);
+            }
+        }
+        $totalPipelineValidasi = $rekapQuery->sum('validasi');
+        
         return view('dashboard.admin', compact(
             'totalAktivitasBulanIni',
             'aktivitasHariIni',
@@ -271,6 +301,7 @@ class DashboardController extends Controller
             'totalTidakTercapai',
             'totalLebih',
             'aktivitasTerbaru',
+            'totalPipelineValidasi',
             'kcList',
             'rmftList',
             'selectedKc',
