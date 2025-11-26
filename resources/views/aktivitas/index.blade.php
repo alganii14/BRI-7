@@ -229,15 +229,15 @@
     }
 
     .pagination-wrapper a:hover {
-        background: linear-gradient(135deg, #0066CC 0%, #003D82 100%) !important;
+        background: #0056b3 !important;
         color: white !important;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 102, 204, 0.3);
-        transition: all 0.3s ease;
+        border-color: #0056b3 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
     }
 
     .pagination-wrapper span {
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
     }
 </style>
 
@@ -688,34 +688,58 @@ document.getElementById('kode_kc').addEventListener('change', function() {
     <div class="pagination-wrapper">
         <p class="pagination-info">Showing {{ $aktivitas->firstItem() }} to {{ $aktivitas->lastItem() }} of {{ $aktivitas->total() }} results</p>
         
-        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 15px; flex-wrap: wrap;">
+            {{-- Previous Button --}}
             @if ($aktivitas->onFirstPage())
-                <span style="padding: 10px 20px; background: #f0f0f0; color: #999; border: 1px solid #ddd; border-radius: 4px; cursor: not-allowed;">← Previous</span>
+                <span style="padding: 8px 16px; background: #e9ecef; color: #6c757d; border: 1px solid #dee2e6; border-radius: 4px; cursor: not-allowed; font-size: 14px;">← Previous</span>
             @else
-                <a href="{{ $aktivitas->appends(request()->query())->previousPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">← Previous</a>
+                <a href="{{ $aktivitas->appends(request()->query())->previousPageUrl() }}" style="padding: 8px 16px; background: white; color: #007bff; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s;">← Previous</a>
             @endif
 
-            {{-- Show pages 1 to 5 only --}}
+            {{-- Page Numbers --}}
             @php
                 $currentPage = $aktivitas->currentPage();
                 $lastPage = $aktivitas->lastPage();
-                $startPage = 1;
-                $endPage = min(5, $lastPage);
+                
+                // Hitung range halaman yang akan ditampilkan (maksimal 5)
+                $maxPages = 5;
+                $halfMax = floor($maxPages / 2);
+                
+                if ($lastPage <= $maxPages) {
+                    // Jika total halaman <= 5, tampilkan semua
+                    $startPage = 1;
+                    $endPage = $lastPage;
+                } else {
+                    // Jika lebih dari 5 halaman
+                    if ($currentPage <= $halfMax) {
+                        // Di awal (halaman 1-3)
+                        $startPage = 1;
+                        $endPage = $maxPages;
+                    } elseif ($currentPage >= ($lastPage - $halfMax)) {
+                        // Di akhir
+                        $startPage = $lastPage - $maxPages + 1;
+                        $endPage = $lastPage;
+                    } else {
+                        // Di tengah
+                        $startPage = $currentPage - $halfMax;
+                        $endPage = $currentPage + $halfMax;
+                    }
+                }
             @endphp
 
-            @foreach (range($startPage, $endPage) as $page)
-                @php $url = $aktivitas->appends(request()->query())->url($page); @endphp
+            @for ($page = $startPage; $page <= $endPage; $page++)
                 @if ($page == $currentPage)
-                    <span style="padding: 10px 20px; background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); color: white; border: 1px solid #0066CC; border-radius: 4px;">{{ $page }}</span>
+                    <span style="padding: 8px 14px; background: #007bff; color: white; border: 1px solid #007bff; border-radius: 4px; font-size: 14px; font-weight: 600; min-width: 40px; text-align: center;">{{ $page }}</span>
                 @else
-                    <a href="{{ $url }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">{{ $page }}</a>
+                    <a href="{{ $aktivitas->appends(request()->query())->url($page) }}" style="padding: 8px 14px; background: white; color: #007bff; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s; min-width: 40px; text-align: center;">{{ $page }}</a>
                 @endif
-            @endforeach
+            @endfor
 
+            {{-- Next Button --}}
             @if ($aktivitas->hasMorePages())
-                <a href="{{ $aktivitas->appends(request()->query())->nextPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">Next →</a>
+                <a href="{{ $aktivitas->appends(request()->query())->nextPageUrl() }}" style="padding: 8px 16px; background: white; color: #007bff; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s;">Next →</a>
             @else
-                <span style="padding: 10px 20px; background: #f0f0f0; color: #999; border: 1px solid #ddd; border-radius: 4px; cursor: not-allowed;">Next →</span>
+                <span style="padding: 8px 16px; background: #e9ecef; color: #6c757d; border: 1px solid #dee2e6; border-radius: 4px; cursor: not-allowed; font-size: 14px;">Next →</span>
             @endif
         </div>
     </div>
