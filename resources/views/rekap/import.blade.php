@@ -149,16 +149,48 @@
 
         <div class="card-body">
             <div style="margin-bottom: 20px; padding: 15px; background: #E8F5E9; border-left: 4px solid #28a745; border-radius: 4px;">
-                <p style="margin: 0 0 10px 0; color: #2E7D32; font-weight: 600;">
-                    📄 Belum punya template?
-                </p>
                 <a href="{{ route('rekap.template') }}" class="btn btn-success" style="padding: 8px 16px; font-size: 14px;">
-                    📥 Download Template CSV
+                    📥 Contoh Template CSV
                 </a>
             </div>
 
             <form action="{{ route('rekap.import') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="dari_tanggal" class="form-label">
+                            Dari Tanggal <span style="color: #dc3545;">*</span>
+                        </label>
+                        <input type="date" 
+                               class="form-control @error('dari_tanggal') is-invalid @enderror" 
+                               id="dari_tanggal" 
+                               name="dari_tanggal" 
+                               value="{{ old('dari_tanggal', date('Y-m-d')) }}"
+                               required>
+                        @error('dari_tanggal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="sampai_tanggal" class="form-label">
+                            Sampai Tanggal <span style="color: #dc3545;">*</span>
+                        </label>
+                        <input type="date" 
+                               class="form-control @error('sampai_tanggal') is-invalid @enderror" 
+                               id="sampai_tanggal" 
+                               name="sampai_tanggal" 
+                               value="{{ old('sampai_tanggal', date('Y-m-d')) }}"
+                               required>
+                        @error('sampai_tanggal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <small style="display: block; margin-bottom: 24px; color: #666; font-size: 13px;">
+                    Range tanggal untuk data rekap yang akan diimport
+                </small>
                 
                 <div class="form-group">
                     <label for="file" class="form-label">

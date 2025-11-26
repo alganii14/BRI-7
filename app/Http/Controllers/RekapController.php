@@ -53,17 +53,20 @@ class RekapController extends Controller
     public function import(Request $request)
     {
         $request->validate([
+            'dari_tanggal' => 'required|date',
+            'sampai_tanggal' => 'required|date|after_or_equal:dari_tanggal',
             'file' => 'required|mimes:xlsx,xls,csv|max:10240',
         ]);
 
         try {
             $file = $request->file('file');
+            $tanggal = $request->input('dari_tanggal'); // Gunakan dari_tanggal sebagai tanggal default
             $extension = $file->getClientOriginalExtension();
 
             if ($extension === 'csv') {
-                $this->importCsv($file);
+                $this->importCsv($file, $tanggal);
             } else {
-                $this->importExcel($file);
+                $this->importExcel($file, $tanggal);
             }
 
             return redirect()->route('rekap.index')
@@ -74,7 +77,7 @@ class RekapController extends Controller
         }
     }
 
-    private function importCsv($file)
+    private function importCsv($file, $tanggal)
     {
         $handle = fopen($file->getRealPath(), 'r');
         
@@ -105,6 +108,7 @@ class RekapController extends Controller
             
             Rekap::create([
                 'nama_kc' => trim($row[$offset + 0] ?? ''),
+                'tanggal' => $tanggal,
                 'pn' => trim($row[$offset + 1] ?? ''),
                 'nama_rmft' => trim($row[$offset + 2] ?? ''),
                 'nama_pemilik' => trim($row[$offset + 3] ?? ''),
@@ -119,7 +123,7 @@ class RekapController extends Controller
         fclose($handle);
     }
 
-    private function importExcel($file)
+    private function importExcel($file, $tanggal)
     {
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getRealPath());
         $worksheet = $spreadsheet->getActiveSheet();
@@ -139,6 +143,7 @@ class RekapController extends Controller
             
             Rekap::create([
                 'nama_kc' => $row[$offset + 0] ?? null,
+                'tanggal' => $tanggal,
                 'pn' => $row[$offset + 1] ?? null,
                 'nama_rmft' => $row[$offset + 2] ?? null,
                 'nama_pemilik' => $row[$offset + 3] ?? null,

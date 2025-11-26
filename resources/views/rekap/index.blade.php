@@ -72,7 +72,8 @@
     table th:nth-child(3),
     table th:nth-child(4),
     table th:nth-child(5),
-    table th:nth-child(6) {
+    table th:nth-child(6),
+    table th:nth-child(7) {
         text-align: left;
     }
 
@@ -88,12 +89,13 @@
     table td:nth-child(3),
     table td:nth-child(4),
     table td:nth-child(5),
-    table td:nth-child(6) {
+    table td:nth-child(6),
+    table td:nth-child(7) {
         text-align: left;
     }
 
-    table td:nth-child(7),
-    table td:nth-child(8) {
+    table td:nth-child(8),
+    table td:nth-child(9) {
         text-align: right;
     }
 
@@ -176,6 +178,7 @@
             <thead>
                 <tr>
                     <th>NO</th>
+                    <th>TANGGAL</th>
                     <th>NAMA KC</th>
                     <th>PN</th>
                     <th>NAMA RMFT</th>
@@ -191,6 +194,7 @@
                 @forelse($rekaps as $item)
                 <tr>
                     <td>{{ $loop->iteration + ($rekaps->currentPage() - 1) * $rekaps->perPage() }}</td>
+                    <td>{{ $item->tanggal ? \Carbon\Carbon::parse($item->tanggal)->format('d M Y') : '-' }}</td>
                     <td>{{ $item->nama_kc ?? '-' }}</td>
                     <td>{{ $item->pn ?? '-' }}</td>
                     <td>{{ $item->nama_rmft ?? '-' }}</td>
@@ -215,7 +219,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="10" style="text-align: center; padding: 40px; color: #666;">
+                    <td colspan="11" style="text-align: center; padding: 40px; color: #666;">
                         Belum ada data rekap. <a href="{{ route('rekap.import.form') }}" style="color: #28a745;">Import data</a>
                     </td>
                 </tr>

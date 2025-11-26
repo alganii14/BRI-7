@@ -11,6 +11,7 @@ class Rekap extends Model
 
     protected $fillable = [
         'nama_kc',
+        'tanggal',
         'pn',
         'nama_rmft',
         'nama_pemilik',

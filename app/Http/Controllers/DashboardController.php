@@ -83,10 +83,20 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
         
-        // Pipeline Tervalidasi - filter berdasarkan KC dan nama RMFT
-        $totalPipelineValidasi = \App\Models\Rekap::where('nama_kc', $rmft->kanca)
-            ->where('nama_rmft', $rmft->completename)
-            ->sum('validasi');
+        // Pipeline Tervalidasi - filter berdasarkan KC, nama RMFT, dan tanggal
+        $rekapQuery = \App\Models\Rekap::where('nama_kc', $rmft->kanca)
+            ->where('nama_rmft', $rmft->completename);
+        
+        // Filter berdasarkan tanggal range jika ada
+        if ($startDate && $endDate) {
+            $rekapQuery->whereDate('tanggal', '>=', $startDate)
+                ->whereDate('tanggal', '<=', $endDate);
+        } else {
+            $rekapQuery->whereYear('tanggal', $selectedYear)
+                ->whereMonth('tanggal', $selectedMonth);
+        }
+        
+        $totalPipelineValidasi = $rekapQuery->sum('validasi');
         
         return view('dashboard.rmft', compact(
             'totalAktivitasBulanIni',
@@ -167,7 +177,7 @@ class DashboardController extends Controller
         }
         $aktivitasTerbaru = $aktivitasTerbaruQuery->limit(5)->get();
         
-        // Pipeline Tervalidasi - filter berdasarkan KC Manager dan RMFT jika dipilih
+        // Pipeline Tervalidasi - filter berdasarkan KC Manager, RMFT, dan tanggal
         $rekapQuery = \App\Models\Rekap::where('nama_kc', $managerKc);
         if ($selectedRmftId) {
             $selectedRmft = RMFT::find($selectedRmftId);
@@ -175,6 +185,16 @@ class DashboardController extends Controller
                 $rekapQuery->where('nama_rmft', $selectedRmft->completename);
             }
         }
+        
+        // Filter berdasarkan tanggal range jika ada
+        if ($startDate && $endDate) {
+            $rekapQuery->whereDate('tanggal', '>=', $startDate)
+                ->whereDate('tanggal', '<=', $endDate);
+        } else {
+            $rekapQuery->whereYear('tanggal', $selectedYear)
+                ->whereMonth('tanggal', $selectedMonth);
+        }
+        
         $totalPipelineValidasi = $rekapQuery->sum('validasi');
         
         return view('dashboard.manager', compact(
@@ -281,7 +301,7 @@ class DashboardController extends Controller
         }
         $aktivitasTerbaru = $aktivitasTerbaruQuery->limit(5)->get();
         
-        // Pipeline Tervalidasi - filter berdasarkan KC dan RMFT yang dipilih
+        // Pipeline Tervalidasi - filter berdasarkan KC, RMFT, dan tanggal yang dipilih
         $rekapQuery = \App\Models\Rekap::query();
         if ($selectedNamaKc) {
             $rekapQuery->where('nama_kc', $selectedNamaKc);
@@ -292,6 +312,16 @@ class DashboardController extends Controller
                 $rekapQuery->where('nama_rmft', $selectedRmft->completename);
             }
         }
+        
+        // Filter berdasarkan tanggal range jika ada
+        if ($startDate && $endDate) {
+            $rekapQuery->whereDate('tanggal', '>=', $startDate)
+                ->whereDate('tanggal', '<=', $endDate);
+        } else {
+            $rekapQuery->whereYear('tanggal', $selectedYear)
+                ->whereMonth('tanggal', $selectedMonth);
+        }
+        
         $totalPipelineValidasi = $rekapQuery->sum('validasi');
         
         return view('dashboard.admin', compact(
