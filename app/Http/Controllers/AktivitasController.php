@@ -9,6 +9,11 @@ use App\Models\User;
 use App\Models\RencanaAktivitas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class AktivitasController extends Controller
 {
@@ -847,41 +852,62 @@ class AktivitasController extends Controller
 
     private function exportToExcel($data, $filename)
     {
-        $headers = [
-            'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
-            'Content-Disposition' => "attachment; filename=\"{$filename}.xls\"",
-            'Pragma' => 'no-cache',
-            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-            'Expires' => '0'
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header
+        $headers = ['No', 'Nama KC', 'PN', 'Nama RMFT', 'Nama Pemilik', 'No Rekening', 'Pipeline (Rp)', 'Realisasi (Rp)', 'Keterangan', 'Validasi'];
+        $sheet->fromArray($headers, null, 'A1');
+
+        // Style header
+        $headerStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '28a745']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
         ];
+        $sheet->getStyle('A1:J1')->applyFromArray($headerStyle);
 
-        $html = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
-        $html .= '<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>';
-        $html .= 'table { border-collapse: collapse; width: 100%; }';
-        $html .= 'th { background-color: #28a745; color: white; font-weight: bold; padding: 10px; border: 1px solid #ddd; text-align: center; }';
-        $html .= 'td { padding: 8px; border: 1px solid #ddd; }';
-        $html .= '.number { text-align: right; } .text { text-align: left; } .center { text-align: center; }';
-        $html .= '</style></head><body><table><thead><tr>';
-        $html .= '<th>No</th><th>Nama KC</th><th>PN</th><th>Nama RMFT</th><th>Nama Pemilik</th><th>No Rekening</th><th>Pipeline (Rp)</th><th>Realisasi (Rp)</th><th>Keterangan</th><th>Validasi</th>';
-        $html .= '</tr></thead><tbody>';
-        
-        foreach ($data as $index => $row) {
-            $html .= '<tr>';
-            $html .= '<td class="center">' . ($index + 1) . '</td>';
-            $html .= '<td class="text">' . ($row->nama_kc ?? '-') . '</td>';
-            $html .= '<td class="text">' . ($row->pn ?? '-') . '</td>';
-            $html .= '<td class="text">' . ($row->nama_rmft ?? '-') . '</td>';
-            $html .= '<td class="text">' . ($row->nama_pemilik ?? '-') . '</td>';
-            $html .= '<td class="text">' . ($row->no_rekening ?? '-') . '</td>';
-            $html .= '<td class="number">' . number_format($row->pipeline, 0, ',', '.') . '</td>';
-            $html .= '<td class="number">' . number_format($row->realisasi, 0, ',', '.') . '</td>';
-            $html .= '<td class="text">' . ($row->keterangan ?? '-') . '</td>';
-            $html .= '<td class="center">' . ($row->validasi ?? '-') . '</td>';
-            $html .= '</tr>';
+        // Set data
+        $row = 2;
+        foreach ($data as $index => $item) {
+            $sheet->setCellValue('A' . $row, $index + 1);
+            $sheet->setCellValue('B' . $row, $item->nama_kc ?? '-');
+            $sheet->setCellValue('C' . $row, $item->pn ?? '-');
+            $sheet->setCellValue('D' . $row, $item->nama_rmft ?? '-');
+            $sheet->setCellValue('E' . $row, $item->nama_pemilik ?? '-');
+            $sheet->setCellValue('F' . $row, $item->no_rekening ?? '-');
+            $sheet->setCellValue('G' . $row, $item->pipeline);
+            $sheet->setCellValue('H' . $row, $item->realisasi);
+            $sheet->setCellValue('I' . $row, $item->keterangan ?? '-');
+            $sheet->setCellValue('J' . $row, $item->validasi ?? '-');
+            $row++;
         }
-        
-        $html .= '</tbody></table></body></html>';
 
-        return response($html, 200, $headers);
+        // Format numbers
+        $lastRow = $row - 1;
+        $sheet->getStyle('G2:H' . $lastRow)->getNumberFormat()->setFormatCode('#,##0');
+
+        // Auto size columns
+        foreach (range('A', 'J') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Borders for all data
+        $sheet->getStyle('A1:J' . $lastRow)->applyFromArray([
+            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+        ]);
+
+        // Alignment
+        $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('G2:H' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('J2:J' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Save to temp file
+        $writer = new Xlsx($spreadsheet);
+        $tempFile = tempnam(sys_get_temp_dir(), 'excel');
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $filename . '.xlsx')->deleteFileAfterSend(true);
     }
 }
