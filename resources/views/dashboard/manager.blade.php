@@ -420,17 +420,17 @@
         <div class="summary-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px;">
             <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
                 <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Total Target</div>
-                <div style="font-size: 24px; font-weight: 700;">Rp {{ number_format($totalTarget / 1000000, 1) }} juta</div>
+                <div style="font-size: 24px; font-weight: 700;">Rp {{ number_format($totalTarget / 1000000, 0) }} juta</div>
             </div>
             
             <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); border-radius: 8px; color: white;">
                 <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Total Realisasi</div>
-                <div style="font-size: 24px; font-weight: 700;">Rp {{ number_format($totalRealisasi / 1000000, 1) }} juta</div>
+                <div style="font-size: 24px; font-weight: 700;">Rp {{ number_format($totalRealisasi / 1000000, 0) }} juta</div>
             </div>
             
             <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #28a745 0%, #218838 100%); border-radius: 8px; color: white;">
                 <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Pipeline Tervalidasi</div>
-                <div style="font-size: 24px; font-weight: 700;">Rp {{ number_format($totalPipelineValidasi / 1000000, 1) }} juta</div>
+                <div style="font-size: 24px; font-weight: 700;">Rp {{ number_format($totalPipelineValidasi / 1000000, 0) }} juta</div>
             </div>
         </div>
         
@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             @endif
                         },
                         label: function(context) {
-                            return context.dataset.label + ': Rp ' + context.parsed.y.toFixed(1) + ' juta';
+                            return context.dataset.label + ': Rp ' + context.parsed.y.toFixed(0) + ' juta';
                         }
                     }
                 }
