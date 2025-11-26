@@ -259,11 +259,15 @@ class AktivitasController extends Controller
             'rencana_aktivitas' => 'nullable|string',
             'rencana_aktivitas_id' => 'nullable|exists:rencana_aktivitas,id',
             'segmen_nasabah' => 'required|string',
+            'tipe_nasabah' => 'required|in:lama,baru',
             'nama_nasabah' => 'required|string',
             'norek' => $isPipelineData ? 'nullable|string' : 'required|string',
             'rp_jumlah' => 'required|string',
             'keterangan' => 'nullable|string',
         ]);
+        
+        // Simpan tipe pipeline (lama = di dalam pipeline, baru = di luar pipeline)
+        $tipePipeline = $validated['tipe_nasabah'];
 
         // Check if multiple units are selected
         $multipleUnits = !empty($validated['kode_uker_list']) && 
@@ -343,12 +347,12 @@ class AktivitasController extends Controller
                     'nasabah_id' => $nasabahId,
                 ];
                 
-                // Jika Manager atau Admin yang membuat, ini adalah assignment
+                // Simpan tipe pipeline (lama/baru) dari form
+                $activityData['tipe'] = $tipePipeline;
+                
+                // Jika Manager atau Admin yang membuat, simpan assigned_by
                 if ($user->isManager() || $user->isAdmin()) {
                     $activityData['assigned_by'] = $user->id;
-                    $activityData['tipe'] = 'assigned';
-                } else {
-                    $activityData['tipe'] = 'self';
                 }
                 
                 Aktivitas::create($activityData);
@@ -386,13 +390,16 @@ class AktivitasController extends Controller
                 $validated['nasabah_id'] = null;
             }
             
-            // Jika Manager atau Admin yang membuat, ini adalah assignment
+            // Simpan tipe pipeline (lama/baru) dari form
+            $validated['tipe'] = $tipePipeline;
+            
+            // Jika Manager atau Admin yang membuat, simpan assigned_by
             if ($user->isManager() || $user->isAdmin()) {
                 $validated['assigned_by'] = $user->id;
-                $validated['tipe'] = 'assigned';
-            } else {
-                $validated['tipe'] = 'self';
             }
+            
+            // Hapus tipe_nasabah dari validated karena tidak ada di database
+            unset($validated['tipe_nasabah']);
 
             Aktivitas::create($validated);
 
@@ -472,6 +479,7 @@ class AktivitasController extends Controller
             'rencana_aktivitas' => 'nullable|string',
             'rencana_aktivitas_id' => 'nullable|exists:rencana_aktivitas,id',
             'segmen_nasabah' => 'required|string',
+            'tipe_nasabah' => 'required|in:lama,baru',
             'nama_nasabah' => 'required|string',
             'norek' => 'nullable|string',
             'rp_jumlah' => 'required|string',
@@ -479,6 +487,10 @@ class AktivitasController extends Controller
             'kode_uker' => 'nullable|string',
             'nama_uker' => 'nullable|string',
         ]);
+        
+        // Simpan tipe pipeline (lama/baru) dari form
+        $validated['tipe'] = $validated['tipe_nasabah'];
+        unset($validated['tipe_nasabah']);
 
         $aktivitas->update($validated);
 
@@ -690,6 +702,7 @@ class AktivitasController extends Controller
         $user = Auth::user();
         
         // Build query berdasarkan role user
+        // Keterangan akan menambahkan "Diluar Pipeline - " jika tipe = 'baru'
         $query = Aktivitas::select(
             'pn',
             'nama_kc',
@@ -698,7 +711,7 @@ class AktivitasController extends Controller
             'norek as no_rekening',
             \DB::raw('SUM(rp_jumlah) as pipeline'),
             \DB::raw('SUM(COALESCE(nominal_realisasi, 0)) as realisasi'),
-            \DB::raw('GROUP_CONCAT(DISTINCT COALESCE(keterangan_realisasi, keterangan) SEPARATOR ", ") as keterangan'),
+            \DB::raw('GROUP_CONCAT(DISTINCT CONCAT(CASE WHEN tipe = "baru" THEN "Diluar Pipeline - " ELSE "" END, COALESCE(keterangan_realisasi, keterangan, "")) SEPARATOR ", ") as keterangan'),
             \DB::raw('NULL as validasi')
         );
 
@@ -746,6 +759,7 @@ class AktivitasController extends Controller
         $format = $request->get('format', 'excel');
         
         // Build query berdasarkan role user
+        // Keterangan akan menambahkan "Diluar Pipeline - " jika tipe = 'baru'
         $query = Aktivitas::select(
             'pn',
             'nama_kc',
@@ -754,7 +768,7 @@ class AktivitasController extends Controller
             'norek as no_rekening',
             \DB::raw('SUM(rp_jumlah) as pipeline'),
             \DB::raw('SUM(COALESCE(nominal_realisasi, 0)) as realisasi'),
-            \DB::raw('GROUP_CONCAT(DISTINCT COALESCE(keterangan_realisasi, keterangan) SEPARATOR ", ") as keterangan'),
+            \DB::raw('GROUP_CONCAT(DISTINCT CONCAT(CASE WHEN tipe = "baru" THEN "Diluar Pipeline - " ELSE "" END, COALESCE(keterangan_realisasi, keterangan, "")) SEPARATOR ", ") as keterangan'),
             \DB::raw('NULL as validasi')
         );
 

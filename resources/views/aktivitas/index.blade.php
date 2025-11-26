@@ -613,16 +613,30 @@ document.getElementById('kode_kc').addEventListener('change', function() {
                         @endif
                     </td>
                     <td>
-                        @if($item->keterangan_realisasi)
-                            @if($item->keterangan_realisasi == 'Sakit')
-                                <span class="badge" style="background-color: #FF6B6B; color: white;">😷 Sakit</span>
-                            @elseif($item->keterangan_realisasi == 'Izin')
-                                <span class="badge" style="background-color: #FFA726; color: white;">📋 Izin</span>
-                            @else
-                                {{ $item->keterangan_realisasi }}
-                            @endif
-                        @elseif($item->keterangan)
-                            {{ $item->keterangan }}
+                        @php
+                            $keteranganParts = [];
+                            
+                            // Tambahkan "Di luar Pipeline" jika tipe = baru
+                            if($item->tipe == 'baru') {
+                                $keteranganParts[] = '<span class="badge" style="background-color: #9C27B0; color: white;">Di luar Pipeline</span>';
+                            }
+                            
+                            // Tambahkan keterangan realisasi atau keterangan biasa
+                            if($item->keterangan_realisasi) {
+                                if($item->keterangan_realisasi == 'Sakit') {
+                                    $keteranganParts[] = '<span class="badge" style="background-color: #FF6B6B; color: white;">😷 Sakit</span>';
+                                } elseif($item->keterangan_realisasi == 'Izin') {
+                                    $keteranganParts[] = '<span class="badge" style="background-color: #FFA726; color: white;">📋 Izin</span>';
+                                } else {
+                                    $keteranganParts[] = e($item->keterangan_realisasi);
+                                }
+                            } elseif($item->keterangan) {
+                                $keteranganParts[] = e($item->keterangan);
+                            }
+                        @endphp
+                        
+                        @if(count($keteranganParts) > 0)
+                            {!! implode(' ', $keteranganParts) !!}
                         @else
                             -
                         @endif
