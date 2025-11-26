@@ -413,9 +413,6 @@
                 <div style="font-size: 24px; font-weight: 700;">Rp {{ number_format($totalRealisasi / 1000000, 1) }} juta</div>
             </div>
             
-            @php
-                $totalPipelineValidasi = \App\Models\Rekap::sum('pipeline');
-            @endphp
             <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #28a745 0%, #218838 100%); border-radius: 8px; color: white;">
                 <div style="font-size: 13px; opacity: 0.9; margin-bottom: 8px;">Pipeline Tervalidasi</div>
                 <div style="font-size: 24px; font-weight: 700;">Rp {{ number_format($totalPipelineValidasi / 1000000, 1) }} juta</div>

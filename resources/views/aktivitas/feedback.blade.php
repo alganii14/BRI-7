@@ -262,10 +262,6 @@
             <span class="info-label">Nasabah</span>
             <span class="info-value">{{ $aktivitas->nama_nasabah }}</span>
         </div>
-        <div class="info-row">
-            <span class="info-label">Norek</span>
-            <span class="info-value">{{ $aktivitas->norek }}</span>
-        </div>
     </div>
 
     <div class="target-info">
