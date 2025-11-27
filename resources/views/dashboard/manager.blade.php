@@ -241,7 +241,7 @@
 @section('content')
 <div class="page-header">
     <h2>Dashboard Manager - {{ Auth::user()->name }}</h2>
-    <p>Monitoring Aktivitas Pipeline - {{ \Carbon\Carbon::now()->format('F Y') }}</p>
+    <p>Monitoring Aktivitas Pipeline </p>
 </div>
 
 <!-- Filter RMFT, Bulan, dan Tahun -->
