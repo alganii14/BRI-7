@@ -209,6 +209,17 @@ class UkerController extends Controller
      */
     public function getByKC(Request $request)
     {
+        // If 'all' parameter is set, return all ukers for kanca list
+        if ($request->get('all')) {
+            $ukers = Uker::select('kode_kanca', 'kanca')
+                ->whereNotNull('kode_kanca')
+                ->where('kode_kanca', '!=', '')
+                ->orderBy('kode_kanca', 'asc')
+                ->get();
+            
+            return response()->json($ukers);
+        }
+        
         $kodeKc = $request->get('kode_kc');
         
         if (!$kodeKc) {

@@ -52,7 +52,7 @@ class AkunController extends Controller
             abort(403, 'Unauthorized action.');
         }
         
-        $rmftList = RMFT::orderBy('completename', 'asc')->get();
+        $rmftList = RMFT::with('ukerRelation')->orderBy('completename', 'asc')->get();
         
         return view('akun.create', compact('rmftList'));
     }
@@ -71,8 +71,8 @@ class AkunController extends Controller
             'role' => 'required|in:admin,manager,rmft',
             'pernr' => 'nullable|string|max:50',
             'rmft_id' => 'nullable|exists:rmfts,id',
-            'kode_kanca' => 'nullable|string|max:10',
-            'nama_kanca' => 'nullable|string|max:255',
+            'kode_kanca' => 'required_if:role,manager|nullable|string|max:10',
+            'nama_kanca' => 'required_if:role,manager|nullable|string|max:255',
         ]);
         
         $validated['password'] = Hash::make($validated['password']);
