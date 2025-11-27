@@ -227,7 +227,6 @@
                         <input type="checkbox" id="remember" name="remember">
                         <label for="remember">Ingat Saya</label>
                     </div>
-                    <a href="#" class="forgot-password">Lupa Password?</a>
                 </div>
 
                 <button type="submit" class="btn-login">Login</button>
