@@ -298,7 +298,7 @@
                     <select name="year" id="year" class="form-control" style="border: 2px solid #E5E7EB; border-radius: 8px; padding: 10px 12px; font-size: 15px; transition: all 0.3s ease; background: white;" onfocus="this.style.borderColor='#0066AE'; this.style.boxShadow='0 0 0 3px rgba(0, 102, 174, 0.1)'" onblur="this.style.borderColor='#E5E7EB'; this.style.boxShadow='none'">
                         @php
                             $currentYear = \Carbon\Carbon::now()->year;
-                            $startYear = $currentYear - 2;
+                            $startYear = $currentYear;
                             $endYear = $currentYear + 1;
                         @endphp
                         @for($y = $startYear; $y <= $endYear; $y++)
