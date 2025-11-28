@@ -31,6 +31,7 @@ use App\Http\Controllers\RekapController;
 use App\Http\Controllers\NasabahDowngradeController;
 use App\Http\Controllers\BrilinkController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PipelineController;
 
 /*
 |--------------------------------------------------------------------------
@@ -91,11 +92,14 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
     Route::get('api/nasabah/search', [NasabahController::class, 'searchByNorek'])->name('api.nasabah.search');
     Route::get('api/nasabah/get', [NasabahController::class, 'getByNorek'])->name('api.nasabah.get');
     
-    // API for pipeline search
+    // API for pipeline search (dari pull of pipeline - untuk manager pilih pipeline)
     Route::get('api/pipeline/search', [NasabahController::class, 'searchPipeline'])->name('api.pipeline.search');
     
     // API for pipeline available years
     Route::get('api/pipeline/years', [NasabahController::class, 'getAvailableYears'])->name('api.pipeline.years');
+    
+    // API for aktivitas search from pipelines table (untuk RMFT pilih nasabah dari pipeline yang sudah dipilih)
+    Route::get('api/aktivitas/search-from-pipeline', [PipelineController::class, 'searchForAktivitas'])->name('api.aktivitas.search-from-pipeline');
     
     // API for nasabah by strategy and kategori
     Route::get('api/nasabah', [NasabahController::class, 'searchPipeline'])->name('api.nasabah.index');
@@ -148,6 +152,10 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
     
     // Manager and Admin Routes
     Route::middleware(['role:manager,admin'])->group(function () {
+        
+        // Pipeline Routes
+        Route::delete('pipeline-delete-all', [PipelineController::class, 'deleteAll'])->name('pipeline.delete-all')->middleware('role:admin');
+        Route::resource('pipeline', PipelineController::class);
         
         // Rekap Routes (Validasi)
         Route::get('rekap', [RekapController::class, 'index'])->name('rekap.index');

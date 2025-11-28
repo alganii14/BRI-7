@@ -54,6 +54,41 @@ class NasabahController extends Controller
     }
     
     /**
+     * Helper function to exclude nasabah yang sudah ada di tabel pipelines
+     * Untuk menghindari duplikasi ketika manager memilih nasabah
+     */
+    private function excludeFromPipelines($query, $strategy, $kategori, $kodeKc, $kodeUker, $fieldToCheck = 'nama_nasabah')
+    {
+        // Get nasabah yang sudah ada di pipelines dengan strategy dan kategori yang sama
+        $pipelinesUsed = \App\Models\Pipeline::where('strategy_pipeline', $strategy)
+            ->where('kode_kc', $kodeKc);
+        
+        // Filter by kategori jika ada
+        if ($kategori) {
+            $pipelinesUsed->where('kategori_strategi', $kategori);
+        }
+        
+        // Filter by uker jika ada (bisa multiple, dipisah koma)
+        if ($kodeUker) {
+            $kodeUkerArray = explode(',', $kodeUker);
+            $pipelinesUsed->whereIn('kode_uker', $kodeUkerArray);
+        }
+        
+        $usedNasabah = $pipelinesUsed->select('nama_nasabah', 'norek')->get();
+        
+        if ($usedNasabah->isNotEmpty()) {
+            // Exclude berdasarkan nama nasabah
+            $usedNames = $usedNasabah->pluck('nama_nasabah')->filter()->unique()->toArray();
+            
+            if (!empty($usedNames)) {
+                $query->whereNotIn($fieldToCheck, $usedNames);
+            }
+        }
+        
+        return $query;
+    }
+    
+    /**
      * Get available years from pipeline tables
      */
     public function getAvailableYears(Request $request)
@@ -303,6 +338,22 @@ class NasabahController extends Controller
         
         $query = $model::query();
         
+        // EXCLUDE NASABAH YANG SUDAH ADA DI PIPELINES
+        // Get nasabah yang sudah dipilih di pipelines dengan strategy dan kategori yang sama
+        $pipelinesUsed = \App\Models\Pipeline::where('strategy_pipeline', $strategy)
+            ->where('kode_kc', $kode_kc);
+        
+        if ($kategori) {
+            $pipelinesUsed->where('kategori_strategi', $kategori);
+        }
+        
+        if ($kode_uker) {
+            $kodeUkerArray = explode(',', $kode_uker);
+            $pipelinesUsed->whereIn('kode_uker', $kodeUkerArray);
+        }
+        
+        $usedNasabah = $pipelinesUsed->pluck('nama_nasabah')->filter()->unique()->toArray();
+        
         if ($isPerusahaanAnak) {
             // Perusahaan Anak - filter berdasarkan kode_cabang_induk sesuai KC user/RMFT
             // Filter by kode_cabang_induk jika ada
@@ -310,17 +361,9 @@ class NasabahController extends Controller
                 $query->where('kode_cabang_induk', $kode_kc);
             }
             
-            // Exclude data yang sudah digunakan di aktivitas dengan kategori List Perusahaan Anak
-            $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', 'List Perusahaan Anak')
-                ->select('nama_nasabah')
-                ->get();
-            
-            if ($aktivitasUsed->isNotEmpty()) {
-                $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                
-                if (!empty($usedNames)) {
-                    $query->whereNotIn('nama_partner_vendor', $usedNames);
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_partner_vendor', $usedNasabah);
             }
             
             // Order by id untuk konsistensi
@@ -385,17 +428,9 @@ class NasabahController extends Controller
             // Untuk Existing Payroll, tampilkan semua data tanpa filter KC
             // karena struktur data berbeda (per perusahaan, bukan per nasabah)
             
-            // Exclude data yang sudah digunakan di aktivitas dengan kategori Existing Payroll
-            $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', 'Existing Payroll')
-                ->select('nama_nasabah')
-                ->get();
-            
-            if ($aktivitasUsed->isNotEmpty()) {
-                $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                
-                if (!empty($usedNames)) {
-                    $query->whereNotIn('nama_perusahaan', $usedNames);
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_perusahaan', $usedNasabah);
             }
             
             // Order by id untuk konsistensi
@@ -461,17 +496,9 @@ class NasabahController extends Controller
                 $query->where('kode_cabang_induk', $kode_kc);
             }
             
-            // Exclude data yang sudah digunakan di aktivitas dengan kategori Potensi Payroll
-            $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', 'Potensi Payroll')
-                ->select('nama_nasabah')
-                ->get();
-            
-            if ($aktivitasUsed->isNotEmpty()) {
-                $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                
-                if (!empty($usedNames)) {
-                    $query->whereNotIn('perusahaan', $usedNames);
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('perusahaan', $usedNasabah);
             }
             
             // Order by id untuk konsistensi
@@ -684,17 +711,9 @@ class NasabahController extends Controller
                 $query->where('kode_uker', $kode_uker);
             }
             
-            // Exclude data yang sudah digunakan di aktivitas dengan kategori Optimalisasi Business Cluster
-            $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', 'Optimalisasi Business Cluster')
-                ->select('nama_nasabah')
-                ->get();
-            
-            if ($aktivitasUsed->isNotEmpty()) {
-                $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                
-                if (!empty($usedNames)) {
-                    $query->whereNotIn('nama_usaha_pusat_bisnis', $usedNames);
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_usaha_pusat_bisnis', $usedNasabah);
             }
             
             // Search by rekening or nama usaha pusat bisnis
@@ -770,21 +789,9 @@ class NasabahController extends Controller
                 });
             }
             
-            // Exclude data yang sudah digunakan di aktivitas dengan kategori yang sama
-            $aktivitasUsed = \App\Models\Aktivitas::whereIn('kategori_strategi', ['Wingback Penguatan Produk & Fungsi RM', 'Winback'])
-                ->select('norek', 'nama_nasabah')
-                ->get();
-            
-            if ($aktivitasUsed->isNotEmpty()) {
-                $usedNoreks = $aktivitasUsed->pluck('norek')->filter()->toArray();
-                $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                
-                if (!empty($usedNoreks)) {
-                    $query->whereNotIn('no_rekening', $usedNoreks);
-                }
-                if (!empty($usedNames)) {
-                    $query->whereNotIn('nama_nasabah', $usedNames);
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_nasabah', $usedNasabah);
             }
             
             // Get total count for pagination
@@ -850,21 +857,9 @@ class NasabahController extends Controller
                 });
             }
             
-            // Exclude data yang sudah digunakan di aktivitas dengan kategori yang sama
-            $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', 'Winback')
-                ->select('norek', 'nama_nasabah')
-                ->get();
-            
-            if ($aktivitasUsed->isNotEmpty()) {
-                $usedNoreks = $aktivitasUsed->pluck('norek')->filter()->toArray();
-                $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                
-                if (!empty($usedNoreks)) {
-                    $query->whereNotIn('no_rekening', $usedNoreks);
-                }
-                if (!empty($usedNames)) {
-                    $query->whereNotIn('nama_nasabah', $usedNames);
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_nasabah', $usedNasabah);
             }
             
             // Get total count for pagination
@@ -876,21 +871,11 @@ class NasabahController extends Controller
                             ->orderBy('id', 'desc')
                             ->get()
                             ->map(function($item) {
-                                return [
-                                    'id' => $item->id,
-                                    'cifno' => $item->cifno,
-                                    'no_rekening' => $item->no_rekening,
-                                    'nama_nasabah' => $item->nama_nasabah,
-                                    'kode_cabang_induk' => $item->kode_cabang_induk,
-                                    'cabang_induk' => $item->cabang_induk,
-                                    'kode_uker' => $item->kode_uker,
-                                    'unit_kerja' => $item->unit_kerja,
-                                    'saldo_terupdate' => $item->saldo_terupdate,
-                                    'saldo_last_eom' => $item->saldo_last_eom,
-                                    'delta' => $item->delta,
-                                    'segmentasi' => $item->segmentasi,
-                                    'jenis_simpanan' => $item->jenis_simpanan,
-                                ];
+                                // Return all attributes from model
+                                $data = $item->toArray();
+                                // Add aliases for compatibility
+                                $data['norek'] = $item->no_rekening ?? '';
+                                return $data;
                             });
             
             return response()->json([
@@ -930,21 +915,9 @@ class NasabahController extends Controller
                 });
             }
             
-            // Exclude data yang sudah digunakan di aktivitas dengan kategori Nasabah Downgrade
-            $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', 'Nasabah Downgrade')
-                ->select('norek', 'nama_nasabah')
-                ->get();
-            
-            if ($aktivitasUsed->isNotEmpty()) {
-                $usedNoreks = $aktivitasUsed->pluck('norek')->filter()->toArray();
-                $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                
-                if (!empty($usedNoreks)) {
-                    $query->whereNotIn('nomor_rekening', $usedNoreks);
-                }
-                if (!empty($usedNames)) {
-                    $query->whereNotIn('nama_nasabah', $usedNames);
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_nasabah', $usedNasabah);
             }
             
             // Get total count for pagination
@@ -1067,21 +1040,9 @@ class NasabahController extends Controller
                 });
             }
             
-            // Exclude data yang sudah digunakan di aktivitas dengan kategori yang sama
-            $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', 'Qlola Non Debitur')
-                ->select('norek', 'nama_nasabah')
-                ->get();
-            
-            if ($aktivitasUsed->isNotEmpty()) {
-                $usedNoreks = $aktivitasUsed->pluck('norek')->filter()->toArray();
-                $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                
-                if (!empty($usedNoreks)) {
-                    $query->whereNotIn('no_rekening', $usedNoreks);
-                }
-                if (!empty($usedNames)) {
-                    $query->whereNotIn('nama_nasabah', $usedNames);
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_nasabah', $usedNasabah);
             }
             
             // Get total count for pagination
@@ -1154,21 +1115,9 @@ class NasabahController extends Controller
                 });
             }
 
-            // Exclude data yang sudah digunakan di aktivitas dengan kategori yang sama
-            $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', 'Non Debitur Vol Besar CASA Kecil')
-                ->select('norek', 'nama_nasabah')
-                ->get();
-            
-            if ($aktivitasUsed->isNotEmpty()) {
-                $usedNoreks = $aktivitasUsed->pluck('norek')->filter()->toArray();
-                $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                
-                if (!empty($usedNoreks)) {
-                    $query->whereNotIn('no_rekening', $usedNoreks);
-                }
-                if (!empty($usedNames)) {
-                    $query->whereNotIn('nama_nasabah', $usedNames);
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_nasabah', $usedNasabah);
             }
 
             $total = $query->count();
@@ -1246,21 +1195,9 @@ class NasabahController extends Controller
             }
             
             // Exclude data yang sudah digunakan di aktivitas dengan kategori yang sama
-            $kategoriNames = ['Qlola (Belum ada Qlola / ada namun nonaktif)', 'Qlola Nonaktif'];
-            $aktivitasUsed = \App\Models\Aktivitas::whereIn('kategori_strategi', $kategoriNames)
-                ->select('norek', 'nama_nasabah')
-                ->get();
-            
-            if ($aktivitasUsed->isNotEmpty()) {
-                $usedNoreks = $aktivitasUsed->pluck('norek')->filter()->toArray();
-                $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                
-                if (!empty($usedNoreks)) {
-                    $query->whereNotIn('norek_pinjaman', $usedNoreks);
-                }
-                if (!empty($usedNames)) {
-                    $query->whereNotIn('nama_debitur', $usedNames);
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_debitur', $usedNasabah);
             }
             
             $total = $query->count();
@@ -1334,21 +1271,9 @@ class NasabahController extends Controller
                 });
             }
             
-            // Exclude data yang sudah digunakan di aktivitas dengan kategori yang sama
-            $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', 'User Aktif Casa Kecil')
-                ->select('norek', 'nama_nasabah')
-                ->get();
-            
-            if ($aktivitasUsed->isNotEmpty()) {
-                $usedNoreks = $aktivitasUsed->pluck('norek')->filter()->toArray();
-                $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                
-                if (!empty($usedNoreks)) {
-                    $query->whereNotIn('norek_pinjaman', $usedNoreks);
-                }
-                if (!empty($usedNames)) {
-                    $query->whereNotIn('nama_nasabah', $usedNames);
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_nasabah', $usedNasabah);
             }
             
             $total = $query->count();
@@ -1604,23 +1529,9 @@ class NasabahController extends Controller
                 });
             }
             
-            // Exclude data yang sudah digunakan di aktivitas dengan kategori yang sama
-            if ($searchKey) {
-                $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', $searchKey)
-                    ->select('norek', 'nama_nasabah')
-                    ->get();
-                
-                if ($aktivitasUsed->isNotEmpty()) {
-                    $usedNoreks = $aktivitasUsed->pluck('norek')->filter()->toArray();
-                    $usedNames = $aktivitasUsed->pluck('nama_nasabah')->filter()->toArray();
-                    
-                    if (!empty($usedNoreks)) {
-                        $query->whereNotIn('no_rekening', $usedNoreks);
-                    }
-                    if (!empty($usedNames)) {
-                        $query->whereNotIn('nama_nasabah', $usedNames);
-                    }
-                }
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_nasabah', $usedNasabah);
             }
             
             // Get total count for pagination
