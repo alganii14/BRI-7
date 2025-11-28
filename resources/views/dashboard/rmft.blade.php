@@ -254,7 +254,7 @@
             <h3 style="margin: 0; color: #0066AE; font-weight: 700; font-size: 20px;">Filter Periode</h3>
         </div>
         <form method="GET" action="{{ route('dashboard') }}">
-            <div class="filter-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+            <div class="filter-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                 <div class="form-group" style="margin-bottom: 0;">
                     <label for="month" style="display: block; margin-bottom: 8px; color: #004A7F; font-weight: 600; font-size: 14px;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 4px; vertical-align: text-top;">
@@ -291,6 +291,21 @@
                     </select>
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
+                    <label for="jenis_simpanan" style="display: block; margin-bottom: 8px; color: #004A7F; font-weight: 600; font-size: 14px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 4px; vertical-align: text-top;">
+                            <path d="M1 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1H1zm7 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/>
+                            <path d="M0 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V5zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V7a2 2 0 0 1-2-2H3z"/>
+                        </svg>
+                        Jenis Simpanan
+                    </label>
+                    <select name="jenis_simpanan" id="jenis_simpanan" class="form-control" style="border: 2px solid #E5E7EB; border-radius: 8px; padding: 10px 12px; font-size: 15px; transition: all 0.3s ease; background: white;" onfocus="this.style.borderColor='#0066AE'; this.style.boxShadow='0 0 0 3px rgba(0, 102, 174, 0.1)'" onblur="this.style.borderColor='#E5E7EB'; this.style.boxShadow='none'">
+                        <option value="">Semua Jenis</option>
+                        <option value="Tabungan" {{ ($selectedJenisSimpanan ?? '') == 'Tabungan' ? 'selected' : '' }}>Tabungan</option>
+                        <option value="Giro" {{ ($selectedJenisSimpanan ?? '') == 'Giro' ? 'selected' : '' }}>Giro</option>
+                        <option value="Deposito" {{ ($selectedJenisSimpanan ?? '') == 'Deposito' ? 'selected' : '' }}>Deposito</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
                     <label for="start_date" style="display: block; margin-bottom: 8px; color: #004A7F; font-weight: 600; font-size: 14px;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 4px; vertical-align: text-top;">
                             <path d="M6.445 11.688V6.354h-.633A12.6 12.6 0 0 0 4.5 7.16v.695c.375-.257.969-.62 1.258-.777h.012v4.61h.675zm1.188-1.305c.047.64.594 1.406 1.703 1.406 1.258 0 2-1.066 2-2.871 0-1.934-.781-2.668-1.953-2.668-.926 0-1.797.672-1.797 1.809 0 1.16.824 1.77 1.676 1.77.746 0 1.23-.376 1.383-.79h.027c-.004 1.316-.461 2.164-1.305 2.164-.664 0-1.008-.45-1.05-.82h-.684zm2.953-2.317c0 .696-.559 1.18-1.184 1.18-.601 0-1.144-.383-1.144-1.2 0-.823.582-1.21 1.168-1.21.633 0 1.16.398 1.16 1.23z"/>
@@ -318,7 +333,7 @@
                     </svg>
                     Filter
                 </button>
-                @if($selectedMonth != \Carbon\Carbon::now()->month || $selectedYear != \Carbon\Carbon::now()->year || $startDate || $endDate)
+                @if($selectedMonth != \Carbon\Carbon::now()->month || $selectedYear != \Carbon\Carbon::now()->year || $startDate || $endDate || ($selectedJenisSimpanan ?? null))
                     <a href="{{ route('dashboard') }}" class="btn btn-secondary" style="background: white; border: 2px solid #0066AE; color: #0066AE; padding: 12px 28px; font-weight: 700; box-shadow: 0 4px 14px rgba(0, 102, 174, 0.15); transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; border-radius: 8px; font-size: 15px;" onmouseover="this.style.background='#F0F8FF'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 102, 174, 0.25)'" onmouseout="this.style.background='white'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(0, 102, 174, 0.15)'">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 8px;">
                             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
@@ -364,6 +379,7 @@
         @php
             // Ambil data per hari dalam bulan terpilih atau range tanggal
             $rmftId = Auth::user()->rmftData?->id;
+            $filterJenisSimpanan = $selectedJenisSimpanan ?? null;
             
             // Tentukan range tanggal
             if ($startDate && $endDate) {
@@ -381,14 +397,34 @@
             
             $dailyData = [];
             foreach ($dateRange as $date) {
-                $targetPerDay = \App\Models\Aktivitas::where('rmft_id', $rmftId)
-                    ->whereDate('tanggal', $date)
-                    ->sum('rp_jumlah');
+                $targetQuery = \App\Models\Aktivitas::where('rmft_id', $rmftId)
+                    ->whereDate('tanggal', $date);
+                if ($filterJenisSimpanan) {
+                    $targetQuery->where('jenis_simpanan', $filterJenisSimpanan);
+                }
+                // Ambil data dan konversi manual karena rp_jumlah adalah string
+                $targetData = $targetQuery->get();
+                $targetPerDay = 0;
+                foreach ($targetData as $item) {
+                    // Hapus "Rp", ".", dan spasi, lalu konversi ke integer
+                    $cleanValue = preg_replace('/[^0-9]/', '', $item->rp_jumlah);
+                    $targetPerDay += intval($cleanValue);
+                }
                 
-                $realisasiPerDay = \App\Models\Aktivitas::where('rmft_id', $rmftId)
+                $realisasiQuery = \App\Models\Aktivitas::where('rmft_id', $rmftId)
                     ->whereDate('tanggal', $date)
-                    ->whereIn('status_realisasi', ['tercapai', 'lebih'])
-                    ->sum('nominal_realisasi');
+                    ->whereIn('status_realisasi', ['tercapai', 'lebih']);
+                if ($filterJenisSimpanan) {
+                    $realisasiQuery->where('jenis_simpanan', $filterJenisSimpanan);
+                }
+                // Ambil data dan konversi manual karena nominal_realisasi adalah string
+                $realisasiData = $realisasiQuery->get();
+                $realisasiPerDay = 0;
+                foreach ($realisasiData as $item) {
+                    // Hapus "Rp", ".", dan spasi, lalu konversi ke integer
+                    $cleanValue = preg_replace('/[^0-9]/', '', $item->nominal_realisasi);
+                    $realisasiPerDay += intval($cleanValue);
+                }
                 
                 $dailyData[] = [
                     'day' => $date->format('d/m'),

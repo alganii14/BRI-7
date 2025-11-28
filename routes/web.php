@@ -28,6 +28,8 @@ use App\Http\Controllers\AumDpkController;
 use App\Http\Controllers\UserAktifCasaKecilController;
 use App\Http\Controllers\LayeringController;
 use App\Http\Controllers\RekapController;
+use App\Http\Controllers\NasabahDowngradeController;
+use App\Http\Controllers\BrilinkController;
 use App\Http\Controllers\NotificationController;
 
 /*
@@ -136,6 +138,12 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
         
         // Layering
         Route::get('manager-pull-pipeline/layering', [ManagerPullPipelineController::class, 'layering'])->name('manager-pull-pipeline.layering');
+        
+        // Nasabah Downgrade
+        Route::get('manager-pull-pipeline/nasabah-downgrade', [ManagerPullPipelineController::class, 'nasabahDowngrade'])->name('manager-pull-pipeline.nasabah-downgrade');
+        
+        // Brilink Saldo Kurang
+        Route::get('manager-pull-pipeline/brilink-saldo-kurang', [ManagerPullPipelineController::class, 'brilinkSaldoKurang'])->name('manager-pull-pipeline.brilink-saldo-kurang');
     });
     
     // Manager and Admin Routes
@@ -305,6 +313,22 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
             Route::post('layering/import', [LayeringController::class, 'import'])->name('layering.import');
             Route::delete('layering-delete-all', [LayeringController::class, 'deleteAll'])->name('layering.delete-all');
             Route::resource('layering', LayeringController::class);
+        });
+
+        // Nasabah Downgrade Routes - Admin Only
+        Route::middleware(['role:admin'])->group(function () {
+            Route::get('nasabah-downgrade/import', [NasabahDowngradeController::class, 'importForm'])->name('nasabah-downgrade.import.form');
+            Route::post('nasabah-downgrade/import', [NasabahDowngradeController::class, 'import'])->name('nasabah-downgrade.import');
+            Route::delete('nasabah-downgrade-delete-all', [NasabahDowngradeController::class, 'deleteAll'])->name('nasabah-downgrade.delete-all');
+            Route::resource('nasabah-downgrade', NasabahDowngradeController::class);
+        });
+
+        // Brilink Routes - Admin Only
+        Route::middleware(['role:admin'])->group(function () {
+            Route::get('brilink/import', [BrilinkController::class, 'importForm'])->name('brilink.import.form');
+            Route::post('brilink/import', [BrilinkController::class, 'import'])->name('brilink.import');
+            Route::delete('brilink-delete-all', [BrilinkController::class, 'deleteAll'])->name('brilink.delete-all');
+            Route::resource('brilink', BrilinkController::class);
         });
     });
     

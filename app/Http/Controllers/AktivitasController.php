@@ -244,7 +244,7 @@ class AktivitasController extends Controller
         $isPipelineData = in_array($request->kategori_strategi, $kategoriBebas) || 
                          $request->strategy_pipeline === 'Wingback Penguatan Produk & Fungsi RM' ||
                          $request->strategy_pipeline === 'Layering' ||
-                         $request->kategori_strategi === 'Wingback' ||
+                         $request->kategori_strategi === 'Winback' ||
                          $request->strategy_pipeline === 'Optimalisasi Business Cluster';
         
         $validated = $request->validate([
@@ -261,10 +261,13 @@ class AktivitasController extends Controller
             'kelompok' => 'required|string',
             'strategy_pipeline' => 'required|string',
             'kategori_strategi' => 'nullable|string',
-            'rencana_aktivitas' => 'nullable|string',
-            'rencana_aktivitas_id' => 'nullable|exists:rencana_aktivitas,id',
+            'rencana_aktivitas' => auth()->user()->isRMFT() ? 'nullable|string' : 'nullable',
+            'rencana_aktivitas_id' => auth()->user()->isRMFT() ? 'nullable|exists:rencana_aktivitas,id' : 'nullable',
             'segmen_nasabah' => 'required|string',
             'tipe_nasabah' => 'required|in:lama,baru',
+            'jenis_usaha' => 'nullable|string',
+            'jenis_simpanan' => 'required|string|in:Tabungan,Giro,Deposito',
+            'tingkat_keyakinan' => 'required|string|in:Di bawah 50%,80% - 100%,100%',
             'nama_nasabah' => 'required|string',
             'norek' => $isPipelineData ? 'nullable|string' : 'required|string',
             'rp_jumlah' => 'required|string',
@@ -342,9 +345,12 @@ class AktivitasController extends Controller
                     'kelompok' => $validated['kelompok'],
                     'strategy_pipeline' => $validated['strategy_pipeline'],
                     'kategori_strategi' => $validated['kategori_strategi'] ?? null,
-                    'rencana_aktivitas' => $validated['rencana_aktivitas'],
-                    'rencana_aktivitas_id' => $validated['rencana_aktivitas_id'],
+                    'rencana_aktivitas' => $validated['rencana_aktivitas'] ?? null,
+                    'rencana_aktivitas_id' => $validated['rencana_aktivitas_id'] ?? null,
                     'segmen_nasabah' => $validated['segmen_nasabah'],
+                    'jenis_usaha' => $validated['jenis_usaha'] ?? null,
+                    'jenis_simpanan' => $validated['jenis_simpanan'],
+                    'tingkat_keyakinan' => $validated['tingkat_keyakinan'],
                     'nama_nasabah' => $validated['nama_nasabah'],
                     'norek' => $validated['norek'],
                     'rp_jumlah' => $validated['rp_jumlah'],
@@ -434,12 +440,17 @@ class AktivitasController extends Controller
     {
         $user = Auth::user();
         
-        // RMFT tidak bisa edit
-        if ($user->isRMFT()) {
-            abort(403, 'RMFT tidak memiliki akses untuk mengedit aktivitas.');
-        }
-        
         $aktivitas = Aktivitas::findOrFail($id);
+        
+        // RMFT hanya bisa edit aktivitas mereka sendiri yang belum ada feedback
+        if ($user->isRMFT()) {
+            if ($aktivitas->rmft_id != $user->rmft_id) {
+                abort(403, 'Anda hanya bisa mengedit aktivitas Anda sendiri.');
+            }
+            if ($aktivitas->status_realisasi && $aktivitas->status_realisasi != 'belum') {
+                abort(403, 'Aktivitas yang sudah ada feedback tidak dapat diedit.');
+            }
+        }
         
         // Manager hanya bisa edit aktivitas di KC mereka (Admin bisa edit semua)
         if ($user->isManager() && $aktivitas->kode_kc != $user->kode_kanca) {
@@ -465,12 +476,17 @@ class AktivitasController extends Controller
     {
         $user = Auth::user();
         
-        // RMFT tidak bisa update
-        if ($user->isRMFT()) {
-            abort(403, 'RMFT tidak memiliki akses untuk mengupdate aktivitas.');
-        }
-        
         $aktivitas = Aktivitas::findOrFail($id);
+        
+        // RMFT hanya bisa update aktivitas mereka sendiri yang belum ada feedback
+        if ($user->isRMFT()) {
+            if ($aktivitas->rmft_id != $user->rmft_id) {
+                abort(403, 'Anda hanya bisa mengupdate aktivitas Anda sendiri.');
+            }
+            if ($aktivitas->status_realisasi && $aktivitas->status_realisasi != 'belum') {
+                abort(403, 'Aktivitas yang sudah ada feedback tidak dapat diupdate.');
+            }
+        }
         
         // Manager hanya bisa update aktivitas di KC mereka (Admin bisa update semua)
         if ($user->isManager() && $aktivitas->kode_kc != $user->kode_kanca) {
@@ -481,10 +497,13 @@ class AktivitasController extends Controller
             'tanggal' => 'required|date',
             'strategy_pipeline' => 'nullable|string',
             'kategori_strategi' => 'nullable|string',
-            'rencana_aktivitas' => 'nullable|string',
-            'rencana_aktivitas_id' => 'nullable|exists:rencana_aktivitas,id',
+            'rencana_aktivitas' => auth()->user()->isRMFT() ? 'nullable|string' : 'nullable',
+            'rencana_aktivitas_id' => auth()->user()->isRMFT() ? 'nullable|exists:rencana_aktivitas,id' : 'nullable',
             'segmen_nasabah' => 'required|string',
             'tipe_nasabah' => 'required|in:lama,baru',
+            'jenis_usaha' => 'nullable|string',
+            'jenis_simpanan' => 'nullable|string|in:Tabungan,Giro,Deposito',
+            'tingkat_keyakinan' => 'nullable|string|in:Di bawah 50%,80% - 100%,100%',
             'nama_nasabah' => 'required|string',
             'norek' => 'nullable|string',
             'rp_jumlah' => 'required|string',

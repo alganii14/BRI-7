@@ -547,4 +547,68 @@ class ManagerPullPipelineController extends Controller
         
         return view('manager-pull-pipeline.layering', compact('data'));
     }
+    
+    /**
+     * Nasabah Downgrade
+     */
+    public function nasabahDowngrade(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$this->canAccessPullPipeline($user)) {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = \App\Models\NasabahDowngrade::where('kode_cabang_induk', $kodeKanca);
+        
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nomor_rekening', 'like', "%{$search}%")
+                  ->orWhere('nama_nasabah', 'like', "%{$search}%")
+                  ->orWhere('cif', 'like', "%{$search}%")
+                  ->orWhere('cabang_induk', 'like', "%{$search}%");
+            });
+        }
+        
+        $data = $query->orderBy('nama_nasabah')->paginate(20);
+        
+        return view('manager-pull-pipeline.nasabah-downgrade', compact('data'));
+    }
+
+    /**
+     * Brilink Saldo Kurang - Strategi 7
+     */
+    public function brilinkSaldoKurang(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$this->canAccessPullPipeline($user)) {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = \App\Models\Brilink::where('kd_cabang', $kodeKanca);
+        
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('norek', 'like', "%{$search}%")
+                  ->orWhere('nama_agen', 'like', "%{$search}%")
+                  ->orWhere('id_agen', 'like', "%{$search}%")
+                  ->orWhere('cabang', 'like', "%{$search}%");
+            });
+        }
+        
+        $data = $query->orderBy('nama_agen')->paginate(20);
+        
+        return view('manager-pull-pipeline.brilink-saldo-kurang', compact('data'));
+    }
 }

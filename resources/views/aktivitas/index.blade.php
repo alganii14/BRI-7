@@ -556,6 +556,9 @@ document.getElementById('kode_kc').addEventListener('change', function() {
                     <th>CIFNO</th>
                     <th>NO. REKENING</th>
                     <th>TARGET</th>
+                    <th>JENIS USAHA</th>
+                    <th>JENIS SIMPANAN</th>
+                    <th>TINGKAT KEYAKINAN</th>
                     <th>STATUS</th>
                     <th>REALISASI</th>
                     <th>KETERANGAN</th>
@@ -585,6 +588,9 @@ document.getElementById('kode_kc').addEventListener('change', function() {
                     <td>{{ $item->nasabah->cifno ?? '-' }}</td>
                     <td>-</td>
                     <td>Rp {{ number_format($item->rp_jumlah, 0, ',', '.') }}</td>
+                    <td>{{ $item->jenis_usaha ?? '-' }}</td>
+                    <td>{{ $item->jenis_simpanan ?? '-' }}</td>
+                    <td>{{ $item->tingkat_keyakinan ?? '-' }}</td>
                     <td>
                         @if($item->status_realisasi == 'belum')
                         <span class="badge badge-warning">Belum</span>
@@ -664,7 +670,8 @@ document.getElementById('kode_kc').addEventListener('change', function() {
                                 </form>
                                 @endif
                             @elseif(auth()->user()->isRMFT())
-                                @if($item->status_realisasi == 'belum')
+                                @if($item->status_realisasi == 'belum' || !$item->status_realisasi)
+                                <a href="{{ route('aktivitas.edit', $item->id) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <a href="{{ route('aktivitas.feedback', $item->id) }}" class="btn btn-primary btn-sm">Feedback</a>
                                 @else
                                 <span style="color: #28a745; font-size: 12px;">✓ Sudah Feedback</span>
@@ -675,7 +682,7 @@ document.getElementById('kode_kc').addEventListener('change', function() {
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="16" style="text-align: center; padding: 40px; color: #666;">
+                    <td colspan="22" style="text-align: center; padding: 40px; color: #666;">
                         Belum ada data pipeline. <a href="{{ route('aktivitas.create') }}" style="color: #0066CC;">Tambah pipeline</a>
                     </td>
                 </tr>

@@ -37,6 +37,7 @@ class PotensiPayrollController extends Controller
                 $q->where('perusahaan', 'like', "%{$search}%")
                   ->orWhere('cabang_induk', 'like', "%{$search}%")
                   ->orWhere('kode_cabang_induk', 'like', "%{$search}%")
+                  ->orWhere('jenis_pipeline', 'like', "%{$search}%")
                   ->orWhere('estimasi_pekerja', 'like', "%{$search}%");
             });
         }
@@ -74,6 +75,7 @@ class PotensiPayrollController extends Controller
             'kode_cabang_induk' => 'nullable|string',
             'cabang_induk' => 'nullable|string',
             'perusahaan' => 'nullable|string',
+            'jenis_pipeline' => 'nullable|string',
             'estimasi_pekerja' => 'nullable|string',
         ]);
 
@@ -118,6 +120,7 @@ class PotensiPayrollController extends Controller
             'kode_cabang_induk' => 'nullable|string',
             'cabang_induk' => 'nullable|string',
             'perusahaan' => 'nullable|string',
+            'jenis_pipeline' => 'nullable|string',
             'estimasi_pekerja' => 'nullable|string',
         ]);
 
@@ -173,12 +176,13 @@ class PotensiPayrollController extends Controller
 
             while (($row = fgetcsv($handle, 1000, ';')) !== false) {
                 // Skip rows with empty data or only containing semicolons
-                if (count($row) >= 4 && !empty(trim($row[2]))) { // Check if perusahaan is not empty
+                if (count($row) >= 5 && !empty(trim($row[2]))) { // Check if perusahaan is not empty
                     $batch[] = [
                         'kode_cabang_induk' => trim($row[0]) ?: null,
                         'cabang_induk' => trim($row[1]) ?: null,
                         'perusahaan' => trim($row[2]) ?: null,
-                        'estimasi_pekerja' => trim($row[3]) ?: null,
+                        'jenis_pipeline' => trim($row[3]) ?: null,
+                        'estimasi_pekerja' => trim($row[4]) ?: null,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

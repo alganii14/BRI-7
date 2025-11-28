@@ -238,6 +238,34 @@
             </div>
         </div>
 
+        <!-- Field tambahan setelah tipe pipeline -->
+        <div class="form-row">
+            <div class="form-group">
+                <label>JENIS USAHA</label>
+                <input type="text" name="jenis_usaha" id="jenis_usaha" value="{{ old('jenis_usaha', $aktivitas->jenis_usaha) }}" placeholder="Masukkan jenis usaha (opsional)">
+            </div>
+
+            <div class="form-group">
+                <label>JENIS SIMPANAN</label>
+                <select name="jenis_simpanan" id="jenis_simpanan">
+                    <option value="">Pilih Jenis Simpanan</option>
+                    <option value="Tabungan" {{ old('jenis_simpanan', $aktivitas->jenis_simpanan) == 'Tabungan' ? 'selected' : '' }}>Tabungan</option>
+                    <option value="Giro" {{ old('jenis_simpanan', $aktivitas->jenis_simpanan) == 'Giro' ? 'selected' : '' }}>Giro</option>
+                    <option value="Deposito" {{ old('jenis_simpanan', $aktivitas->jenis_simpanan) == 'Deposito' ? 'selected' : '' }}>Deposito</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>TINGKAT KEYAKINAN</label>
+                <select name="tingkat_keyakinan" id="tingkat_keyakinan">
+                    <option value="">Pilih Tingkat Keyakinan</option>
+                    <option value="Di bawah 50%" {{ old('tingkat_keyakinan', $aktivitas->tingkat_keyakinan) == 'Di bawah 50%' ? 'selected' : '' }}>Di bawah 50%</option>
+                    <option value="80% - 100%" {{ old('tingkat_keyakinan', $aktivitas->tingkat_keyakinan) == '80% - 100%' ? 'selected' : '' }}>80% - 100%</option>
+                    <option value="100%" {{ old('tingkat_keyakinan', $aktivitas->tingkat_keyakinan) == '100%' ? 'selected' : '' }}>100%</option>
+                </select>
+            </div>
+        </div>
+
         <!-- Form untuk Nasabah Lama (dari Pipeline) -->
         <div id="form_nasabah_lama" style="display: {{ old('tipe_nasabah', $aktivitas->tipe ?? 'lama') == 'lama' ? 'block' : 'none' }};">
             <input type="hidden" id="norek" name="norek" value="{{ old('norek', $aktivitas->norek) }}">
@@ -342,7 +370,7 @@
             'AUM>2M DPK<50 juta'
         ],
         'Strategi 8': ['Wingback Penguatan Produk & Fungsi RM'],
-        'Layering': ['Wingback']
+        'Layering': ['Winback']
     };
 
     const strategySelect = document.getElementById('strategy_pipeline');
@@ -384,9 +412,9 @@
                     const option = document.createElement('option');
                     option.value = kategori;
                     option.textContent = kategori;
-                    // Handle backward compatibility - "Wingback" lama untuk Strategi 8
+                    // Handle backward compatibility - "Winback" untuk Layering
                     if (kategori === currentKategori || 
-                        (strategy === 'Strategi 8' && currentKategori === 'Wingback' && kategori === 'Wingback Penguatan Produk & Fungsi RM')) {
+                        (strategy === 'Layering' && currentKategori === 'Wingback' && kategori === 'Winback')) {
                         option.selected = true;
                     }
                     kategoriSelect.appendChild(option);
@@ -463,7 +491,7 @@
         if (strategy === 'Strategi 8' && !kategori) {
             kategori = 'Wingback Penguatan Produk & Fungsi RM';
         } else if (strategy === 'Layering' && !kategori) {
-            kategori = 'Wingback';
+            kategori = 'Winback';
         }
         
         // Populate filter tahun jika belum ada
@@ -560,7 +588,7 @@
         const isPenurunanPrioritasRitelMikro = kategori === 'PENURUNAN PRIORITAS RITEL MIKRO' || kategori === 'Penurunan Prioritas Ritel & Mikro';
         const isAumDpk = kategori === 'AUM>2M DPK<50 juta';
         const isStrategi8 = kategori === 'Wingback Penguatan Produk & Fungsi RM' || strategy === 'Strategi 8';
-        const isLayering = kategori === 'Wingback' || strategy === 'Layering';
+        const isLayering = kategori === 'Winback' || strategy === 'Layering';
         const isOptimalisasiBusinessCluster = kategori === 'Optimalisasi Business Cluster' || strategy === 'Strategi 3';
         
         let html = '<table style="width: 100%; border-collapse: collapse; font-size: 13px;"><thead><tr style="background: #f8f9fa; position: sticky; top: 0; z-index: 1;">';

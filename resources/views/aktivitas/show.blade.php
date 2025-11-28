@@ -295,6 +295,18 @@
                     <div class="detail-label">Target (RP / Jumlah)</div>
                     <div class="detail-value">{{ $aktivitas->rp_jumlah }}</div>
                 </div>
+                <div class="detail-item">
+                    <div class="detail-label">Jenis Usaha</div>
+                    <div class="detail-value {{ !$aktivitas->jenis_usaha ? 'empty' : '' }}">{{ $aktivitas->jenis_usaha ?? '-' }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Jenis Simpanan</div>
+                    <div class="detail-value {{ !$aktivitas->jenis_simpanan ? 'empty' : '' }}">{{ $aktivitas->jenis_simpanan ?? '-' }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Tingkat Keyakinan</div>
+                    <div class="detail-value {{ !$aktivitas->tingkat_keyakinan ? 'empty' : '' }}">{{ $aktivitas->tingkat_keyakinan ?? '-' }}</div>
+                </div>
             </div>
         </div>
 

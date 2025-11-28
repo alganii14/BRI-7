@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Import CSV Potensi Payroll')
-@section('page-title', 'Import Data Potensi Payroll dari CSV')
+@section('title', 'Import CSV Nasabah Downgrade')
+@section('page-title', 'Import Data Nasabah Downgrade dari CSV')
 
 @section('content')
 <style>
@@ -190,21 +190,25 @@
         <ul>
             <li>File harus dalam format CSV (.csv)</li>
             <li>Pastikan format CSV sesuai dengan template yang ada</li>
-            <li><strong>Kolom CSV (5 kolom):</strong></li>
-            <li style="margin-left: 20px; font-family: monospace; font-size: 13px;">
-                1. Kode Cabang Induk<br>
-                2. Cabang Induk<br>
-                3. Perusahaan<br>
-                4. Jenis Pipeline<br>
-                5. Estimasi Pekerja
-            </li>
-            <li>Header baris pertama akan diabaikan (skip)</li>
-            <li>Gunakan delimiter semicolon (;) untuk memisahkan kolom</li>
+            <li>Kolom CSV: Kode Cabang Induk, Cabang Induk, Kode Uker, Unit Kerja, SLP, PBO, CIF, ID Prioritas, Nama Nasabah, Nomor Rekening, AUM</li>
+            <li>File CSV menggunakan delimiter semicolon (;)</li>
         </ul>
     </div>
 
-    <form action="{{ route('potensi-payroll.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
+    <form action="{{ route('nasabah-downgrade.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
         @csrf
+        
+        <div style="margin-bottom: 24px;">
+            <label for="tanggal_posisi_data" style="display: block; margin-bottom: 8px; color: #333; font-weight: 600; font-size: 14px;">
+                📅 Tanggal Posisi Data <span style="color: #dc3545;">*</span>
+            </label>
+            <input type="date" name="tanggal_posisi_data" id="tanggal_posisi_data" required 
+                   style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px;"
+                   value="{{ date('Y-m-d') }}">
+            @error('tanggal_posisi_data')
+                <p style="color: #dc3545; margin-top: 5px; font-size: 13px;">{{ $message }}</p>
+            @enderror
+        </div>
         
         <div class="upload-area">
             <div class="upload-icon">📄</div>
@@ -212,7 +216,7 @@
             <p>Pilih file CSV untuk diimport ke sistem</p>
             
             <div class="file-input-wrapper">
-                <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
+                <input type="file" name="file" id="csv_file" accept=".csv" required>
                 <label for="csv_file" class="file-input-label">
                     📁 Pilih File CSV
                 </label>
@@ -220,7 +224,7 @@
             
             <div class="file-name" id="fileName"></div>
             
-            @error('csv_file')
+            @error('file')
                 <p style="color: #dc3545; margin-top: 10px;">{{ $message }}</p>
             @enderror
         </div>
@@ -229,27 +233,27 @@
             <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
                 ⬆️ Upload & Import
             </button>
-            <a href="{{ route('potensi-payroll.index') }}" class="btn btn-secondary">
+            <a href="{{ route('nasabah-downgrade.index') }}" class="btn btn-secondary">
                 ↩️ Kembali
             </a>
         </div>
     </form>
 
     @php
-        $totalPotensiPayroll = \App\Models\PotensiPayroll::count();
+        $totalNasabahDowngrade = \App\Models\NasabahDowngrade::count();
     @endphp
 
-    @if($totalPotensiPayroll > 0)
+    @if($totalNasabahDowngrade > 0)
     <div style="margin-top: 30px; padding-top: 30px; border-top: 2px solid #f0f0f0;">
         <h3 style="color: #dc3545; margin-bottom: 16px;">⚠️ Zona Berbahaya</h3>
         <p style="color: #666; font-size: 14px; margin-bottom: 16px;">
-            Menghapus semua data potensi payroll akan menghapus <strong>{{ number_format($totalPotensiPayroll, 0, ',', '.') }} data</strong> secara permanen dan tidak dapat dikembalikan.
+            Menghapus semua data Nasabah Downgrade akan menghapus <strong>{{ number_format($totalNasabahDowngrade, 0, ',', '.') }} data</strong> secara permanen dan tidak dapat dikembalikan.
         </p>
-        <form action="{{ route('potensi-payroll.delete-all') }}" method="POST" onsubmit="return confirm('⚠️ PERINGATAN KERAS!\n\nAnda akan menghapus SEMUA {{ number_format($totalPotensiPayroll, 0, ",", ".") }} data potensi payroll!\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda BENAR-BENAR yakin?')">
+        <form action="{{ route('nasabah-downgrade.delete-all') }}" method="POST" onsubmit="return confirm('⚠️ PERINGATAN KERAS!\n\nAnda akan menghapus SEMUA {{ number_format($totalNasabahDowngrade, 0, ",", ".") }} data Nasabah Downgrade!\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda BENAR-BENAR yakin?')">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger">
-                🗑️ Hapus Semua Data Potensi Payroll
+                🗑️ Hapus Semua Data Nasabah Downgrade
             </button>
         </form>
     </div>

@@ -107,6 +107,14 @@
         </div>
 
         <div class="form-group">
+            <label for="jenis_pipeline">Jenis Pipeline</label>
+            <input type="text" id="jenis_pipeline" name="jenis_pipeline" value="{{ old('jenis_pipeline') }}">
+            @error('jenis_pipeline')
+                <span class="error">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="form-group">
             <label for="estimasi_pekerja">Estimasi Pekerja</label>
             <input type="text" id="estimasi_pekerja" name="estimasi_pekerja" value="{{ old('estimasi_pekerja') }}">
             @error('estimasi_pekerja')

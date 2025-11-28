@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Potensi Payroll')
-@section('page-title', 'Data Potensi Payroll')
+@section('title', 'Nasabah Downgrade')
+@section('page-title', 'Data Nasabah Downgrade (Strategi 7)')
 
 @section('content')
 <style>
@@ -69,11 +69,6 @@
         font-size: 13px;
     }
 
-    .btn-info {
-        background-color: #17a2b8;
-        color: white;
-    }
-
     .btn-warning {
         background-color: #ffc107;
         color: #333;
@@ -120,12 +115,11 @@
         gap: 10px;
     }
 
-    .search-form input {
+    .search-form input, .search-form select {
         padding: 8px 16px;
         border: 1px solid #ddd;
         border-radius: 6px;
         font-size: 14px;
-        min-width: 300px;
     }
 
     .pagination-wrapper {
@@ -146,8 +140,8 @@
 
 <div class="header-actions">
     <div style="display: flex; gap: 10px;">
-        @if($potensiPayrolls->total() > 0)
-        <form action="{{ route('potensi-payroll.delete-all') }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ PERHATIAN!\n\nAnda akan menghapus SEMUA data potensi payroll ({{ number_format($potensiPayrolls->total(), 0, ',', '.') }} baris).\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda yakin ingin melanjutkan?')">
+        @if($nasabahDowngrades->total() > 0)
+        <form action="{{ route('nasabah-downgrade.delete-all') }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ PERHATIAN!\n\nAnda akan menghapus SEMUA data Nasabah Downgrade ({{ number_format($nasabahDowngrades->total(), 0, ',', '.') }} baris).\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda yakin ingin melanjutkan?')">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger-gradient">
@@ -155,37 +149,31 @@
             </button>
         </form>
         @endif
-        <a href="{{ route('potensi-payroll.create') }}" class="btn btn-primary">
+        <a href="{{ route('nasabah-downgrade.create') }}" class="btn btn-primary">
             ➕ Tambah Data
         </a>
-        <a href="{{ route('potensi-payroll.import.form') }}" class="btn btn-success">
+        <a href="{{ route('nasabah-downgrade.import.form') }}" class="btn btn-success">
             📁 Import CSV
         </a>
     </div>
     
-    <form method="GET" action="{{ route('potensi-payroll.index') }}" class="search-form" style="display:flex;gap:10px;align-items:end;">
+    <form method="GET" action="{{ route('nasabah-downgrade.index') }}" class="search-form" style="display:flex;gap:10px;align-items:end;">
         <div style="flex:1;">
-            <select name="year" style="width:100%;padding:10px 16px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:white;">
-                <option value="">Semua Tahun</option>
-                @foreach($availableYears as $availableYear)
-                    <option value="{{ $availableYear }}" {{ request('year') == $availableYear ? 'selected' : '' }}>{{ $availableYear }}</option>
+            <select name="kode_cabang_induk" style="width:100%;padding:10px 16px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:white;">
+                <option value="">Semua Cabang</option>
+                @foreach($listCabang as $cabang)
+                    <option value="{{ $cabang->kode_cabang_induk }}" {{ request('kode_cabang_induk') == $cabang->kode_cabang_induk ? 'selected' : '' }}>
+                        {{ $cabang->cabang_induk }}
+                    </option>
                 @endforeach
             </select>
         </div>
-        <div style="flex:1;">
-            <select name="month" style="width:100%;padding:10px 16px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:white;">
-                <option value="">Semua Bulan</option>
-                @for($i=1;$i<=12;$i++)
-                    <option value="{{ $i }}" {{ request('month') == $i ? 'selected' : '' }}>{{ ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][$i] }}</option>
-                @endfor
-            </select>
-        </div>
         <div style="flex:2;">
-            <input type="text" name="search" placeholder="Cari perusahaan, cabang, atau estimasi pekerja..." value="{{ request('search') }}" style="width:100%;">
+            <input type="text" name="search" placeholder="Cari nama, CIF, no rekening, atau cabang..." value="{{ request('search') }}" style="width:100%;">
         </div>
         <button type="submit" class="btn btn-primary">🔍 Cari</button>
-        @if(request('search') || request('month') || request('year'))
-            <a href="{{ route('potensi-payroll.index') }}" class="btn btn-warning">✖ Reset</a>
+        @if(request('search') || request('kode_cabang_induk'))
+            <a href="{{ route('nasabah-downgrade.index') }}" class="btn btn-warning">✖ Reset</a>
         @endif
     </form>
 </div>
@@ -209,26 +197,37 @@
                 <th>#</th>
                 <th>Kode Cabang Induk</th>
                 <th>Cabang Induk</th>
-                <th>Perusahaan</th>
-                <th>Jenis Pipeline</th>
-                <th>Estimasi Pekerja</th>
+                <th>Kode Uker</th>
+                <th>Unit Kerja</th>
+                <th>SLP</th>
+                <th>PBO</th>
+                <th>CIF</th>
+                <th>ID Prioritas</th>
+                <th>Nama Nasabah</th>
+                <th>Nomor Rekening</th>
+                <th>AUM</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($potensiPayrolls as $index => $item)
+            @forelse($nasabahDowngrades as $index => $item)
             <tr>
-                <td>{{ $potensiPayrolls->firstItem() + $index }}</td>
+                <td>{{ $nasabahDowngrades->firstItem() + $index }}</td>
                 <td>{{ $item->kode_cabang_induk }}</td>
                 <td>{{ $item->cabang_induk }}</td>
-                <td>{{ $item->perusahaan }}</td>
-                <td>{{ $item->jenis_pipeline }}</td>
-                <td>{{ $item->estimasi_pekerja }}</td>
+                <td>{{ $item->kode_uker }}</td>
+                <td>{{ $item->unit_kerja }}</td>
+                <td>{{ $item->slp }}</td>
+                <td>{{ $item->pbo }}</td>
+                <td>{{ $item->cif }}</td>
+                <td>{{ $item->id_prioritas }}</td>
+                <td>{{ $item->nama_nasabah }}</td>
+                <td>{{ $item->nomor_rekening }}</td>
+                <td>{{ $item->aum }}</td>
                 <td>
                     <div class="actions">
-                        <a href="{{ route('potensi-payroll.show', $item->id) }}" class="btn btn-sm btn-info">👁️ View</a>
-                        <a href="{{ route('potensi-payroll.edit', $item->id) }}" class="btn btn-sm btn-warning">✏️ Edit</a>
-                        <form action="{{ route('potensi-payroll.destroy', $item->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                        <a href="{{ route('nasabah-downgrade.edit', $item->id) }}" class="btn btn-sm btn-warning">✏️ Edit</a>
+                        <form action="{{ route('nasabah-downgrade.destroy', $item->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete</button>
@@ -238,9 +237,9 @@
             </tr>
             @empty
             <tr>
-                <td colspan="7" style="text-align: center; padding: 40px;">
-                    <p style="color: #999; font-size: 16px;">Tidak ada data potensi payroll.</p>
-                    <a href="{{ route('potensi-payroll.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
+                <td colspan="13" style="text-align: center; padding: 40px;">
+                    <p style="color: #999; font-size: 16px;">Tidak ada data Nasabah Downgrade.</p>
+                    <a href="{{ route('nasabah-downgrade.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
                 </td>
             </tr>
             @endforelse
@@ -249,25 +248,24 @@
 </div>
 
 <div class="pagination-wrapper">
-    <p class="pagination-info">Showing {{ $potensiPayrolls->firstItem() }} to {{ $potensiPayrolls->lastItem() }} of {{ $potensiPayrolls->total() }} results</p>
+    <p class="pagination-info">Showing {{ $nasabahDowngrades->firstItem() }} to {{ $nasabahDowngrades->lastItem() }} of {{ $nasabahDowngrades->total() }} results</p>
     
     <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-        @if ($potensiPayrolls->onFirstPage())
+        @if ($nasabahDowngrades->onFirstPage())
             <span style="padding: 10px 20px; background: #f0f0f0; color: #999; border: 1px solid #ddd; border-radius: 4px; cursor: not-allowed;">← Previous</span>
         @else
-            <a href="{{ $potensiPayrolls->previousPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">← Previous</a>
+            <a href="{{ $nasabahDowngrades->previousPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">← Previous</a>
         @endif
 
-        {{-- Show pages 1 to 5 only --}}
         @php
-            $currentPage = $potensiPayrolls->currentPage();
-            $lastPage = $potensiPayrolls->lastPage();
+            $currentPage = $nasabahDowngrades->currentPage();
+            $lastPage = $nasabahDowngrades->lastPage();
             $startPage = 1;
             $endPage = min(5, $lastPage);
         @endphp
 
         @foreach (range($startPage, $endPage) as $page)
-            @php $url = $potensiPayrolls->url($page); @endphp
+            @php $url = $nasabahDowngrades->url($page); @endphp
             @if ($page == $currentPage)
                 <span style="padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 1px solid #667eea; border-radius: 4px;">{{ $page }}</span>
             @else
@@ -275,11 +273,28 @@
             @endif
         @endforeach
 
-        @if ($potensiPayrolls->hasMorePages())
-            <a href="{{ $potensiPayrolls->nextPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">Next →</a>
+        @if ($nasabahDowngrades->hasMorePages())
+            <a href="{{ $nasabahDowngrades->nextPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">Next →</a>
         @else
             <span style="padding: 10px 20px; background: #f0f0f0; color: #999; border: 1px solid #ddd; border-radius: 4px; cursor: not-allowed;">Next →</span>
         @endif
     </div>
 </div>
+
+
 @endsection
+
+
+<script>
+// Auto-hide alerts after 5 seconds
+setTimeout(function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        alert.style.transition = 'opacity 0.5s';
+        alert.style.opacity = '0';
+        setTimeout(function() {
+            alert.remove();
+        }, 500);
+    });
+}, 5000);
+</script>

@@ -13,6 +13,7 @@ class PotensiPayroll extends Model
         'kode_cabang_induk',
         'cabang_induk',
         'perusahaan',
+        'jenis_pipeline',
         'estimasi_pekerja',
     ];
 }

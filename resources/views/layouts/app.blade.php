@@ -886,7 +886,7 @@
                 </a>
                 @endif
                 
-                @if(auth()->user()->isAdmin())
+                @if(auth()->user()->isRMFT())
                 <a href="{{ route('rencana-aktivitas.index') }}" class="menu-item {{ request()->routeIs('rencana-aktivitas.*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
@@ -939,6 +939,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
                                 Penurunan Casa Brilink
+                            </a>
+                            <a href="{{ route('manager-pull-pipeline.brilink-saldo-kurang') }}" class="sub-submenu-item {{ request()->routeIs('manager-pull-pipeline.brilink-saldo-kurang') ? 'active' : '' }}">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                Brilink Saldo < 10 Juta
                             </a>
                             <a href="{{ route('manager-pull-pipeline.qlola-non-debitur') }}" class="sub-submenu-item {{ request()->routeIs('manager-pull-pipeline.qlola-non-debitur') ? 'active' : '' }}">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
@@ -1046,7 +1052,7 @@
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; margin-right: 10px;">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                                 </svg>
-                                Strategi 7 - Reaktivasi Rekening Dormant & Rekening Tidak Berkualitas
+                                Strategi 7 - Optimalisasi Nasabah Prioritas & BOC BOD Nasabah Wholesale & Komersial
                             </span>
                             <svg class="dropdown-toggle-sub" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; margin-left: auto;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -1065,6 +1071,12 @@
                                 </svg>
                                 AUM>2M DPK<50 juta
                             </a>
+                            <a href="{{ route('manager-pull-pipeline.nasabah-downgrade') }}" class="sub-submenu-item {{ request()->routeIs('manager-pull-pipeline.nasabah-downgrade') ? 'active' : '' }}">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                                </svg>
+                                Nasabah Downgrade
+                            </a>
                         </div>
                         <div class="submenu-item-dropdown" onclick="toggleSubDropdown(this)">
                             <span style="display: flex; align-items: center; width: 100%;">
@@ -1082,7 +1094,7 @@
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
-                                Wingback
+                                Winback
                             </a>
                         </div>
                         <div class="submenu-item-dropdown" onclick="toggleSubDropdown(this)">
@@ -1101,7 +1113,7 @@
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                                 </svg>
-                                Layering
+                                Winback
                             </a>
                         </div>
                     </div>
@@ -1152,6 +1164,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
                                 PENURUNAN CASA BRILINK
+                            </a>
+                            <a href="{{ route('brilink.index') }}" class="sub-submenu-item {{ request()->routeIs('brilink.*') ? 'active' : '' }}">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                BRILINK SALDO < 10 JUTA
                             </a>
                             <a href="{{ route('qlola-non-debitur.index') }}" class="sub-submenu-item {{ request()->routeIs('qlola-non-debitur.*') ? 'active' : '' }}">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
@@ -1259,7 +1277,7 @@
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; margin-right: 10px;">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                                 </svg>
-                                Strategi 7 - Reaktivasi Rekening Dormant & Rekening Tidak Berkualitas
+                                Strategi 7 - Optimalisasi Nasabah Prioritas & BOC BOD Nasabah Wholesale & Komersial
                             </span>
                             <svg class="dropdown-toggle-sub" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; margin-left: auto;">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -1278,6 +1296,12 @@
                                 </svg>
                                 AUM>2M DPK<50 juta
                             </a>
+                            <a href="{{ route('nasabah-downgrade.index') }}" class="sub-submenu-item {{ request()->routeIs('nasabah-downgrade.*') ? 'active' : '' }}">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                                </svg>
+                                Nasabah Downgrade
+                            </a>
                         </div>
                         <div class="submenu-item-dropdown" onclick="toggleSubDropdown(this)">
                             <span style="display: flex; align-items: center; width: 100%;">
@@ -1295,7 +1319,7 @@
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
-                                Wingback Penguatan Produk & Fungsi RM
+                                Winback Penguatan Produk & Fungsi RM
                             </a>
                         </div>
                         <div class="submenu-item-dropdown" onclick="toggleSubDropdown(this)">
@@ -1314,7 +1338,7 @@
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                                 </svg>
-                                Wingback
+                                Winback
                             </a>
                         </div>
                     </div>

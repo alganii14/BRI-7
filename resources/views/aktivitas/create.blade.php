@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('title', 'Tambah Pipeline')
 @section('page-title', 'Tambah Pipeline')
@@ -280,7 +280,7 @@
                 <option value="Strategi 3">Strategi 3 - Optimalisasi Business Cluster</option>
                 <option value="Strategi 4">Strategi 4 - Peningkatan Payroll Berkualitas</option>
                 <option value="Strategi 6">Strategi 6 - Kolaborasi Perusahaan Anak</option>
-                <option value="Strategi 7">Strategi 7 - Reaktivasi Rekening Dormant & Rekening Tidak Berkualitas</option>
+                <option value="Strategi 7">Strategi 7 - Optimalisasi Nasabah Prioritas & BOC BOD Nasabah Wholesale & Komersial</option>
                 <option value="Strategi 8">Strategi 8 - Penguatan Produk & Fungsi RM</option>
                 <option value="Layering">Layering</option>
             </select>
@@ -293,6 +293,7 @@
             </select>
         </div>
 
+        @if(auth()->user()->isRMFT())
         <div class="form-group">
             <label>RENCANA AKTIVITAS <span style="color: red;">*</span></label>
             <select name="rencana_aktivitas_id" id="rencana_aktivitas" required disabled>
@@ -307,6 +308,7 @@
             </select>
             <input type="hidden" name="rencana_aktivitas" id="rencana_aktivitas_text" value="{{ old('rencana_aktivitas') }}">
         </div>
+        @endif
 
         <div class="form-row">
             <div class="form-group">
@@ -355,7 +357,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>RP / JUMLAH <span style="color: red;">*</span></label>
+                    <label>RP Nominal Penuh <span style="color: red;">*</span></label>
                     <input type="text" id="rp_jumlah" name="rp_jumlah" value="{{ old('rp_jumlah') }}" placeholder="Pilih RMFT terlebih dahulu" disabled>
                 </div>
             </div>
@@ -375,14 +377,44 @@
                 </div>
 
                 <div class="form-group">
-                    <label>RP / JUMLAH <span style="color: red;">*</span></label>
+                    <label>Rp Nominal Penuh <span style="color: red;">*</span></label>
                     <input type="text" id="rp_jumlah_baru" name="rp_jumlah_baru" value="{{ old('rp_jumlah_baru') }}" placeholder="Masukkan jumlah" disabled>
                 </div>
             </div>
         </div>
 
+        <!-- Field tambahan setelah form nasabah (hidden by default) -->
+        <div id="field_tambahan_container" style="display: none;">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>JENIS USAHA</label>
+                    <input type="text" name="jenis_usaha" id="jenis_usaha" value="{{ old('jenis_usaha') }}" placeholder="Masukkan jenis usaha (opsional)">
+                </div>
+
+                <div class="form-group">
+                    <label>JENIS SIMPANAN <span style="color: red;">*</span></label>
+                    <select name="jenis_simpanan" id="jenis_simpanan" required>
+                        <option value="">Pilih Jenis Simpanan</option>
+                        <option value="Tabungan" {{ old('jenis_simpanan') == 'Tabungan' ? 'selected' : '' }}>Tabungan</option>
+                        <option value="Giro" {{ old('jenis_simpanan') == 'Giro' ? 'selected' : '' }}>Giro</option>
+                        <option value="Deposito" {{ old('jenis_simpanan') == 'Deposito' ? 'selected' : '' }}>Deposito</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>TINGKAT KEYAKINAN <span style="color: red;">*</span></label>
+                    <select name="tingkat_keyakinan" id="tingkat_keyakinan" required>
+                        <option value="">Pilih Tingkat Keyakinan</option>
+                        <option value="Di bawah 50%" {{ old('tingkat_keyakinan') == 'Di bawah 50%' ? 'selected' : '' }}>Di bawah 50%</option>
+                        <option value="80% - 100%" {{ old('tingkat_keyakinan') == '80% - 100%' ? 'selected' : '' }}>80% - 100%</option>
+                        <option value="100%" {{ old('tingkat_keyakinan') == '100%' ? 'selected' : '' }}>100%</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Simpan Aktivitas</button>
+            <button type="submit" class="btn btn-primary">Simpan</button>
             <a href="{{ route('aktivitas.index') }}" class="btn btn-secondary">Batal</a>
         </div>
     </form>
@@ -467,14 +499,14 @@
 <script>
     // Kategori per strategi sesuai dengan dropdown Pull of Pipeline
     const kategoriPerStrategi = {
-        'Strategi 1': ['MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)', 'PENURUNAN CASA BRILINK', 'PENURUNAN CASA MERCHANT (QRIS & EDC)', 'Qlola Non Debitur', 'Non Debitur Vol Besar CASA Kecil'],
+        'Strategi 1': ['MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)', 'PENURUNAN CASA BRILINK', 'PENURUNAN CASA MERCHANT (QRIS & EDC)', 'BRILINK SALDO < 10 JUTA', 'Qlola Non Debitur', 'Non Debitur Vol Besar CASA Kecil'],
         'Strategi 2': ['Qlola (Belum ada Qlola / ada namun nonaktif)', 'User Aktif Casa Kecil'],
         'Strategi 3': ['Optimalisasi Business Cluster'],
         'Strategi 4': ['Existing Payroll', 'Potensi Payroll'],
         'Strategi 6': ['List Perusahaan Anak'],
-        'Strategi 7': ['Penurunan Prioritas Ritel & Mikro', 'AUM>2M DPK<50 juta'],
+        'Strategi 7': ['Penurunan Prioritas Ritel & Mikro', 'AUM>2M DPK<50 juta', 'Nasabah Downgrade'],
         'Strategi 8': ['Wingback Penguatan Produk & Fungsi RM'],
-        'Layering': ['Wingback']
+        'Layering': ['Winback']
     };
 
     // Handle strategy pipeline change
@@ -659,8 +691,10 @@
     function disableAktivitasFields() {
         document.getElementById('strategy_pipeline').disabled = true;
         document.getElementById('strategy_pipeline').innerHTML = '<option value="">Pilih RMFT terlebih dahulu</option>';
+        @if(auth()->user()->isRMFT())
         document.getElementById('rencana_aktivitas').disabled = true;
         document.getElementById('rencana_aktivitas').innerHTML = '<option value="">Pilih RMFT terlebih dahulu</option>';
+        @endif
         document.getElementById('segmen_nasabah').disabled = true;
         document.getElementById('segmen_nasabah').innerHTML = '<option value="">Pilih RMFT terlebih dahulu</option>';
         document.getElementById('tipe_nasabah').disabled = true;
@@ -691,11 +725,12 @@
             <option value="Strategi 3">Strategi 3 - Optimalisasi Business Cluster</option>
             <option value="Strategi 4">Strategi 4 - Peningkatan Payroll Berkualitas</option>
             <option value="Strategi 6">Strategi 6 - Kolaborasi Perusahaan Anak</option>
-            <option value="Strategi 7">Strategi 7 - Reaktivasi Rekening Dormant & Rekening Tidak Berkualitas</option>
+            <option value="Strategi 7">Strategi 7 - Optimalisasi Nasabah Prioritas & BOC BOD Nasabah Wholesale & Komersial</option>
             <option value="Strategi 8">Strategi 8 - Penguatan Produk & Fungsi RM</option>
             <option value="Layering">Layering</option>
         `;
         
+        @if(auth()->user()->isRMFT())
         // Enable Rencana Aktivitas
         document.getElementById('rencana_aktivitas').disabled = false;
         document.getElementById('rencana_aktivitas').innerHTML = `
@@ -704,6 +739,7 @@
             <option value="{{ $item->id }}" data-nama="{{ $item->nama_rencana }}">{{ $item->nama_rencana }}</option>
             @endforeach
         `;
+        @endif
         
         // Enable Segmen Nasabah
         document.getElementById('segmen_nasabah').disabled = false;
@@ -752,10 +788,12 @@
         const tipeNasabah = document.getElementById('tipe_nasabah').value;
         const formLama = document.getElementById('form_nasabah_lama');
         const formBaru = document.getElementById('form_nasabah_baru');
+        const fieldTambahan = document.getElementById('field_tambahan_container');
         
         if (tipeNasabah === 'lama') {
             formLama.style.display = 'block';
             formBaru.style.display = 'none';
+            fieldTambahan.style.display = 'block'; // Tampilkan field tambahan
             // Clear Nasabah Baru fields
             document.getElementById('norek_baru').value = '';
             document.getElementById('nama_nasabah_baru').value = '';
@@ -763,6 +801,7 @@
         } else if (tipeNasabah === 'baru') {
             formLama.style.display = 'none';
             formBaru.style.display = 'block';
+            fieldTambahan.style.display = 'block'; // Tampilkan field tambahan
             // Clear Nasabah Lama fields
             document.getElementById('norek').value = '';
             document.getElementById('nama_nasabah').value = '';
@@ -770,6 +809,7 @@
         } else {
             formLama.style.display = 'none';
             formBaru.style.display = 'none';
+            fieldTambahan.style.display = 'none'; // Sembunyikan field tambahan
         }
     }
 
@@ -913,6 +953,8 @@
         const filterMonth = document.getElementById('filterMonth').value;
         const filterYear = document.getElementById('filterYear').value;
         
+        console.log('Load All Nasabah - Params:', {kodeKc, strategy, kategori, page, filterMonth, filterYear});
+        
         // Save current state
         currentPage = page;
         currentStrategy = strategy;
@@ -963,9 +1005,19 @@
             url += `&month=${filterMonth}`;
         }
         
+        console.log('Fetching URL:', url);
         fetch(url)
-            .then(response => response.json())
             .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(response => {
+                console.log('API Response:', response);
+                console.log('Data count:', response.data ? response.data.length : 0);
+                
                 // Handle paginated response
                 const nasabahs = response.data || [];
                 totalPages = response.last_page || 1;
@@ -977,7 +1029,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             <p>Tidak ada nasabah ditemukan di ${strategy}</p>
-                            <small style="color: #999;">Untuk KC: ${document.getElementById('nama_kc').value}</small>
+                            <small style="color: #999;">Kategori: ${kategori || 'Semua'}</small>
                         </div>
                     `;
                     return;
@@ -986,10 +1038,12 @@
                 displayNasabahList(nasabahs, response);
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Fetch Error:', error);
+                console.error('Error details:', error.message);
                 document.getElementById('nasabahList').innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #d32f2f;">
                         <p>Terjadi kesalahan saat memuat data</p>
+                        <small style="color: #999;">${error.message}</small>
                     </div>
                 `;
             });
@@ -1028,13 +1082,15 @@
         const isMerchantSavol = kategori === 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)';
         const isPenurunanMerchant = kategori === 'PENURUNAN CASA MERCHANT (QRIS & EDC)';
         const isPenurunanBrilink = kategori === 'PENURUNAN CASA BRILINK';
+        const isBrilinkSaldoKurang = kategori === 'BRILINK SALDO < 10 JUTA';
         const isQlolaNonDebitur = kategori === 'Qlola Non Debitur';
         const isNonDebiturVolBesar = kategori === 'Non Debitur Vol Besar CASA Kecil';
         const isUserAktifCasaKecil = kategori === 'User Aktif Casa Kecil';
         const isPenurunanPrioritasRitelMikro = kategori === 'Penurunan Prioritas Ritel & Mikro';
         const isAumDpk = kategori === 'AUM>2M DPK<50 juta';
+        const isNasabahDowngrade = kategori === 'Nasabah Downgrade';
         const isStrategi8 = kategori === 'Wingback Penguatan Produk & Fungsi RM';
-        const isLayeringWingback = kategori === 'Wingback';
+        const isLayeringWinback = kategori === 'Winback';
         const isOptimalisasiBusinessCluster = kategori === 'Optimalisasi Business Cluster';
         
         if (isMerchantSavol) {
@@ -1075,6 +1131,17 @@
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Last EOM</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Terupdate</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px;">Delta</th>';
+        } else if (isBrilinkSaldoKurang) {
+            // Kolom khusus untuk Brilink Saldo < 10 Juta
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Cabang</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Cabang</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Unit Kerja</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px;">Nama Agen</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">ID Agen</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kelas</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">No. Rekening</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">CASA</th>';
         } else if (isQlolaNonDebitur) {
             // Kolom khusus untuk Qlola Non Debitur
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Kanca</th>';
@@ -1142,8 +1209,8 @@
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Last EOM</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Terupdate</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px;">Delta</th>';
-        } else if (isAumDpk) {
-            // Kolom khusus untuk AUM>2M DPK<50 juta
+        } else if (isAumDpk || isNasabahDowngrade) {
+            // Kolom khusus untuk AUM>2M DPK<50 juta dan Nasabah Downgrade
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Uker</th>';
@@ -1156,7 +1223,7 @@
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Nomor Rekening</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">AUM</th>';
         } else if (isStrategi8) {
-            // Kolom khusus untuk Wingback Penguatan Produk & Fungsi RM
+            // Kolom khusus untuk Strategi 8 - Wingback Penguatan Produk & Fungsi RM
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Uker</th>';
@@ -1169,8 +1236,8 @@
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Last EOM</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Terupdate</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px;">Delta</th>';
-        } else if (isLayeringWingback) {
-            // Kolom khusus untuk Layering Wingback
+        } else if (isLayeringWinback) {
+            // Kolom khusus untuk Layering Winback
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Uker</th>';
@@ -1216,6 +1283,7 @@
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px;">Perusahaan</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Jenis Pipeline</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px;">Estimasi Pekerja</th>';
         } else {
             // Kolom untuk strategi lainnya
@@ -1280,11 +1348,13 @@
             const isMerchantSavol = kategori === 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)';
             const isPenurunanMerchant = kategori === 'PENURUNAN CASA MERCHANT (QRIS & EDC)';
             const isPenurunanBrilink = kategori === 'PENURUNAN CASA BRILINK';
+            const isBrilinkSaldoKurang = kategori === 'BRILINK SALDO < 10 JUTA';
             const isQlolaNonDebitur = kategori === 'Qlola Non Debitur';
             const isNonDebiturVolBesar = kategori === 'Non Debitur Vol Besar CASA Kecil';
             const isUserAktifCasaKecil = kategori === 'User Aktif Casa Kecil';
             const isPenurunanPrioritasRitelMikro = kategori === 'Penurunan Prioritas Ritel & Mikro';
             const isAumDpk = kategori === 'AUM>2M DPK<50 juta';
+            const isNasabahDowngrade = kategori === 'Nasabah Downgrade';
             const isStrategi8 = kategori === 'Wingback Penguatan Produk & Fungsi RM';
             const isStrategiLain = ['Strategi 1', 'Strategi 2', 'Strategi 3', 'Strategi 4', 'Strategi 6', 'Strategi 7', 'Strategi 8'].includes(strategy);
             const showDelta = false; // Removed Penurunan Brilink
@@ -1335,6 +1405,17 @@
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.saldo_last_eom || '-'}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.saldo_terupdate || '-'}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600; color: ${deltaColor};">${deltaFormatted}</td>`;
+            } else if (isBrilinkSaldoKurang) {
+                // Tampilan untuk Brilink Saldo < 10 Juta
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kd_cabang || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.cabang || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kd_uker || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.uker || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_agen || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.id_agen || '-'}</td>`;
+                html += `<td style="padding: 10px;"><span style="padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; background-color: ${nasabah.kelas === 'JAWARA' ? '#d1ecf1' : '#fff3cd'}; color: ${nasabah.kelas === 'JAWARA' ? '#0c5460' : '#856404'};">${nasabah.kelas || '-'}</span></td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600;">${nasabah.casa || '-'}</td>`;
             } else if (isQlolaNonDebitur) {
                 // Tampilan untuk Qlola Non Debitur
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_kanca || '-'}</td>`;
@@ -1465,8 +1546,8 @@
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${saldoLastEomFormatted}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${saldoTerupdateFormatted}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600; color: ${deltaColor};">${deltaFormatted}</td>`;
-            } else if (isAumDpk) {
-                // Tampilan untuk AUM>2M DPK<50 juta
+            } else if (isAumDpk || isNasabahDowngrade) {
+                // Tampilan untuk AUM>2M DPK<50 juta dan Nasabah Downgrade
                 const parseValue = (value) => {
                     if (!value || value === '-') return 0;
                     if (typeof value === 'number') return value;
@@ -1490,7 +1571,7 @@
                 html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600;">${aumFormatted}</td>`;
             } else if (isStrategi8) {
-                // Tampilan untuk Wingback Penguatan Produk & Fungsi RM
+                // Tampilan untuk Strategi 8 - Wingback Penguatan Produk & Fungsi RM
                 const parseValue = (value) => {
                     if (!value || value === '-') return 0;
                     if (typeof value === 'number') return value;
@@ -1515,8 +1596,8 @@
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${saldoLastEom}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${saldoTerupdate}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; color: ${parseValue(delta) >= 0 ? '#2e7d32' : '#d32f2f'};">${delta}</td>`;
-            } else if (isLayeringWingback) {
-                // Tampilan untuk Layering Wingback
+            } else if (isLayeringWinback) {
+                // Tampilan untuk Layering Winback
                 const parseValue = (value) => {
                     if (!value || value === '-') return 0;
                     if (typeof value === 'number') return value;
@@ -1578,6 +1659,7 @@
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_cabang_induk || '-'}</td>`;
                 html += `<td style="padding: 10px; font-size: 12px; color: #666;">${nasabah.cabang_induk || '-'}</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.perusahaan || '-'}</td>`;
+                html += `<td style="padding: 10px;"><span style="padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; background-color: ${nasabah.jenis_pipeline === 'Payroll' ? '#d1ecf1' : '#fff3cd'}; color: ${nasabah.jenis_pipeline === 'Payroll' ? '#0c5460' : '#856404'};">${nasabah.jenis_pipeline || '-'}</span></td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600;">${nasabah.estimasi_pekerja || '0'}</td>`;
             } else {
                 // Tampilan untuk strategi lainnya
@@ -1903,6 +1985,8 @@
         const isExistingPayroll = kategori === 'Existing Payroll';
         const isMerchantSavol = kategori === 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)';
         const isPerusahaanAnak = kategori === 'List Perusahaan Anak';
+        const isBrilinkSaldoKurang = kategori === 'BRILINK SALDO < 10 JUTA';
+        
         // Set Norek berdasarkan kategori dan data yang tersedia
         if (isPotensiPayroll) {
             document.getElementById('norek').value = nasabah.perusahaan || '';
@@ -1911,21 +1995,26 @@
         } else if (isMerchantSavol) {
             // Untuk Merchant Savol, hide nomor rekening
             document.getElementById('norek').value = '-';
+        } else if (isBrilinkSaldoKurang) {
+            // Untuk Brilink, gunakan norek
+            document.getElementById('norek').value = nasabah.norek || '-';
         } else {
             // Untuk kategori lainnya, hide nomor rekening
             document.getElementById('norek').value = '-';
         }
         
-        // Set nama nasabah - untuk Potensi Payroll gunakan perusahaan, untuk Perusahaan Anak gunakan nama_partner_vendor
+        // Set nama nasabah - untuk Potensi Payroll gunakan perusahaan, untuk Perusahaan Anak gunakan nama_partner_vendor, untuk Brilink gunakan nama_agen
         if (isPotensiPayroll) {
             document.getElementById('nama_nasabah').value = nasabah.perusahaan || '';
         } else if (isPerusahaanAnak) {
             document.getElementById('nama_nasabah').value = nasabah.nama_partner_vendor || '';
+        } else if (isBrilinkSaldoKurang) {
+            document.getElementById('nama_nasabah').value = nasabah.nama_agen || '';
         } else {
             document.getElementById('nama_nasabah').value = nasabah.nama_nasabah || '';
         }
         
-        // Ambil nilai delta atau estimasi pekerja
+        // Ambil nilai delta atau estimasi pekerja atau casa
         let deltaValue = 0;
         
         if (isPotensiPayroll) {
@@ -1935,6 +2024,15 @@
                     deltaValue = nasabah.estimasi_pekerja;
                 } else {
                     deltaValue = parseInt(nasabah.estimasi_pekerja.replace(/[.,]/g, ''));
+                }
+            }
+        } else if (isBrilinkSaldoKurang) {
+            // Untuk Brilink, gunakan casa
+            if (nasabah.casa) {
+                if (typeof nasabah.casa === 'number') {
+                    deltaValue = nasabah.casa;
+                } else {
+                    deltaValue = parseFloat(nasabah.casa.replace(/[.,]/g, ''));
                 }
             }
         } else if (nasabah.delta !== undefined && nasabah.delta !== null) {
@@ -2038,6 +2136,7 @@
                 'Qlola Non Debitur',
                 'Non Debitur Vol Besar CASA Kecil',
                 'AUM>2M DPK<50 juta',
+                'Nasabah Downgrade',
                 'User Aktif Casa Kecil',
                 'PENURUNAN CASA BRILINK',
                 'PENURUNAN CASA MERCHANT (QRIS & EDC)',
@@ -2049,7 +2148,7 @@
             const isPipelineData = kategoriBebas.includes(kategori) || 
                                    strategy === 'Wingback Penguatan Produk & Fungsi RM' ||
                                    strategy === 'Layering' ||
-                                   kategori === 'Wingback' ||
+                                   kategori === 'Winback' ||
                                    strategy === 'Optimalisasi Business Cluster';
             
             // CIFNO tidak wajib untuk kategori yang menggunakan pipeline
@@ -2062,7 +2161,7 @@
                 return false;
             }
             if (!rpJumlah) {
-                alert('Harap isi RP / Jumlah untuk Nasabah Lama');
+                alert('Harap isi Nominal Penuh untuk Nasabah Lama');
                 return false;
             }
             
@@ -2086,7 +2185,7 @@
                 return false;
             }
             if (!rpJumlahBaru) {
-                alert('Harap isi RP / Jumlah untuk Nasabah Baru');
+                alert('Harap isi Nominal Penuh untuk Nasabah Baru');
                 return false;
             }
             
@@ -2163,11 +2262,13 @@
     })();
     @endif
     
+    @if(auth()->user()->isRMFT())
     // Event listener untuk update hidden field rencana_aktivitas
     document.getElementById('rencana_aktivitas').addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         const namaRencana = selectedOption.getAttribute('data-nama') || selectedOption.text;
         document.getElementById('rencana_aktivitas_text').value = namaRencana;
     });
+    @endif
 </script>
 @endsection

@@ -75,6 +75,9 @@
         <div class="detail-label">Perusahaan:</div>
         <div class="detail-value">{{ $potensiPayroll->perusahaan ?? '-' }}</div>
 
+        <div class="detail-label">Jenis Pipeline:</div>
+        <div class="detail-value">{{ $potensiPayroll->jenis_pipeline ?? '-' }}</div>
+
         <div class="detail-label">Estimasi Pekerja:</div>
         <div class="detail-value">{{ $potensiPayroll->estimasi_pekerja ?? '-' }}</div>
 

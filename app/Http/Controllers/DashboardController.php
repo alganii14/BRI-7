@@ -37,6 +37,7 @@ class DashboardController extends Controller
         $selectedYear = $request->get('year', Carbon::now()->year);
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
+        $selectedJenisSimpanan = $request->get('jenis_simpanan');
         
         if (!$rmft) {
             return view('dashboard.rmft', [
@@ -50,6 +51,7 @@ class DashboardController extends Controller
                 'selectedYear' => $selectedYear,
                 'startDate' => $startDate,
                 'endDate' => $endDate,
+                'selectedJenisSimpanan' => $selectedJenisSimpanan,
             ]);
         }
         
@@ -63,6 +65,11 @@ class DashboardController extends Controller
         } else {
             $aktivitasBulanIni->whereYear('tanggal', $selectedYear)
                 ->whereMonth('tanggal', $selectedMonth);
+        }
+        
+        // Filter berdasarkan jenis simpanan jika dipilih
+        if ($selectedJenisSimpanan) {
+            $aktivitasBulanIni->where('jenis_simpanan', $selectedJenisSimpanan);
         }
         
         $totalAktivitasBulanIni = $aktivitasBulanIni->count();
@@ -109,7 +116,8 @@ class DashboardController extends Controller
             'selectedMonth',
             'selectedYear',
             'startDate',
-            'endDate'
+            'endDate',
+            'selectedJenisSimpanan'
         ));
     }
     

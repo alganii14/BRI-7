@@ -86,6 +86,65 @@
 <div class="card">
     <span class="read-only-badge">📊 View Only - Read-Only Access</span>
     
+    @php
+        // Ambil tanggal posisi data terbaru berdasarkan model yang digunakan
+        $latestTanggalPosisi = null;
+        $modelClass = get_class($data->first() ?? new stdClass());
+        
+        if ($data->count() > 0) {
+            try {
+                $model = $modelClass::query();
+                
+                // Filter berdasarkan KC untuk manager/rmft
+                if (auth()->user()->role === 'manager' || auth()->user()->role === 'rmft') {
+                    $kcField = null;
+                    $kcValue = auth()->user()->kode_kanca ?? auth()->user()->nama_kanca ?? '';
+                    
+                    // Cek field yang tersedia untuk filter KC
+                    $firstItem = $data->first();
+                    if (isset($firstItem->kode_kc)) {
+                        $kcField = 'kode_kc';
+                    } elseif (isset($firstItem->kd_cabang)) {
+                        $kcField = 'kd_cabang';
+                    } elseif (isset($firstItem->kode_cabang)) {
+                        $kcField = 'kode_cabang';
+                    }
+                    
+                    if ($kcField && $kcValue) {
+                        $model->where($kcField, $kcValue);
+                    }
+                }
+                
+                // Cari field tanggal posisi data
+                $dateField = null;
+                $firstItem = $data->first();
+                if (isset($firstItem->tanggal_posisi_data)) {
+                    $dateField = 'tanggal_posisi_data';
+                } elseif (isset($firstItem->tgl_posisi_data)) {
+                    $dateField = 'tgl_posisi_data';
+                } elseif (isset($firstItem->posisi_data)) {
+                    $dateField = 'posisi_data';
+                }
+                
+                if ($dateField) {
+                    $latestTanggalPosisi = $model->whereNotNull($dateField)
+                                                 ->orderBy($dateField, 'desc')
+                                                 ->first();
+                }
+            } catch (\Exception $e) {
+                // Jika terjadi error, abaikan saja
+            }
+        }
+    @endphp
+    
+    @if($latestTanggalPosisi && isset($dateField) && $latestTanggalPosisi->{$dateField})
+        <div style="background: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px 20px; border-radius: 6px; margin-bottom: 20px;">
+            <p style="margin: 0; color: #1976d2; font-weight: 600; font-size: 14px;">
+                📅 Posisi Data: {{ \Carbon\Carbon::parse($latestTanggalPosisi->{$dateField})->format('d F Y') }}
+            </p>
+        </div>
+    @endif
+    
     <div class="search-box">
         <form action="{{ $route }}" method="GET" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
             <input type="text" name="search" placeholder="Cari norek, nama, atau PN..." value="{{ request('search') }}">
