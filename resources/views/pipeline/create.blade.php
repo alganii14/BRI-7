@@ -96,6 +96,17 @@
     .section-header:first-child {
         margin-top: -24px;
     }
+
+    .hidden-section {
+        display: none !important;
+    }
+    
+    .form-group select:disabled,
+    .form-group input:disabled {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
 </style>
 
 <div class="card">
@@ -125,12 +136,80 @@
 
             @if(auth()->user()->isAdmin())
             <div class="form-group">
-                <label>PILIH KC <span style="color: red;">*</span></label>
-                <select name="kc_select" id="kc_select" required onchange="handleKCChange()">
-                    <option value="">-- Pilih KC --</option>
-                    @foreach($listKC as $kc)
-                        <option value="{{ $kc->kode_kanca }}" data-nama="{{ $kc->kanca }}">
-                            {{ $kc->kanca }}
+                <label>PILIH RMFT <span style="color: red;">*</span></label>
+                <select name="rmft_select" id="rmft_select" required onchange="fillRMFTData(this.value)">
+                    <option value="">-- Pilih RMFT --</option>
+                    @foreach($rmftList as $rmft)
+                        @php
+                            $rmftRecord = $rmft->rmftData;
+                            $ukerRecord = null;
+                            $kodeUkerValue = '';
+                            
+                            if ($rmftRecord) {
+                                if ($rmftRecord->uker) {
+                                    $ukerRecord = \App\Models\Uker::where('sub_kanca', $rmftRecord->uker)->first();
+                                }
+                                if (!$ukerRecord && $rmftRecord->kanca) {
+                                    $ukerRecord = \App\Models\Uker::where('kanca', $rmftRecord->kanca)->first();
+                                }
+                                if (!$ukerRecord) {
+                                    $ukerRecord = $rmftRecord->ukerRelation;
+                                }
+                                if ($ukerRecord) {
+                                    $kodeUkerValue = $ukerRecord->kode_sub_kanca;
+                                }
+                            }
+                        @endphp
+                        <option value="{{ $rmft->id }}" 
+                                data-rmft-id="{{ $rmftRecord ? $rmftRecord->id : '' }}"
+                                data-name="{{ $rmft->name }}"
+                                data-pernr="{{ $rmft->pernr }}"
+                                data-kode-kc="{{ $ukerRecord ? $ukerRecord->kode_kanca : '' }}"
+                                data-kanca="{{ $rmftRecord ? $rmftRecord->kanca : '' }}"
+                                data-kode-uker="{{ $kodeUkerValue }}"
+                                data-uker="{{ $rmftRecord ? $rmftRecord->uker : '' }}">
+                            {{ $rmft->name }} ({{ $rmft->pernr }}) - {{ $rmftRecord ? $rmftRecord->kanca : 'N/A' }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
+
+            @if(auth()->user()->isManager())
+            <div class="form-group">
+                <label>PILIH RMFT <span style="color: red;">*</span></label>
+                <select name="rmft_select" id="rmft_select" required onchange="fillRMFTData(this.value)">
+                    <option value="">-- Pilih RMFT --</option>
+                    @foreach($rmftList as $rmft)
+                        @php
+                            $rmftRecord = $rmft->rmftData;
+                            $ukerRecord = null;
+                            $kodeUkerValue = '';
+                            
+                            if ($rmftRecord) {
+                                if ($rmftRecord->uker) {
+                                    $ukerRecord = \App\Models\Uker::where('sub_kanca', $rmftRecord->uker)->first();
+                                }
+                                if (!$ukerRecord && $rmftRecord->kanca) {
+                                    $ukerRecord = \App\Models\Uker::where('kanca', $rmftRecord->kanca)->first();
+                                }
+                                if (!$ukerRecord) {
+                                    $ukerRecord = $rmftRecord->ukerRelation;
+                                }
+                                if ($ukerRecord) {
+                                    $kodeUkerValue = $ukerRecord->kode_sub_kanca;
+                                }
+                            }
+                        @endphp
+                        <option value="{{ $rmft->id }}" 
+                                data-rmft-id="{{ $rmftRecord ? $rmftRecord->id : '' }}"
+                                data-name="{{ $rmft->name }}"
+                                data-pernr="{{ $rmft->pernr }}"
+                                data-kode-kc="{{ $ukerRecord ? $ukerRecord->kode_kanca : '' }}"
+                                data-kanca="{{ $rmftRecord ? $rmftRecord->kanca : '' }}"
+                                data-kode-uker="{{ $kodeUkerValue }}"
+                                data-uker="{{ $rmftRecord ? $rmftRecord->uker : '' }}">
+                            {{ $rmft->name }} ({{ $rmft->pernr }}) - {{ $rmftRecord ? $rmftRecord->kanca : 'N/A' }}
                         </option>
                     @endforeach
                 </select>
@@ -138,37 +217,37 @@
             @endif
 
             <div class="form-group">
+                <label>PN RMFT</label>
+                <input type="text" id="pn_rmft" name="pn_rmft" value="{{ old('pn_rmft') }}" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>NAMA RMFT</label>
+                <input type="text" id="nama_rmft" name="nama_rmft" value="{{ old('nama_rmft') }}" readonly>
+            </div>
+
+            <div class="form-group">
                 <label>KODE KC <span style="color: red;">*</span></label>
-                <input type="text" name="kode_kc" id="kode_kc" value="{{ old('kode_kc', auth()->user()->kode_kanca ?? '') }}" readonly required>
+                <input type="text" name="kode_kc" id="kode_kc" value="{{ old('kode_kc') }}" readonly required>
             </div>
 
             <div class="form-group">
                 <label>NAMA KC <span style="color: red;">*</span></label>
-                <input type="text" name="nama_kc" id="nama_kc" value="{{ old('nama_kc', auth()->user()->nama_kanca ?? '') }}" readonly required>
+                <input type="text" name="nama_kc" id="nama_kc" value="{{ old('nama_kc') }}" readonly required>
             </div>
 
             <div class="form-group">
-                <label>PILIH UKER <span style="color: red;">*</span></label>
-                <select name="uker_select" id="uker_select" required onchange="handleUkerChange()" {{ auth()->user()->isManager() ? '' : 'disabled' }}>
-                    <option value="">-- Pilih Unit Kerja --</option>
-                    @if(auth()->user()->isManager())
-                        @foreach($listUker as $uker)
-                            <option value="{{ $uker->kode_sub_kanca }}" data-nama="{{ $uker->sub_kanca }}">
-                                {{ $uker->sub_kanca }}
-                            </option>
-                        @endforeach
-                    @endif
-                </select>
+                <label>NAMA UKER <span style="color: red;">*</span> <span id="unit_selector_label" style="color: #0066CC; display: none;">(Klik untuk pilih unit)</span></label>
+                <input type="text" id="nama_uker_display" name="nama_uker" value="{{ old('nama_uker') }}" readonly required style="background-color: #f5f5f5;">
+                <input type="hidden" id="nama_uker" value="{{ old('nama_uker') }}">
+                <input type="hidden" id="is_unit_rmft" value="0">
+                <input type="hidden" id="rmft_kode_kc" value="">
             </div>
 
             <div class="form-group">
                 <label>KODE UKER <span style="color: red;">*</span></label>
-                <input type="text" name="kode_uker" id="kode_uker" value="{{ old('kode_uker') }}" readonly required>
-            </div>
-
-            <div class="form-group">
-                <label>NAMA UKER <span style="color: red;">*</span></label>
-                <input type="text" name="nama_uker" id="nama_uker" value="{{ old('nama_uker') }}" readonly required>
+                <input type="text" id="kode_uker_display" readonly required style="background-color: #f5f5f5;" value="{{ old('kode_uker') }}">
+                <input type="hidden" id="kode_uker" name="kode_uker" value="{{ old('kode_uker') }}">
             </div>
         </div>
 
@@ -243,6 +322,42 @@
             </div>
         </div>
 
+        <!-- Field Tambahan setelah Tipe Nasabah - Hidden by default -->
+        <div id="form_additional_fields" style="display: none;">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>JENIS SIMPANAN <span style="color: red;">*</span></label>
+                    <select name="jenis_simpanan" id="jenis_simpanan" required>
+                        <option value="">-- Pilih Jenis Simpanan --</option>
+                        <option value="Tabungan" {{ old('jenis_simpanan') == 'Tabungan' ? 'selected' : '' }}>Tabungan</option>
+                        <option value="Giro" {{ old('jenis_simpanan') == 'Giro' ? 'selected' : '' }}>Giro</option>
+                        <option value="Deposito" {{ old('jenis_simpanan') == 'Deposito' ? 'selected' : '' }}>Deposito</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>JENIS USAHA</label>
+                    <input type="text" name="jenis_usaha" id="jenis_usaha" value="{{ old('jenis_usaha') }}" placeholder="Masukkan jenis usaha (opsional)">
+                </div>
+
+                <div class="form-group">
+                    <label>NOMINAL <span style="color: red;">*</span></label>
+                    <input type="number" name="nominal" id="nominal" value="{{ old('nominal') }}" placeholder="Masukkan nominal dalam penuh" min="0" step="1" required>
+                    <small style="color: #666;">Contoh: 5000000 untuk Rp 5.000.000</small>
+                </div>
+
+                <div class="form-group">
+                    <label>TINGKAT KEYAKINAN <span style="color: red;">*</span></label>
+                    <select name="tingkat_keyakinan" id="tingkat_keyakinan" required>
+                        <option value="">-- Pilih Tingkat Keyakinan --</option>
+                        <option value="100%" {{ old('tingkat_keyakinan') == '100%' ? 'selected' : '' }}>100%</option>
+                        <option value="50-80%" {{ old('tingkat_keyakinan') == '50-80%' ? 'selected' : '' }}>50-80%</option>
+                        <option value="DIATAS 80% sd < 100%" {{ old('tingkat_keyakinan') == 'DIATAS 80% sd < 100%' ? 'selected' : '' }}>DIATAS 80% sd &lt; 100%</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <div class="form-group">
             <label>KETERANGAN</label>
             <textarea name="keterangan" rows="3">{{ old('keterangan') }}</textarea>
@@ -286,6 +401,37 @@
     </div>
 </div>
 
+<!-- Modal Unit Selection -->
+<div id="unitModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; border-radius: 12px; width: 90%; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+        <div style="padding: 20px; border-bottom: 2px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); flex-shrink: 0;">
+            <h3 style="margin: 0; color: white;">Pilih Unit di <span id="modal_kc_name"></span></h3>
+            <button onclick="closeUnitModal()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 0; width: 30px; height: 30px;">&times;</button>
+        </div>
+        
+        <div style="padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column;">
+            <div style="margin-bottom: 15px; flex-shrink: 0;">
+                <input type="text" id="searchUnit" placeholder="Cari nama unit..." style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;" onkeyup="filterUnitList()">
+            </div>
+            
+            <div id="selected_count" style="margin-bottom: 10px; padding: 8px 12px; background: #e3f2fd; border-radius: 6px; color: #1976d2; font-size: 13px; font-weight: 600; flex-shrink: 0;">
+                <span id="count_text">Belum ada unit dipilih</span>
+            </div>
+            
+            <div id="unitList" style="flex: 1; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 10px; min-height: 200px; max-height: 350px;">
+                <div style="text-align: center; padding: 40px; color: #666;">
+                    <p>Memuat daftar unit...</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end; flex-shrink: 0;">
+                <button onclick="closeUnitModal()" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">Batal</button>
+                <button onclick="applySelectedUnits()" style="padding: 10px 20px; background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Terapkan Pilihan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
 @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -299,11 +445,13 @@ function toggleNasabahForm() {
     const tipeNasabah = document.getElementById('tipe_nasabah').value;
     const formLama = document.getElementById('form_nasabah_lama');
     const formBaru = document.getElementById('form_nasabah_baru');
+    const formAdditional = document.getElementById('form_additional_fields');
     
     if (tipeNasabah === 'lama') {
         // Di Dalam Pipeline - show search form
         formLama.style.display = 'block';
         formBaru.style.display = 'none';
+        formAdditional.style.display = 'block'; // Show additional fields
         
         // Enable fields for lama
         document.getElementById('norek').disabled = false;
@@ -322,6 +470,7 @@ function toggleNasabahForm() {
         // Di Luar Pipeline - show manual input form
         formLama.style.display = 'none';
         formBaru.style.display = 'block';
+        formAdditional.style.display = 'block'; // Show additional fields
         
         // Disable fields for lama
         document.getElementById('norek').disabled = true;
@@ -340,64 +489,210 @@ function toggleNasabahForm() {
         // No selection - hide both
         formLama.style.display = 'none';
         formBaru.style.display = 'none';
+        formAdditional.style.display = 'none'; // Hide additional fields
     }
 }
 
 
 
-// Handle KC Change (Admin only)
-function handleKCChange() {
-    const kcSelect = document.getElementById('kc_select');
-    const selectedOption = kcSelect.options[kcSelect.selectedIndex];
+// Variable untuk menyimpan unit yang dipilih (SINGLE SELECTION)
+let selectedUnit = null;
+
+// Function to fill RMFT data when selecting RMFT
+function fillRMFTData(rmftUserId) {
+    const select = document.getElementById('rmft_select');
+    if (!select) {
+        console.error('ERROR: rmft_select element not found!');
+        return;
+    }
     
-    if (selectedOption.value) {
-        document.getElementById('kode_kc').value = selectedOption.value;
-        document.getElementById('nama_kc').value = selectedOption.dataset.nama;
-        
-        // Load uker berdasarkan KC
-        loadUkerByKC(selectedOption.value);
-        
-        // Reset uker selection
+    const option = select.options[select.selectedIndex];
+    
+    if (!option.value) {
+        // Clear all fields
+        document.getElementById('pn_rmft').value = '';
+        document.getElementById('nama_rmft').value = '';
+        document.getElementById('kode_kc').value = '';
+        document.getElementById('nama_kc').value = '';
         document.getElementById('kode_uker').value = '';
+        document.getElementById('kode_uker_display').value = '';
         document.getElementById('nama_uker').value = '';
+        document.getElementById('nama_uker_display').value = '';
+        document.getElementById('is_unit_rmft').value = '0';
+        document.getElementById('rmft_kode_kc').value = '';
+        
+        // Clear list fields
+        document.getElementById('kode_uker_list').value = '';
+        document.getElementById('nama_uker_list').value = '';
+        selectedUnits = [];
+        return;
+    }
+    
+    // Fill form with selected RMFT data
+    console.log('Filling fields...');
+    document.getElementById('pn_rmft').value = option.dataset.pernr;
+    document.getElementById('nama_rmft').value = option.dataset.name;
+    document.getElementById('kode_kc').value = option.dataset.kodeKc;
+    document.getElementById('nama_kc').value = option.dataset.kanca;
+    document.getElementById('kode_uker').value = option.dataset.kodeUker;
+    document.getElementById('kode_uker_display').value = option.dataset.kodeUker;
+    console.log('Fields filled!');
+    
+    // Simpan kode KC untuk filter unit
+    document.getElementById('rmft_kode_kc').value = option.dataset.kodeKc;
+    
+    // Set default value
+    document.getElementById('nama_uker').value = option.dataset.uker;
+    document.getElementById('nama_uker_display').value = option.dataset.uker;
+    
+    // Cek apakah RMFT ini bisa ganti unit (hanya KC/Unit, bukan KCP)
+    const ukerName = option.dataset.uker.toUpperCase();
+    const canSelectUnit = ukerName.includes('UNIT') || ukerName.startsWith('KC ') || ukerName.startsWith('KK ');
+    
+    if (canSelectUnit) {
+        // Enable modal untuk pilih unit - SINGLE SELECTION
+        document.getElementById('unit_selector_label').style.display = 'inline';
+        document.getElementById('nama_uker_display').style.cursor = 'pointer';
+        document.getElementById('nama_uker_display').style.backgroundColor = '#f0f8ff';
+        document.getElementById('nama_uker_display').title = 'Klik untuk memilih unit di KC ini';
+        document.getElementById('nama_uker_display').onclick = openUnitModal;
+        
+        // Set is_unit_rmft
+        if (ukerName.includes('UNIT')) {
+            document.getElementById('is_unit_rmft').value = '1';
+        } else {
+            document.getElementById('is_unit_rmft').value = '0';
+        }
+        
+        // Set default selection
+        selectedUnit = {
+            kode_sub_kanca: option.dataset.kodeUker,
+            sub_kanca: option.dataset.uker
+        };
+    } else {
+        // KCP - readonly, tidak bisa ganti
+        document.getElementById('is_unit_rmft').value = '0';
+        document.getElementById('unit_selector_label').style.display = 'none';
+        document.getElementById('nama_uker_display').style.cursor = 'default';
+        document.getElementById('nama_uker_display').style.backgroundColor = '#f5f5f5';
+        document.getElementById('nama_uker_display').title = '';
+        document.getElementById('nama_uker_display').onclick = null;
+        
+        selectedUnit = null;
     }
 }
 
-// Load Uker by KC
-function loadUkerByKC(kodeKC) {
-    const ukerSelect = document.getElementById('uker_select');
-    ukerSelect.innerHTML = '<option value="">-- Loading... --</option>';
-    ukerSelect.disabled = true;
+// Modal Unit Selection Functions
+function openUnitModal() {
+    const kodeKc = document.getElementById('rmft_kode_kc').value;
+    const namaKc = document.getElementById('nama_kc').value;
     
-    fetch(`{{ route('api.uker.by-kc') }}?kode_kc=${kodeKC}`)
+    if (!kodeKc) {
+        alert('Pilih RMFT terlebih dahulu');
+        return;
+    }
+    
+    document.getElementById('modal_kc_name').textContent = namaKc;
+    document.getElementById('unitModal').style.display = 'flex';
+    
+    // Load unit list
+    loadUnitList(kodeKc);
+}
+
+function closeUnitModal() {
+    document.getElementById('unitModal').style.display = 'none';
+}
+
+function loadUnitList(kodeKc) {
+    document.getElementById('unitList').innerHTML = '<div style="text-align: center; padding: 20px; color: #666;"><p>Memuat daftar unit...</p></div>';
+    
+    fetch(`{{ route('api.uker.by-kc') }}?kode_kc=${kodeKc}`)
         .then(response => response.json())
         .then(data => {
-            ukerSelect.innerHTML = '<option value="">-- Pilih Unit Kerja --</option>';
-            data.forEach(uker => {
-                const option = document.createElement('option');
-                option.value = uker.kode_sub_kanca;
-                option.dataset.nama = uker.sub_kanca;
-                option.textContent = uker.sub_kanca;
-                ukerSelect.appendChild(option);
-            });
-            ukerSelect.disabled = false;
+            displayUnitList(data);
         })
         .catch(error => {
-            console.error('Error loading uker:', error);
-            ukerSelect.innerHTML = '<option value="">-- Error loading data --</option>';
-            ukerSelect.disabled = false;
+            console.error('Error:', error);
+            document.getElementById('unitList').innerHTML = '<div style="text-align: center; padding: 20px; color: #d32f2f;"><p>Error memuat data</p></div>';
         });
 }
 
-// Handle Uker Change
-function handleUkerChange() {
-    const ukerSelect = document.getElementById('uker_select');
-    const selectedOption = ukerSelect.options[ukerSelect.selectedIndex];
+function displayUnitList(units) {
+    let html = '';
     
-    if (selectedOption.value) {
-        document.getElementById('kode_uker').value = selectedOption.value;
-        document.getElementById('nama_uker').value = selectedOption.dataset.nama;
+    units.forEach((unit, index) => {
+        const isSelected = selectedUnit && selectedUnit.kode_sub_kanca === unit.kode_sub_kanca;
+        const unitId = 'unit_' + index;
+        const borderColor = isSelected ? '#0066CC' : '#ddd';
+        const bgColor = isSelected ? '#e3f2fd' : 'white';
+        const checked = isSelected ? 'checked' : '';
+        
+        html += '<div id="' + unitId + '" data-kode="' + unit.kode_sub_kanca + '" data-nama="' + unit.sub_kanca + '" ';
+        html += 'style="padding: 10px; border: 1px solid ' + borderColor + '; border-radius: 6px; margin-bottom: 8px; cursor: pointer; background: ' + bgColor + '; transition: all 0.2s;" ';
+        html += 'onclick="toggleUnitSelectionById(\'' + unitId + '\')">';
+        html += '<div style="display: flex; align-items: center; gap: 10px;">';
+        html += '<input type="radio" name="unit_radio" ' + checked + ' style="width: 18px; height: 18px; cursor: pointer;" onclick="event.stopPropagation();">';
+        html += '<div style="flex: 1;">';
+        html += '<div style="font-weight: 600; color: #333; margin-bottom: 4px;">' + unit.sub_kanca + '</div>';
+        html += '<div style="font-size: 12px; color: #666; font-family: monospace;">' + unit.kode_sub_kanca + '</div>';
+        html += '</div></div></div>';
+    });
+    
+    document.getElementById('unitList').innerHTML = html;
+    updateSelectedCountDisplay();
+}
+
+function toggleUnitSelectionById(unitId) {
+    const element = document.getElementById(unitId);
+    const unit = {
+        kode_sub_kanca: element.dataset.kode,
+        sub_kanca: element.dataset.nama
+    };
+    toggleUnitSelection(unit);
+}
+
+function toggleUnitSelection(unit) {
+    // Single selection - replace previous selection
+    selectedUnit = unit;
+    
+    // Reload display
+    const kodeKc = document.getElementById('rmft_kode_kc').value;
+    loadUnitList(kodeKc);
+}
+
+function updateSelectedCountDisplay() {
+    if (selectedUnit) {
+        document.getElementById('count_text').textContent = '1 unit dipilih: ' + selectedUnit.sub_kanca;
+    } else {
+        document.getElementById('count_text').textContent = 'Belum ada unit dipilih';
     }
+}
+
+function filterUnitList() {
+    const searchTerm = document.getElementById('searchUnit').value.toLowerCase();
+    const unitItems = document.querySelectorAll('#unitList > div');
+    
+    unitItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(searchTerm) ? 'block' : 'none';
+    });
+}
+
+function applySelectedUnits() {
+    if (!selectedUnit) {
+        alert('Pilih 1 unit');
+        return;
+    }
+    
+    // Update display fields - single value
+    document.getElementById('nama_uker_display').value = selectedUnit.sub_kanca;
+    document.getElementById('kode_uker_display').value = selectedUnit.kode_sub_kanca;
+    
+    // Update hidden fields
+    document.getElementById('nama_uker').value = selectedUnit.sub_kanca;
+    document.getElementById('kode_uker').value = selectedUnit.kode_sub_kanca;
+    
+    closeUnitModal();
 }
 
 // Handle Strategy Change
@@ -468,8 +763,13 @@ function openNasabahModal() {
     const strategy = document.getElementById('strategy_pipeline').value;
     const kategori = document.getElementById('kategori_strategi')?.value || '';
     
-    if (!kodeKC || !kodeUker) {
-        alert('Pilih KC dan Uker terlebih dahulu');
+    if (!kodeKC) {
+        alert('Pilih RMFT terlebih dahulu untuk menentukan KC');
+        return;
+    }
+    
+    if (!kodeUker) {
+        alert('Pilih RMFT terlebih dahulu untuk menentukan Uker');
         return;
     }
     
@@ -509,6 +809,17 @@ function toggleNasabahSelection(nasabah) {
     updateSelectedCount();
 }
 
+function toggleNasabahSelectionById(rowId) {
+    const element = document.getElementById(rowId);
+    const nasabah = {
+        nama: element.dataset.nama,
+        norek: element.dataset.norek,
+        segmen: element.dataset.segmen
+    };
+    toggleNasabahSelection(nasabah);
+    loadNasabahList(false);
+}
+
 function isNasabahSelected(nasabah) {
     return selectedNasabahList.some(n => n.norek === nasabah.norek && n.nama === nasabah.nama);
 }
@@ -543,16 +854,20 @@ function applySelectedNasabah() {
 
 function loadNasabahList(append = false) {
     const kodeKC = document.getElementById('kode_kc').value;
-    const kodeUker = document.getElementById('kode_uker').value;
     const strategy = document.getElementById('strategy_pipeline').value;
     const kategori = document.getElementById('kategori_strategi')?.value || '';
     const search = document.getElementById('searchNasabah').value;
+    const pnRmft = document.getElementById('pn_rmft').value; // Ambil PN RMFT
+    
+    // Gunakan single unit yang dipilih
+    const kodeUkerParam = document.getElementById('kode_uker').value;
     
     if (!append) {
         document.getElementById('nasabahList').innerHTML = '<div style="text-align: center; padding: 40px; color: #0066CC;"><div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #0066CC; border-radius: 50%; animation: spin 1s linear infinite;"></div><p style="margin-top: 16px;">Memuat data...</p></div>';
     }
     
-    let url = `{{ route('api.pipeline.search') }}?search=${encodeURIComponent(search)}&kode_kc=${kodeKC}&kode_uker=${kodeUker}&strategy=${encodeURIComponent(strategy)}&load_all=1&page=${currentPage}`;
+    // Gunakan route khusus untuk pipeline - mencari dari tabel Pull of Pipeline dengan filter exclude per RMFT
+    let url = `{{ route('api.pipeline.search-from-pull') }}?search=${encodeURIComponent(search)}&kode_kc=${kodeKC}&kode_uker=${kodeUkerParam}&strategy=${encodeURIComponent(strategy)}&pn_rmft=${pnRmft}&page=${currentPage}`;
     if (kategori) {
         url += `&kategori=${encodeURIComponent(kategori)}`;
     }
@@ -581,7 +896,7 @@ function loadNasabahList(append = false) {
         })
         .catch(error => {
             console.error('Error:', error);
-            document.getElementById('nasabahList').innerHTML = '<div style="text-align: center; padding: 40px; color: #d32f2f;">Error saat memuat data</div>';
+            document.getElementById('nasabahList').innerHTML = '<div style="text-align: center; padding: 40px; color: #d32f2f;">Error saat memuat data<br><small>' + error.message + '</small></div>';
             isLoadingMore = false;
         });
 }
@@ -609,7 +924,7 @@ function displayNasabahList(nasabahs, paginationData) {
     
     // Get all column names from first item (exclude hidden columns)
     const firstItem = nasabahs[0];
-    const hiddenColumns = ['id', 'created_at', 'updated_at', 'no_rekening', 'norekening', 'nomor_rekening', 'norek'];
+    const hiddenColumns = ['id', 'created_at', 'updated_at', 'no_rekening', 'norekening', 'nomor_rekening', 'norek', 'nama', 'segmen'];
     const allColumns = Object.keys(firstItem).filter(col => !hiddenColumns.includes(col));
     
     // Scrollable table container
@@ -627,7 +942,7 @@ function displayNasabahList(nasabahs, paginationData) {
     html += '</tr></thead><tbody>';
     
     // Data rows
-    nasabahs.forEach(item => {
+    nasabahs.forEach((item, index) => {
         const displayName = item.nama_nasabah || item.nama_partner_vendor || item.nama_perusahaan || item.perusahaan || item.nama_agen || item.nama_debitur || '-';
         const displayNorek = item.norek || item.no_rekening || item.cifno || item.corporate_code || '-';
         const displaySegmen = item.segmen_nasabah || item.segmentasi || item.segmentasi_bpr || '-';
@@ -639,15 +954,19 @@ function displayNasabahList(nasabahs, paginationData) {
         };
         
         const isSelected = isNasabahSelected(nasabahObj);
+        const rowId = 'nasabah_row_' + index;
+        const bgColor = isSelected ? '#e3f2fd' : 'white';
+        const checked = isSelected ? 'checked' : '';
         
-        html += `<tr style="border-bottom: 1px solid #eee; cursor: pointer; background: ${isSelected ? '#e3f2fd' : 'white'};" 
-                     onmouseover="if(!${isSelected}) this.style.background='#f5f5f5'" 
-                     onmouseout="this.style.background='${isSelected ? '#e3f2fd' : 'white'}'"
-                     onclick="toggleNasabahSelection(${JSON.stringify(nasabahObj).replace(/"/g, '&quot;')}); loadNasabahList(false);">`;
+        html += '<tr id="' + rowId + '" data-nama="' + displayName + '" data-norek="' + displayNorek + '" data-segmen="' + displaySegmen + '" ';
+        html += 'style="border-bottom: 1px solid #eee; cursor: pointer; background: ' + bgColor + ';" ';
+        html += 'onmouseover="if(!' + isSelected + ') this.style.background=\'#f5f5f5\'" ';
+        html += 'onmouseout="this.style.background=\'' + bgColor + '\'" ';
+        html += 'onclick="toggleNasabahSelectionById(\'' + rowId + '\')">';
         
-        html += `<td style="padding: 10px; text-align: center;">
-                    <input type="checkbox" ${isSelected ? 'checked' : ''} style="width: 18px; height: 18px; cursor: pointer;" onclick="event.stopPropagation();">
-                 </td>`;
+        html += '<td style="padding: 10px; text-align: center;">';
+        html += '<input type="checkbox" ' + checked + ' style="width: 18px; height: 18px; cursor: pointer;" onclick="event.stopPropagation();">';
+        html += '</td>';
         
         // Display all column values dynamically
         allColumns.forEach(column => {
@@ -663,7 +982,7 @@ function displayNasabahList(nasabahs, paginationData) {
             const nameColumns = ['nama_nasabah', 'nama_partner_vendor', 'nama_perusahaan', 'perusahaan', 'nama_agen', 'nama_debitur', 'nama_usaha_pusat_bisnis', 'nama_merchant'];
             const fontWeight = nameColumns.includes(column) ? '600' : 'normal';
             
-            html += `<td style="padding: 10px; font-weight: ${fontWeight};">${value}</td>`;
+            html += '<td style="padding: 10px; font-weight: ' + fontWeight + ';">' + value + '</td>';
         });
         
         html += '</tr>';
@@ -729,18 +1048,15 @@ function validateForm() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    @if(auth()->user()->isManager())
-        // Manager: KC sudah terisi otomatis, uker sudah di-load dari server
-        // Tidak perlu load lagi
-    @endif
-    
-    @if(auth()->user()->isAdmin())
-        // Admin: Perlu pilih KC dulu
-        document.getElementById('uker_select').disabled = true;
-    @endif
-    
     // Add event listener for tipe nasabah
     document.getElementById('tipe_nasabah').addEventListener('change', toggleNasabahForm);
+    
+    // Trigger fillRMFTData if RMFT is already selected (for page reload with old values)
+    const rmftSelect = document.getElementById('rmft_select');
+    if (rmftSelect && rmftSelect.value) {
+        console.log('RMFT already selected on page load, triggering fillRMFTData');
+        fillRMFTData(rmftSelect.value);
+    }
 });
 
 // Form Validation before submit
@@ -781,22 +1097,6 @@ function validateForm() {
     
     return true;
 }
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    @if(auth()->user()->isManager())
-        // Manager: KC sudah terisi otomatis, uker sudah di-load dari server
-        // Tidak perlu load lagi
-    @endif
-    
-    @if(auth()->user()->isAdmin())
-        // Admin: Perlu pilih KC dulu
-        document.getElementById('uker_select').disabled = true;
-    @endif
-    
-    // Add event listener for tipe nasabah
-    document.getElementById('tipe_nasabah').addEventListener('change', toggleNasabahForm);
-});
 </script>
 
 

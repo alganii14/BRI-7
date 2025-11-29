@@ -141,4 +141,21 @@ class RencanaAktivitasController extends Controller
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Get rencana aktivitas by RMFT ID (for Manager/Admin)
+     *
+     * @param  int  $rmftId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getByRMFT($rmftId)
+    {
+        // Get all active rencana aktivitas for the selected RMFT
+        // Since rencana aktivitas is not tied to specific RMFT, return all active ones
+        $rencanaAktivitas = RencanaAktivitas::where('is_active', true)
+            ->orderBy('nama_rencana')
+            ->get(['id', 'nama_rencana']);
+
+        return response()->json($rencanaAktivitas);
+    }
 }

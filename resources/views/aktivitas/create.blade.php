@@ -293,22 +293,26 @@
             </select>
         </div>
 
-        @if(auth()->user()->isRMFT())
         <div class="form-group">
             <label>RENCANA AKTIVITAS <span style="color: red;">*</span></label>
-            <select name="rencana_aktivitas_id" id="rencana_aktivitas" required disabled>
-                <option value="">Pilih Rencana Aktivitas</option>
-                @foreach($rencanaAktivitas as $item)
-                    <option value="{{ $item->id }}" 
-                            data-nama="{{ $item->nama_rencana }}"
-                            {{ old('rencana_aktivitas_id') == $item->id ? 'selected' : '' }}>
-                        {{ $item->nama_rencana }}
-                    </option>
-                @endforeach
-            </select>
+            @if(auth()->user()->isRMFT())
+                <select name="rencana_aktivitas_id" id="rencana_aktivitas" required disabled>
+                    <option value="">Pilih Rencana Aktivitas</option>
+                    @foreach($rencanaAktivitas as $item)
+                        <option value="{{ $item->id }}" 
+                                data-nama="{{ $item->nama_rencana }}"
+                                {{ old('rencana_aktivitas_id') == $item->id ? 'selected' : '' }}>
+                            {{ $item->nama_rencana }}
+                        </option>
+                    @endforeach
+                </select>
+            @else
+                <select name="rencana_aktivitas_id" id="rencana_aktivitas" required disabled>
+                    <option value="">Pilih RMFT terlebih dahulu</option>
+                </select>
+            @endif
             <input type="hidden" name="rencana_aktivitas" id="rencana_aktivitas_text" value="{{ old('rencana_aktivitas') }}">
         </div>
-        @endif
 
         <div class="form-row">
             <div class="form-group">
@@ -562,6 +566,36 @@
         }
     });
 
+    // Function to load rencana aktivitas for selected RMFT (Manager/Admin only)
+    function loadRencanaAktivitasForRMFT(rmftId) {
+        fetch(`{{ url('/api/rencana-aktivitas/by-rmft') }}/${rmftId}`)
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('rencana_aktivitas');
+                select.innerHTML = '<option value="">Pilih Rencana Aktivitas</option>';
+                
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        option.setAttribute('data-nama', item.nama_rencana);
+                        option.textContent = item.nama_rencana;
+                        select.appendChild(option);
+                    });
+                    select.disabled = false;
+                } else {
+                    select.innerHTML = '<option value="">Tidak ada rencana aktivitas</option>';
+                    select.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading rencana aktivitas:', error);
+                const select = document.getElementById('rencana_aktivitas');
+                select.innerHTML = '<option value="">Error memuat data</option>';
+                select.disabled = true;
+            });
+    }
+    
     // Function to fill RMFT data when Manager selects RMFT
     function fillRMFTData(rmftUserId) {
         const select = document.getElementById('rmft_select');
@@ -667,10 +701,8 @@
     function disableAktivitasFields() {
         document.getElementById('strategy_pipeline').disabled = true;
         document.getElementById('strategy_pipeline').innerHTML = '<option value="">Pilih RMFT terlebih dahulu</option>';
-        @if(auth()->user()->isRMFT())
         document.getElementById('rencana_aktivitas').disabled = true;
         document.getElementById('rencana_aktivitas').innerHTML = '<option value="">Pilih RMFT terlebih dahulu</option>';
-        @endif
         document.getElementById('segmen_nasabah').disabled = true;
         document.getElementById('segmen_nasabah').innerHTML = '<option value="">Pilih RMFT terlebih dahulu</option>';
         document.getElementById('tipe_nasabah').disabled = true;
@@ -707,7 +739,7 @@
         `;
         
         @if(auth()->user()->isRMFT())
-        // Enable Rencana Aktivitas
+        // Enable Rencana Aktivitas for RMFT
         document.getElementById('rencana_aktivitas').disabled = false;
         document.getElementById('rencana_aktivitas').innerHTML = `
             <option value="">Pilih Rencana Aktivitas</option>
@@ -715,6 +747,12 @@
             <option value="{{ $item->id }}" data-nama="{{ $item->nama_rencana }}">{{ $item->nama_rencana }}</option>
             @endforeach
         `;
+        @else
+        // For Manager/Admin, load rencana aktivitas based on selected RMFT
+        const rmftId = document.getElementById('rmft_id_input').value;
+        if (rmftId) {
+            loadRencanaAktivitasForRMFT(rmftId);
+        }
         @endif
         
         // Enable Segmen Nasabah
@@ -932,7 +970,8 @@
         `;
         
         // Build URL with filters - AMBIL DARI PIPELINES + JOIN KE PULL OF PIPELINE (DATA LENGKAP)
-        let url = `{{ route('api.aktivitas.search-from-pipeline') }}?search=&kode_kc=${kodeKc}&kode_uker=${kodeUkerParam}&strategy=${encodeURIComponent(strategy)}&page=${page}`;
+        const pnRmft = document.getElementById('pn')?.value || ''; // Ambil PN RMFT
+        let url = `{{ route('api.aktivitas.search-from-pipeline') }}?search=&kode_kc=${kodeKc}&kode_uker=${kodeUkerParam}&strategy=${encodeURIComponent(strategy)}&pn_rmft=${pnRmft}&page=${page}`;
         if (kategori) {
             url += `&kategori=${encodeURIComponent(kategori)}`;
         }
@@ -2188,13 +2227,11 @@
     })();
     @endif
     
-    @if(auth()->user()->isRMFT())
-    // Event listener untuk update hidden field rencana_aktivitas
+    // Event listener untuk update hidden field rencana_aktivitas (all user types)
     document.getElementById('rencana_aktivitas').addEventListener('change', function() {
         const selectedOption = this.options[this.selectedIndex];
         const namaRencana = selectedOption.getAttribute('data-nama') || selectedOption.text;
         document.getElementById('rencana_aktivitas_text').value = namaRencana;
     });
-    @endif
 </script>
 @endsection

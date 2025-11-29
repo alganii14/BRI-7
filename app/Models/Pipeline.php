@@ -11,6 +11,8 @@ class Pipeline extends Model
 
     protected $fillable = [
         'tanggal',
+        'pn_rmft',
+        'nama_rmft',
         'kode_kc',
         'nama_kc',
         'kode_uker',
@@ -18,6 +20,10 @@ class Pipeline extends Model
         'strategy_pipeline',
         'kategori_strategi',
         'tipe',
+        'jenis_simpanan',
+        'jenis_usaha',
+        'nominal',
+        'tingkat_keyakinan',
         'nama_nasabah',
         'norek',
         'keterangan',

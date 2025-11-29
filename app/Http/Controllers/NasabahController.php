@@ -1952,4 +1952,231 @@ class NasabahController extends Controller
                 ->with('error', 'Gagal menghapus data: ' . $e->getMessage());
         }
     }
+    
+    /**
+     * Search nasabah from Pull of Pipeline tables for Pipeline Create
+     * Tidak ada filter exclude - boleh duplikat di pipeline
+     */
+    public function searchFromPullOfPipeline(Request $request)
+    {
+        try {
+            $search = $request->get('search', '');
+            $kodeKc = $request->get('kode_kc');
+            $kodeUker = $request->get('kode_uker');
+            $strategy = $request->get('strategy');
+            $kategori = $request->get('kategori');
+            $pnRmft = $request->get('pn_rmft'); // PN RMFT untuk filter
+            $page = $request->get('page', 1);
+            $perPage = 50;
+        
+        // Tentukan model berdasarkan kategori
+        $model = null;
+        $nameField = 'nama_nasabah';
+        
+        switch ($kategori) {
+            case 'Winback':
+                $model = \App\Models\Layering::class;
+                break;
+            case 'List Perusahaan Anak':
+                $model = \App\Models\PerusahaanAnak::class;
+                $nameField = 'nama_partner_vendor';
+                break;
+            case 'Existing Payroll':
+                $model = \App\Models\ExistingPayroll::class;
+                $nameField = 'nama_perusahaan';
+                break;
+            case 'Potensi Payroll':
+                $model = \App\Models\PotensiPayroll::class;
+                $nameField = 'perusahaan';
+                break;
+            case 'Nasabah Downgrade':
+                $model = \App\Models\NasabahDowngrade::class;
+                break;
+            case 'BRILINK SALDO < 10 JUTA':
+                $model = \App\Models\Brilink::class;
+                $nameField = 'nama_agen';
+                break;
+            case 'Optimalisasi Business Cluster':
+                $model = \App\Models\OptimalisasiBusinessCluster::class;
+                $nameField = 'nama_usaha_pusat_bisnis';
+                break;
+            case 'Wingback Penguatan Produk & Fungsi RM':
+                $model = \App\Models\Strategi8::class;
+                break;
+            case 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)':
+                $model = \App\Models\MerchantSavol::class;
+                $nameField = 'nama_merchant';
+                break;
+            case 'PENURUNAN CASA MERCHANT (QRIS & EDC)':
+                $model = \App\Models\PenurunanMerchant::class;
+                break;
+            case 'PENURUNAN CASA BRILINK':
+                $model = \App\Models\PenurunanCasaBrilink::class;
+                $nameField = 'nama_agen';
+                break;
+            case 'Qlola Non Debitur':
+                $model = \App\Models\QlolaNonDebitur::class;
+                break;
+            case 'Non Debitur Vol Besar CASA Kecil':
+                $model = \App\Models\NonDebiturVolBesar::class;
+                break;
+            case 'Qlola (Belum ada Qlola / ada namun nonaktif)':
+                $model = \App\Models\QlolaNonaktif::class;
+                $nameField = 'nama_debitur';
+                break;
+            case 'User Aktif Casa Kecil':
+                $model = \App\Models\UserAktifCasaKecil::class;
+                break;
+            case 'AUM>2M DPK<50 juta':
+                $model = \App\Models\AumDpk::class;
+                break;
+            case 'Penurunan Prioritas Ritel & Mikro':
+                $model = \App\Models\PenurunanPrioritasRitelMikro::class;
+                break;
+            default:
+                return response()->json([
+                    'data' => [],
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'total' => 0,
+                ]);
+        }
+        
+        if (!$model) {
+            return response()->json([
+                'data' => [],
+                'current_page' => 1,
+                'last_page' => 1,
+                'total' => 0,
+            ]);
+        }
+        
+        // Query data dari tabel source
+        $query = $model::query();
+        
+        // EXCLUDE data yang sudah ada di pipelines untuk RMFT yang sama
+        $usedInPipeline = \App\Models\Pipeline::where('strategy_pipeline', $strategy)
+            ->where('kode_kc', $kodeKc);
+        
+        if ($kategori) {
+            $usedInPipeline->where('kategori_strategi', $kategori);
+        }
+        
+        if ($kodeUker) {
+            $usedInPipeline->where('kode_uker', $kodeUker);
+        }
+        
+        // Filter berdasarkan PN RMFT - hanya exclude untuk RMFT yang sama
+        if ($pnRmft) {
+            $usedInPipeline->where('pn_rmft', $pnRmft);
+        }
+        
+        $usedNames = $usedInPipeline->pluck('nama_nasabah')->filter()->unique()->toArray();
+        
+        if (!empty($usedNames)) {
+            $query->whereNotIn($nameField, $usedNames);
+        }
+        
+        // Filter by KC
+        if ($kodeKc) {
+            // Sesuaikan field KC berdasarkan model
+            if ($kategori === 'BRILINK SALDO < 10 JUTA') {
+                $query->where('kd_cabang', $kodeKc);
+            } elseif (in_array($kategori, ['List Perusahaan Anak', 'Potensi Payroll', 'Optimalisasi Business Cluster'])) {
+                $query->where('kode_cabang_induk', $kodeKc);
+            } elseif (in_array($kategori, ['Existing Payroll'])) {
+                $query->where('kode_cabang_induk', $kodeKc);
+            } else {
+                // Default untuk kategori lain yang punya field kode_kc
+                if (\Schema::hasColumn($model::make()->getTable(), 'kode_kc')) {
+                    $query->where('kode_kc', $kodeKc);
+                }
+            }
+        }
+        
+        // Filter by Unit - skip untuk kategori yang tidak punya field kode_uker
+        $skipUkerFilter = ['List Perusahaan Anak', 'Existing Payroll', 'Potensi Payroll'];
+        
+        if ($kodeUker && !in_array($kategori, $skipUkerFilter)) {
+            if ($kategori === 'BRILINK SALDO < 10 JUTA') {
+                $query->where('kd_uker', $kodeUker);
+            } elseif ($kategori === 'Optimalisasi Business Cluster') {
+                $query->where('kode_uker', $kodeUker);
+            } else {
+                // Default untuk kategori lain yang punya field kode_uker
+                if (\Schema::hasColumn($model::make()->getTable(), 'kode_uker')) {
+                    $query->where('kode_uker', $kodeUker);
+                }
+            }
+        }
+        
+        // Search
+        if ($search) {
+            $query->where($nameField, 'like', '%' . $search . '%');
+        }
+        
+        // Get total
+        $total = $query->count();
+        $lastPage = ceil($total / $perPage);
+        
+        // Get data with pagination
+        $results = $query->skip(($page - 1) * $perPage)
+                        ->take($perPage)
+                        ->get();
+        
+        // Format data - return all attributes
+        $data = $results->map(function($item) use ($nameField, $kategori) {
+            // Get all attributes
+            $attributes = $item->toArray();
+            
+            // Add standardized fields for compatibility
+            $norek = '-';
+            $segmen = '-';
+            
+            // Get norek based on kategori
+            if (isset($item->norek)) {
+                $norek = $item->norek;
+            } elseif (isset($item->cifno)) {
+                $norek = $item->cifno;
+            } elseif (isset($item->no_rekening)) {
+                $norek = $item->no_rekening;
+            } elseif (isset($item->cif)) {
+                $norek = $item->cif;
+            } elseif (isset($item->corporate_code)) {
+                $norek = $item->corporate_code;
+            }
+            
+            // Get segmen
+            if (isset($item->segmen_nasabah)) {
+                $segmen = $item->segmen_nasabah;
+            } elseif (isset($item->segmen)) {
+                $segmen = $item->segmen;
+            }
+            
+            // Add standardized fields
+            $attributes['nama'] = $item->$nameField;
+            $attributes['norek'] = $norek;
+            $attributes['segmen'] = $segmen;
+            
+            return $attributes;
+        });
+        
+        return response()->json([
+            'data' => $data,
+            'current_page' => (int)$page,
+            'last_page' => $lastPage,
+            'total' => $total,
+        ]);
+        
+        } catch (\Exception $e) {
+            \Log::error('Error in searchFromPullOfPipeline: ' . $e->getMessage());
+            return response()->json([
+                'data' => [],
+                'current_page' => 1,
+                'last_page' => 1,
+                'total' => 0,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

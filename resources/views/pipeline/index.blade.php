@@ -188,13 +188,21 @@
 @endif
 
 <div class="header-actions">
-    <div>
+    <div style="display: flex; gap: 10px;">
+        @if(auth()->user()->isAdmin() || auth()->user()->isManager())
         <a href="{{ route('pipeline.create') }}" class="btn btn-primary">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             Tambah Pipeline
         </a>
+        <a href="{{ route('pipeline.export') }}?{{ http_build_query(request()->except('page')) }}" class="btn btn-primary" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 4px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Export Excel
+        </a>
+        @endif
     </div>
     @if(auth()->user()->isAdmin())
     <div>
@@ -223,6 +231,20 @@
                 @foreach($listKC as $kc)
                     <option value="{{ $kc->kode_kc }}" {{ request('kode_kc') == $kc->kode_kc ? 'selected' : '' }}>
                         {{ $kc->nama_kc }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        @endif
+        
+        @if(auth()->user()->isAdmin() || auth()->user()->isManager())
+        <div class="form-group">
+            <label>RMFT</label>
+            <select name="pn_rmft" class="form-control">
+                <option value="">Semua RMFT</option>
+                @foreach($listRMFT as $rmft)
+                    <option value="{{ $rmft->pn_rmft }}" {{ request('pn_rmft') == $rmft->pn_rmft ? 'selected' : '' }}>
+                        {{ $rmft->nama_rmft }} ({{ $rmft->pn_rmft }})
                     </option>
                 @endforeach
             </select>
@@ -258,12 +280,42 @@
     </div>
 </form>
 
+<!-- Rekap Summary Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0;">
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Total Pipeline</div>
+        <div style="font-size: 32px; font-weight: bold;">{{ $summary['total_pipeline'] }}</div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Total Nominal</div>
+        <div style="font-size: 24px; font-weight: bold;">Rp {{ number_format($summary['total_nominal'], 0, ',', '.') }}</div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Tabungan</div>
+        <div style="font-size: 24px; font-weight: bold;">Rp {{ number_format($summary['total_tabungan'], 0, ',', '.') }}</div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Giro</div>
+        <div style="font-size: 24px; font-weight: bold;">Rp {{ number_format($summary['total_giro'], 0, ',', '.') }}</div>
+    </div>
+    
+    <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Deposito</div>
+        <div style="font-size: 24px; font-weight: bold;">Rp {{ number_format($summary['total_deposito'], 0, ',', '.') }}</div>
+    </div>
+</div>
+
 <div class="table-container">
     <table>
         <thead>
             <tr>
                 <th>No</th>
                 <th>Tanggal</th>
+                <th>Nama RMFT</th>
+                <th>PN</th>
                 @if(auth()->user()->isAdmin())
                 <th>KC</th>
                 @endif
@@ -272,6 +324,10 @@
                 <th>Kategori</th>
                 <th>Nasabah</th>
                 <th>Tipe</th>
+                <th>Jenis Simpanan</th>
+                <th>Jenis Usaha</th>
+                <th>Nominal</th>
+                <th>Tingkat Keyakinan</th>
                 <th>Aksi</th>
             </tr>
         </thead>
@@ -280,6 +336,8 @@
             <tr>
                 <td>{{ $pipelines->firstItem() + $index }}</td>
                 <td>{{ $pipeline->tanggal->format('d/m/Y') }}</td>
+                <td>{{ $pipeline->nama_rmft ?? '-' }}</td>
+                <td>{{ $pipeline->pn_rmft ?? '-' }}</td>
                 @if(auth()->user()->isAdmin())
                 <td>{{ $pipeline->nama_kc }}</td>
                 @endif
@@ -294,21 +352,27 @@
                         <span class="badge badge-warning">Di Luar Pipeline</span>
                     @endif
                 </td>
+                <td>{{ $pipeline->jenis_simpanan ?? '-' }}</td>
+                <td>{{ $pipeline->jenis_usaha ?? '-' }}</td>
+                <td>{{ $pipeline->nominal ? 'Rp ' . number_format($pipeline->nominal, 0, ',', '.') : '-' }}</td>
+                <td>{{ $pipeline->tingkat_keyakinan ?? '-' }}</td>
                 <td>
                     <div class="action-buttons">
                         <a href="{{ route('pipeline.show', $pipeline->id) }}" class="btn btn-info btn-sm">Detail</a>
+                        @if(auth()->user()->isAdmin() || auth()->user()->isManager())
                         <a href="{{ route('pipeline.edit', $pipeline->id) }}" class="btn btn-warning btn-sm">Edit</a>
                         <form action="{{ route('pipeline.destroy', $pipeline->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                         </form>
+                        @endif
                     </div>
                 </td>
             </tr>
             @empty
             <tr>
-                <td colspan="{{ auth()->user()->isAdmin() ? '9' : '8' }}" style="text-align: center; padding: 40px;">
+                <td colspan="{{ auth()->user()->isAdmin() ? '15' : '14' }}" style="text-align: center; padding: 40px;">
                     Tidak ada data pipeline
                 </td>
             </tr>

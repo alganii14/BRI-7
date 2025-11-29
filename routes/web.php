@@ -101,6 +101,9 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
     // API for aktivitas search from pipelines table (untuk RMFT pilih nasabah dari pipeline yang sudah dipilih)
     Route::get('api/aktivitas/search-from-pipeline', [PipelineController::class, 'searchForAktivitas'])->name('api.aktivitas.search-from-pipeline');
     
+    // API for pipeline create - search from pull of pipeline (tanpa filter, boleh duplikat)
+    Route::get('api/pipeline/search-from-pull', [NasabahController::class, 'searchFromPullOfPipeline'])->name('api.pipeline.search-from-pull');
+    
     // API for nasabah by strategy and kategori
     Route::get('api/nasabah', [NasabahController::class, 'searchPipeline'])->name('api.nasabah.index');
     
@@ -109,6 +112,9 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
     
     // API for RMFT by KC
     Route::get('api/rmft/by-kc', [RMFTController::class, 'getByKC'])->name('api.rmft.by-kc');
+    
+    // API for Rencana Aktivitas by RMFT
+    Route::get('api/rencana-aktivitas/by-rmft/{rmftId}', [RencanaAktivitasController::class, 'getByRMFT'])->name('api.rencana-aktivitas.by-rmft');
     
     // Manager & RMFT Pipeline Routes (Read-only view per KC)
     Route::middleware(['role:manager,rmft'])->group(function () {
@@ -150,12 +156,27 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
         Route::get('manager-pull-pipeline/brilink-saldo-kurang', [ManagerPullPipelineController::class, 'brilinkSaldoKurang'])->name('manager-pull-pipeline.brilink-saldo-kurang');
     });
     
+    // Pipeline Routes - Index untuk semua role (termasuk RMFT)
+    Route::get('pipeline', [PipelineController::class, 'index'])->name('pipeline.index');
+    Route::get('pipeline-export', [PipelineController::class, 'export'])->name('pipeline.export');
+    
     // Manager and Admin Routes
     Route::middleware(['role:manager,admin'])->group(function () {
         
-        // Pipeline Routes
+        // Pipeline Routes - Create, Edit, Delete hanya untuk Manager dan Admin
+        Route::get('pipeline/create', [PipelineController::class, 'create'])->name('pipeline.create');
+        Route::post('pipeline', [PipelineController::class, 'store'])->name('pipeline.store');
+        Route::get('pipeline/{pipeline}/edit', [PipelineController::class, 'edit'])->name('pipeline.edit');
+        Route::put('pipeline/{pipeline}', [PipelineController::class, 'update'])->name('pipeline.update');
+        Route::delete('pipeline/{pipeline}', [PipelineController::class, 'destroy'])->name('pipeline.destroy');
         Route::delete('pipeline-delete-all', [PipelineController::class, 'deleteAll'])->name('pipeline.delete-all')->middleware('role:admin');
-        Route::resource('pipeline', PipelineController::class);
+    });
+    
+    // Pipeline Show - untuk semua role (harus setelah route create agar tidak bentrok)
+    Route::get('pipeline/{pipeline}', [PipelineController::class, 'show'])->name('pipeline.show');
+    
+    // Continue with other Manager/Admin routes
+    Route::middleware(['role:manager,admin'])->group(function () {
         
         // Rekap Routes (Validasi)
         Route::get('rekap', [RekapController::class, 'index'])->name('rekap.index');

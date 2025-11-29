@@ -21,6 +21,10 @@ class PipelineController extends Controller
                 $query->where('kode_kc', $request->kode_kc);
             }
             
+            if ($request->filled('pn_rmft')) {
+                $query->where('pn_rmft', $request->pn_rmft);
+            }
+            
             if ($request->filled('kode_uker')) {
                 $query->where('kode_uker', $request->kode_uker);
             }
@@ -34,22 +38,58 @@ class PipelineController extends Controller
             }
             
             $pipelines = $query->orderBy('tanggal', 'desc')->paginate(20);
+            
+            // Calculate summary for current filter
+            $summaryQuery = Pipeline::query();
+            if ($request->filled('kode_kc')) {
+                $summaryQuery->where('kode_kc', $request->kode_kc);
+            }
+            if ($request->filled('pn_rmft')) {
+                $summaryQuery->where('pn_rmft', $request->pn_rmft);
+            }
+            if ($request->filled('kode_uker')) {
+                $summaryQuery->where('kode_uker', $request->kode_uker);
+            }
+            if ($request->filled('tanggal_dari')) {
+                $summaryQuery->whereDate('tanggal', '>=', $request->tanggal_dari);
+            }
+            if ($request->filled('tanggal_sampai')) {
+                $summaryQuery->whereDate('tanggal', '<=', $request->tanggal_sampai);
+            }
+            
+            $summary = [
+                'total_pipeline' => $summaryQuery->count(),
+                'total_nominal' => $summaryQuery->sum('nominal'),
+                'total_tabungan' => $summaryQuery->where('jenis_simpanan', 'Tabungan')->sum('nominal'),
+                'total_giro' => $summaryQuery->where('jenis_simpanan', 'Giro')->sum('nominal'),
+                'total_deposito' => $summaryQuery->where('jenis_simpanan', 'Deposito')->sum('nominal'),
+            ];
             
             $listKC = Pipeline::select('kode_kc', 'nama_kc')
                              ->distinct()
                              ->orderBy('nama_kc')
                              ->get();
             
+            $listRMFT = Pipeline::select('pn_rmft', 'nama_rmft')
+                               ->whereNotNull('pn_rmft')
+                               ->distinct()
+                               ->orderBy('nama_rmft')
+                               ->get();
+            
             $listUnit = Pipeline::select('kode_uker', 'nama_uker', 'kode_kc')
                                ->distinct()
                                ->orderBy('nama_uker')
                                ->get();
             
-            return view('pipeline.index', compact('pipelines', 'listKC', 'listUnit'));
+            return view('pipeline.index', compact('pipelines', 'summary', 'listKC', 'listRMFT', 'listUnit'));
             
         } elseif ($user->isManager()) {
             $query = Pipeline::with(['assignedBy', 'nasabah'])
                             ->where('kode_kc', $user->kode_kanca);
+            
+            if ($request->filled('pn_rmft')) {
+                $query->where('pn_rmft', $request->pn_rmft);
+            }
             
             if ($request->filled('kode_uker')) {
                 $query->where('kode_uker', $request->kode_uker);
@@ -64,6 +104,36 @@ class PipelineController extends Controller
             }
             
             $pipelines = $query->orderBy('tanggal', 'desc')->paginate(20);
+            
+            // Calculate summary for current filter
+            $summaryQuery = Pipeline::where('kode_kc', $user->kode_kanca);
+            if ($request->filled('pn_rmft')) {
+                $summaryQuery->where('pn_rmft', $request->pn_rmft);
+            }
+            if ($request->filled('kode_uker')) {
+                $summaryQuery->where('kode_uker', $request->kode_uker);
+            }
+            if ($request->filled('tanggal_dari')) {
+                $summaryQuery->whereDate('tanggal', '>=', $request->tanggal_dari);
+            }
+            if ($request->filled('tanggal_sampai')) {
+                $summaryQuery->whereDate('tanggal', '<=', $request->tanggal_sampai);
+            }
+            
+            $summary = [
+                'total_pipeline' => $summaryQuery->count(),
+                'total_nominal' => $summaryQuery->sum('nominal'),
+                'total_tabungan' => $summaryQuery->where('jenis_simpanan', 'Tabungan')->sum('nominal'),
+                'total_giro' => $summaryQuery->where('jenis_simpanan', 'Giro')->sum('nominal'),
+                'total_deposito' => $summaryQuery->where('jenis_simpanan', 'Deposito')->sum('nominal'),
+            ];
+            
+            $listRMFT = Pipeline::select('pn_rmft', 'nama_rmft')
+                               ->where('kode_kc', $user->kode_kanca)
+                               ->whereNotNull('pn_rmft')
+                               ->distinct()
+                               ->orderBy('nama_rmft')
+                               ->get();
             
             $listUnit = Pipeline::select('kode_uker', 'nama_uker')
                                ->where('kode_kc', $user->kode_kanca)
@@ -71,7 +141,55 @@ class PipelineController extends Controller
                                ->orderBy('nama_uker')
                                ->get();
             
-            return view('pipeline.index', compact('pipelines', 'listUnit'));
+            return view('pipeline.index', compact('pipelines', 'summary', 'listRMFT', 'listUnit'));
+            
+        } elseif ($user->role === 'rmft') {
+            // RMFT hanya bisa lihat pipeline mereka sendiri
+            $query = Pipeline::with(['assignedBy', 'nasabah'])
+                            ->where('pn_rmft', $user->pernr);
+            
+            if ($request->filled('kode_uker')) {
+                $query->where('kode_uker', $request->kode_uker);
+            }
+            
+            if ($request->filled('tanggal_dari')) {
+                $query->whereDate('tanggal', '>=', $request->tanggal_dari);
+            }
+            
+            if ($request->filled('tanggal_sampai')) {
+                $query->whereDate('tanggal', '<=', $request->tanggal_sampai);
+            }
+            
+            $pipelines = $query->orderBy('tanggal', 'desc')->paginate(20);
+            
+            // Calculate summary for RMFT
+            $summaryQuery = Pipeline::where('pn_rmft', $user->pernr);
+            if ($request->filled('kode_uker')) {
+                $summaryQuery->where('kode_uker', $request->kode_uker);
+            }
+            if ($request->filled('tanggal_dari')) {
+                $summaryQuery->whereDate('tanggal', '>=', $request->tanggal_dari);
+            }
+            if ($request->filled('tanggal_sampai')) {
+                $summaryQuery->whereDate('tanggal', '<=', $request->tanggal_sampai);
+            }
+            
+            $summary = [
+                'total_pipeline' => $summaryQuery->count(),
+                'total_nominal' => $summaryQuery->sum('nominal'),
+                'total_tabungan' => $summaryQuery->where('jenis_simpanan', 'Tabungan')->sum('nominal'),
+                'total_giro' => $summaryQuery->where('jenis_simpanan', 'Giro')->sum('nominal'),
+                'total_deposito' => $summaryQuery->where('jenis_simpanan', 'Deposito')->sum('nominal'),
+            ];
+            
+            $listUnit = Pipeline::select('kode_uker', 'nama_uker')
+                               ->where('pn_rmft', $user->pernr)
+                               ->distinct()
+                               ->orderBy('nama_uker')
+                               ->get();
+            
+            return view('pipeline.index', compact('pipelines', 'summary', 'listUnit'));
+            
         } else {
             abort(403, 'Unauthorized action.');
         }
@@ -85,25 +203,30 @@ class PipelineController extends Controller
             abort(403, 'Unauthorized action.');
         }
         
-        // Get list KC untuk Admin
-        $listKC = [];
+        // Get list RMFT
+        $rmftList = [];
         if ($user->isAdmin()) {
-            $listKC = \App\Models\Uker::select('kode_kanca', 'kanca')
-                                      ->distinct()
-                                      ->orderBy('kanca')
-                                      ->get();
-        }
-        
-        // Get list Uker berdasarkan KC
-        $listUker = [];
-        if ($user->isManager()) {
-            // Manager hanya lihat uker di KC mereka
-            $listUker = \App\Models\Uker::where('kode_kanca', $user->kode_kanca)
-                                        ->orderBy('sub_kanca')
+            // Admin bisa lihat semua RMFT
+            $rmftList = \App\Models\User::where('role', 'rmft')
+                                        ->with('rmftData.ukerRelation')
+                                        ->orderBy('name')
+                                        ->get();
+        } elseif ($user->isManager()) {
+            // Manager hanya lihat RMFT di KC mereka
+            // Gunakan whereHas untuk filter berdasarkan kanca di tabel rmfts
+            $kodeKcManager = $user->kode_kanca;
+            $rmftList = \App\Models\User::where('role', 'rmft')
+                                        ->with('rmftData.ukerRelation')
+                                        ->whereHas('rmftData', function($query) use ($kodeKcManager) {
+                                            $query->whereHas('ukerRelation', function($q) use ($kodeKcManager) {
+                                                $q->where('kode_kanca', $kodeKcManager);
+                                            });
+                                        })
+                                        ->orderBy('name')
                                         ->get();
         }
         
-        return view('pipeline.create', compact('listKC', 'listUker'));
+        return view('pipeline.create', compact('rmftList'));
     }
 
     public function store(Request $request)
@@ -136,6 +259,8 @@ class PipelineController extends Controller
         
         $validated = $request->validate([
             'tanggal' => 'required|date',
+            'pn_rmft' => 'nullable|string',
+            'nama_rmft' => 'nullable|string',
             'kode_kc' => 'required|string',
             'nama_kc' => 'required|string',
             'kode_uker' => 'required|string',
@@ -145,6 +270,10 @@ class PipelineController extends Controller
             'strategy_pipeline' => 'required|string',
             'kategori_strategi' => 'nullable|string',
             'tipe_nasabah' => 'required|in:lama,baru',
+            'jenis_simpanan' => 'required|string',
+            'jenis_usaha' => 'nullable|string',
+            'nominal' => 'required|numeric|min:0',
+            'tingkat_keyakinan' => 'required|string',
             'nama_nasabah' => 'required|string',
             'norek' => $isPipelineData ? 'nullable|string' : 'required|string',
             'keterangan' => 'nullable|string',
@@ -193,12 +322,18 @@ class PipelineController extends Controller
                 
                 $pipelineData = [
                     'tanggal' => $validated['tanggal'],
+                    'pn_rmft' => $validated['pn_rmft'] ?? null,
+                    'nama_rmft' => $validated['nama_rmft'] ?? null,
                     'kode_kc' => $validated['kode_kc'],
                     'nama_kc' => $validated['nama_kc'],
                     'kode_uker' => $validated['kode_uker'],
                     'nama_uker' => $validated['nama_uker'],
                     'strategy_pipeline' => $validated['strategy_pipeline'],
                     'kategori_strategi' => $validated['kategori_strategi'] ?? null,
+                    'jenis_simpanan' => $validated['jenis_simpanan'],
+                    'jenis_usaha' => $validated['jenis_usaha'] ?? null,
+                    'nominal' => $validated['nominal'],
+                    'tingkat_keyakinan' => $validated['tingkat_keyakinan'],
                     'nama_nasabah' => $nasabahData['nama'],
                     'norek' => $nasabahData['norek'] !== '-' ? $nasabahData['norek'] : null,
                     'keterangan' => $validated['keterangan'],
@@ -265,12 +400,18 @@ class PipelineController extends Controller
                 
                 $pipelineData = [
                     'tanggal' => $validated['tanggal'],
+                    'pn_rmft' => $validated['pn_rmft'] ?? null,
+                    'nama_rmft' => $validated['nama_rmft'] ?? null,
                     'kode_kc' => $validated['kode_kc'],
                     'nama_kc' => $validated['nama_kc'],
                     'kode_uker' => trim($kodeUker),
                     'nama_uker' => trim($namaUker),
                     'strategy_pipeline' => $validated['strategy_pipeline'],
                     'kategori_strategi' => $validated['kategori_strategi'] ?? null,
+                    'jenis_simpanan' => $validated['jenis_simpanan'],
+                    'jenis_usaha' => $validated['jenis_usaha'] ?? null,
+                    'nominal' => $validated['nominal'],
+                    'tingkat_keyakinan' => $validated['tingkat_keyakinan'],
                     'nama_nasabah' => $validated['nama_nasabah'],
                     'norek' => $validated['norek'],
                     'keterangan' => $validated['keterangan'],
@@ -431,6 +572,180 @@ class PipelineController extends Controller
     }
     
     /**
+     * Export pipeline to Excel
+     */
+    public function export(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Build query sama seperti index
+        if ($user->isAdmin()) {
+            $query = Pipeline::query();
+            
+            if ($request->filled('kode_kc')) {
+                $query->where('kode_kc', $request->kode_kc);
+            }
+            
+            if ($request->filled('pn_rmft')) {
+                $query->where('pn_rmft', $request->pn_rmft);
+            }
+            
+            if ($request->filled('kode_uker')) {
+                $query->where('kode_uker', $request->kode_uker);
+            }
+            
+            if ($request->filled('tanggal_dari')) {
+                $query->whereDate('tanggal', '>=', $request->tanggal_dari);
+            }
+            
+            if ($request->filled('tanggal_sampai')) {
+                $query->whereDate('tanggal', '<=', $request->tanggal_sampai);
+            }
+            
+        } elseif ($user->isManager()) {
+            $query = Pipeline::where('kode_kc', $user->kode_kanca);
+            
+            if ($request->filled('pn_rmft')) {
+                $query->where('pn_rmft', $request->pn_rmft);
+            }
+            
+            if ($request->filled('kode_uker')) {
+                $query->where('kode_uker', $request->kode_uker);
+            }
+            
+            if ($request->filled('tanggal_dari')) {
+                $query->whereDate('tanggal', '>=', $request->tanggal_dari);
+            }
+            
+            if ($request->filled('tanggal_sampai')) {
+                $query->whereDate('tanggal', '<=', $request->tanggal_sampai);
+            }
+        } else {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        $pipelines = $query->orderBy('tanggal', 'desc')->get();
+        
+        // Calculate summary
+        $totalPipeline = $pipelines->count();
+        $totalNominal = $pipelines->sum('nominal');
+        $totalTabungan = $pipelines->where('jenis_simpanan', 'Tabungan')->sum('nominal');
+        $totalGiro = $pipelines->where('jenis_simpanan', 'Giro')->sum('nominal');
+        $totalDeposito = $pipelines->where('jenis_simpanan', 'Deposito')->sum('nominal');
+        
+        // Create Excel file
+        $filename = 'Rekap_Pipeline_' . date('Y-m-d_His') . '.xlsx';
+        
+        return $this->generateExcel($pipelines, $totalPipeline, $totalNominal, $totalTabungan, $totalGiro, $totalDeposito, $filename);
+    }
+    
+    private function generateExcel($pipelines, $totalPipeline, $totalNominal, $totalTabungan, $totalGiro, $totalDeposito, $filename)
+    {
+        try {
+            // Create spreadsheet
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+        
+        // Set title
+        $sheet->setTitle('Rekap Pipeline');
+        
+        // Header
+        $headers = ['No', 'Tanggal', 'Nama RMFT', 'PN', 'KC', 'Unit', 'Strategi', 'Kategori', 'Nasabah', 'Tipe', 'Jenis Simpanan', 'Jenis Usaha', 'Nominal', 'Tingkat Keyakinan'];
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $sheet->getStyle($col . '1')->getFont()->setBold(true);
+            $sheet->getStyle($col . '1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('0066CC');
+            $sheet->getStyle($col . '1')->getFont()->getColor()->setRGB('FFFFFF');
+            $col++;
+        }
+        
+        // Data
+        $row = 2;
+        $no = 1;
+        foreach ($pipelines as $pipeline) {
+            $sheet->setCellValue('A' . $row, $no++);
+            $sheet->setCellValue('B' . $row, $pipeline->tanggal->format('d/m/Y'));
+            $sheet->setCellValue('C' . $row, $pipeline->nama_rmft ?? '-');
+            $sheet->setCellValue('D' . $row, $pipeline->pn_rmft ?? '-');
+            $sheet->setCellValue('E' . $row, $pipeline->nama_kc);
+            $sheet->setCellValue('F' . $row, $pipeline->nama_uker);
+            $sheet->setCellValue('G' . $row, $pipeline->strategy_pipeline);
+            $sheet->setCellValue('H' . $row, $pipeline->kategori_strategi);
+            $sheet->setCellValue('I' . $row, $pipeline->nama_nasabah);
+            $sheet->setCellValue('J' . $row, $pipeline->tipe == 'lama' ? 'Di Dalam Pipeline' : 'Di Luar Pipeline');
+            $sheet->setCellValue('K' . $row, $pipeline->jenis_simpanan ?? '-');
+            $sheet->setCellValue('L' . $row, $pipeline->jenis_usaha ?? '-');
+            $sheet->setCellValue('M' . $row, $pipeline->nominal ?? 0);
+            $sheet->setCellValue('N' . $row, $pipeline->tingkat_keyakinan ?? '-');
+            $row++;
+        }
+        
+        // Summary
+        $row += 2;
+        $sheet->setCellValue('A' . $row, 'RINGKASAN');
+        $sheet->getStyle('A' . $row)->getFont()->setBold(true);
+        $row++;
+        
+        $sheet->setCellValue('A' . $row, 'Total Pipeline:');
+        $sheet->setCellValue('B' . $row, $totalPipeline);
+        $row++;
+        
+        $sheet->setCellValue('A' . $row, 'Total Nominal:');
+        $sheet->setCellValue('B' . $row, $totalNominal);
+        $sheet->getStyle('B' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $row++;
+        
+        $sheet->setCellValue('A' . $row, 'Total Tabungan:');
+        $sheet->setCellValue('B' . $row, $totalTabungan);
+        $sheet->getStyle('B' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $row++;
+        
+        $sheet->setCellValue('A' . $row, 'Total Giro:');
+        $sheet->setCellValue('B' . $row, $totalGiro);
+        $sheet->getStyle('B' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        $row++;
+        
+        $sheet->setCellValue('A' . $row, 'Total Deposito:');
+        $sheet->setCellValue('B' . $row, $totalDeposito);
+        $sheet->getStyle('B' . $row)->getNumberFormat()->setFormatCode('#,##0');
+        
+        // Auto size columns
+        foreach (range('A', 'N') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+        
+        // Format nominal column
+        $lastRow = $row - 6;
+        $sheet->getStyle('M2:M' . $lastRow)->getNumberFormat()->setFormatCode('#,##0');
+        
+            // Create writer and download
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            
+            // Clear any previous output
+            if (ob_get_length()) {
+                ob_end_clean();
+            }
+            
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="' . $filename . '"');
+            header('Cache-Control: max-age=0');
+            header('Cache-Control: max-age=1');
+            header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+            header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+            header('Cache-Control: cache, must-revalidate');
+            header('Pragma: public');
+            
+            $writer->save('php://output');
+            exit;
+            
+        } catch (\Exception $e) {
+            \Log::error('Excel Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal export Excel: ' . $e->getMessage());
+        }
+    }
+    
+    /**
      * Search nasabah from pipelines table for aktivitas form
      * JOIN dengan tabel pull of pipeline untuk mendapatkan data lengkap
      */
@@ -441,6 +756,7 @@ class PipelineController extends Controller
         $kodeUker = $request->get('kode_uker');
         $strategy = $request->get('strategy');
         $kategori = $request->get('kategori');
+        $pnRmft = $request->get('pn_rmft'); // PN RMFT yang sedang login/dipilih
         
         // Get list nasabah dari pipelines
         $query = Pipeline::query();
@@ -460,6 +776,11 @@ class PipelineController extends Controller
         
         if ($kategori) {
             $query->where('kategori_strategi', $kategori);
+        }
+        
+        // FILTER: Hanya tampilkan pipeline untuk RMFT yang sama
+        if ($pnRmft) {
+            $query->where('pn_rmft', $pnRmft);
         }
         
         if ($search) {
