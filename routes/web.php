@@ -16,6 +16,7 @@ use App\Http\Controllers\MerchantSavolController;
 use App\Http\Controllers\QlolaNonDebiturController;
 use App\Http\Controllers\NonDebiturVolBesarController;
 use App\Http\Controllers\QlolaNonaktifController;
+use App\Http\Controllers\DebiturBelumMemilikiQlolaController;
 use App\Http\Controllers\ManagerPipelineController;
 use App\Http\Controllers\ManagerPullPipelineController;
 use App\Http\Controllers\RencanaAktivitasController;
@@ -127,6 +128,7 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
         
         // Strategi 2
         Route::get('manager-pull-pipeline/qlola-nonaktif', [ManagerPullPipelineController::class, 'qlolaNonaktif'])->name('manager-pull-pipeline.qlola-nonaktif');
+        Route::get('manager-pull-pipeline/debitur-belum-memiliki-qlola', [ManagerPullPipelineController::class, 'debiturBelumMemilikiQlola'])->name('manager-pull-pipeline.debitur-belum-memiliki-qlola');
         Route::get('manager-pull-pipeline/user-aktif-casa-kecil', [ManagerPullPipelineController::class, 'userAktifCasaKecil'])->name('manager-pull-pipeline.user-aktif-casa-kecil');
         
         // Strategi 3
@@ -246,6 +248,14 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
             Route::post('qlola-nonaktif/import', [QlolaNonaktifController::class, 'import'])->name('qlola-nonaktif.import');
             Route::delete('qlola-nonaktif-delete-all', [QlolaNonaktifController::class, 'deleteAll'])->name('qlola-nonaktif.delete-all');
             Route::resource('qlola-nonaktif', QlolaNonaktifController::class);
+        });
+
+        // Debitur Belum Memiliki Qlola Routes (Strategi 2: DEBITUR BELUM MEMILIKI QLOLA) - Admin Only
+        Route::middleware(['role:admin'])->group(function () {
+            Route::get('debitur-belum-memiliki-qlola/import', [\App\Http\Controllers\DebiturBelumMemilikiQlolaController::class, 'importForm'])->name('debitur-belum-memiliki-qlola.import.form');
+            Route::post('debitur-belum-memiliki-qlola/import', [\App\Http\Controllers\DebiturBelumMemilikiQlolaController::class, 'import'])->name('debitur-belum-memiliki-qlola.import');
+            Route::delete('debitur-belum-memiliki-qlola-delete-all', [\App\Http\Controllers\DebiturBelumMemilikiQlolaController::class, 'deleteAll'])->name('debitur-belum-memiliki-qlola.delete-all');
+            Route::resource('debitur-belum-memiliki-qlola', \App\Http\Controllers\DebiturBelumMemilikiQlolaController::class);
         });
 
         // User Aktif Casa Kecil Routes (Strategi 2: USER AKTIF CASA KECIL) - Admin Only

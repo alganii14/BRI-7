@@ -154,6 +154,9 @@ class NasabahController extends Controller
             case 'Strategi 2':
                 $model = QlolaNonaktif::class;
                 break;
+            case 'Debitur Belum Memiliki Qlola':
+                $model = \App\Models\DebiturBelumMemilikiQlola::class;
+                break;
             case 'User Aktif Casa Kecil':
                 $model = UserAktifCasaKecil::class;
                 break;
@@ -301,6 +304,9 @@ class NasabahController extends Controller
             case 'Qlola (Belum ada Qlola / ada namun nonaktif)':
             case 'Strategi 2':
                 $model = QlolaNonaktif::class;
+                break;
+            case 'Debitur Belum Memiliki Qlola':
+                $model = \App\Models\DebiturBelumMemilikiQlola::class;
                 break;
             case 'User Aktif Casa Kecil':
                 $model = UserAktifCasaKecil::class;
@@ -1167,7 +1173,7 @@ class NasabahController extends Controller
                 'per_page' => $perPage
             ]);
             
-        } elseif ($model === QlolaNonaktif::class) {
+        } elseif ($model === QlolaNonaktif::class || $model === \App\Models\DebiturBelumMemilikiQlola::class) {
             if ($kode_kc) {
                 $query->where('kode_kanca', $kode_kc);
             }
@@ -2024,8 +2030,13 @@ class NasabahController extends Controller
                 $model = \App\Models\QlolaNonaktif::class;
                 $nameField = 'nama_debitur';
                 break;
+            case 'Debitur Belum Memiliki Qlola':
+                $model = \App\Models\DebiturBelumMemilikiQlola::class;
+                $nameField = 'nama_debitur';
+                break;
             case 'User Aktif Casa Kecil':
                 $model = \App\Models\UserAktifCasaKecil::class;
+                $nameField = 'nama_debitur';
                 break;
             case 'AUM>2M DPK<50 juta':
                 $model = \App\Models\AumDpk::class;

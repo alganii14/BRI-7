@@ -719,6 +719,107 @@ class AktivitasController extends Controller
     }
 
     /**
+     * Show import form
+     */
+    public function importForm()
+    {
+        return view('aktivitas.import');
+    }
+
+    /**
+     * Import CSV file with comma delimiter
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt',
+        ]);
+
+        $file = $request->file('csv_file');
+        $path = $file->getRealPath();
+
+        try {
+            \DB::beginTransaction();
+
+            // Auto-detect delimiter using CsvHelper
+            $delimiter = \App\Helpers\CsvHelper::detectDelimiter($path);
+            
+            $handle = fopen($path, 'r');
+            $header = fgetcsv($handle, 1000, $delimiter); // Skip header row
+            
+            $batch = [];
+            $batchSize = 1000;
+            $totalInserted = 0;
+            $skippedRows = 0;
+
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
+                // Skip rows with insufficient columns or empty required fields
+                if (count($row) >= 20 && !empty(trim($row[0])) && !empty(trim($row[1]))) {
+                    $batch[] = [
+                        'tanggal' => trim($row[0]) ?: null,
+                        'rmft_id' => trim($row[1]) ?: null,
+                        'nama_rmft' => trim($row[2]) ?: null,
+                        'pn' => trim($row[3]) ?: null,
+                        'kode_kc' => trim($row[4]) ?: null,
+                        'nama_kc' => trim($row[5]) ?: null,
+                        'kode_uker' => trim($row[6]) ?: null,
+                        'nama_uker' => trim($row[7]) ?: null,
+                        'kelompok' => trim($row[8]) ?: null,
+                        'strategy_pipeline' => trim($row[9]) ?: null,
+                        'kategori_strategi' => trim($row[10]) ?: null,
+                        'rencana_aktivitas' => trim($row[11]) ?: null,
+                        'rencana_aktivitas_id' => !empty(trim($row[12])) ? trim($row[12]) : null,
+                        'segmen_nasabah' => trim($row[13]) ?: null,
+                        'tipe' => trim($row[14]) ?: 'lama',
+                        'jenis_usaha' => trim($row[15]) ?: null,
+                        'jenis_simpanan' => trim($row[16]) ?: null,
+                        'tingkat_keyakinan' => trim($row[17]) ?: null,
+                        'nama_nasabah' => trim($row[18]) ?: null,
+                        'norek' => trim($row[19]) ?: null,
+                        'rp_jumlah' => trim($row[20]) ?: null,
+                        'keterangan' => isset($row[21]) ? trim($row[21]) : null,
+                        'nasabah_id' => isset($row[22]) && !empty(trim($row[22])) ? trim($row[22]) : null,
+                        'assigned_by' => isset($row[23]) && !empty(trim($row[23])) ? trim($row[23]) : null,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+
+                    if (count($batch) >= $batchSize) {
+                        \DB::table('aktivitas')->insert($batch);
+                        $totalInserted += count($batch);
+                        $batch = [];
+                    }
+                } else {
+                    $skippedRows++;
+                }
+            }
+
+            // Insert remaining batch
+            if (!empty($batch)) {
+                \DB::table('aktivitas')->insert($batch);
+                $totalInserted += count($batch);
+            }
+
+            fclose($handle);
+            \DB::commit();
+
+            $message = '✓ Import berhasil! Total data: ' . number_format($totalInserted, 0, ',', '.') . ' baris';
+            if ($skippedRows > 0) {
+                $message .= ' (Dilewati: ' . $skippedRows . ' baris kosong)';
+            }
+            $message .= ' | Delimiter: ' . \App\Helpers\CsvHelper::getDelimiterName($delimiter);
+
+            return redirect()->route('aktivitas.index')
+                            ->with('success', $message);
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return redirect()->back()
+                            ->with('error', '✗ Gagal mengimport CSV: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Get rekap data for pipeline summary
      */
     public function rekap(Request $request)

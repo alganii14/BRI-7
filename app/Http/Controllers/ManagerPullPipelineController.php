@@ -274,6 +274,38 @@ class ManagerPullPipelineController extends Controller
     }
 
     /**
+     * Debitur Belum Memiliki Qlola - Strategi 2
+     */
+    public function debiturBelumMemilikiQlola(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$this->canAccessPullPipeline($user)) {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = \App\Models\DebiturBelumMemilikiQlola::where('kode_kanca', $kodeKanca);
+        
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('norek_pinjaman', 'like', "%{$search}%")
+                  ->orWhere('norek_simpanan', 'like', "%{$search}%")
+                  ->orWhere('nama_debitur', 'like', "%{$search}%")
+                  ->orWhere('cifno', 'like', "%{$search}%");
+            });
+        }
+        
+        $data = $query->orderBy('id')->paginate(20);
+        
+        return view('manager-pull-pipeline.debitur-belum-memiliki-qlola', compact('data'));
+    }
+
+    /**
      * User Aktif Casa Kecil - Strategi 2
      */
     public function userAktifCasaKecil(Request $request)

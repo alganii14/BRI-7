@@ -117,25 +117,18 @@ class ExistingPayrollController extends Controller
         try {
             DB::beginTransaction();
 
-            $content = file_get_contents($path);
-            $lines = explode("\n", $content);
+            // Auto-detect delimiter
+            $delimiter = \App\Helpers\CsvHelper::detectDelimiter($path);
+
+            $handle = fopen($path, 'r');
+            $header = fgetcsv($handle, 0, $delimiter); // Skip header
             
             $batch = [];
             $batchSize = 1000;
             $totalInserted = 0;
-            $isFirstLine = true;
+            $skippedRows = 0;
 
-            foreach ($lines as $line) {
-                if ($isFirstLine) {
-                    $isFirstLine = false;
-                    continue;
-                }
-
-                $line = trim($line);
-                if (empty($line)) continue;
-
-                $row = str_getcsv($line, ';');
-                
+            while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
                 if (count($row) >= 6 && !empty(array_filter($row))) {
                     $batch[] = [
                         'kode_cabang_induk' => trim($row[0]) ?: null,
@@ -153,6 +146,8 @@ class ExistingPayrollController extends Controller
                         $totalInserted += count($batch);
                         $batch = [];
                     }
+                } else {
+                    $skippedRows++;
                 }
             }
 
@@ -161,10 +156,17 @@ class ExistingPayrollController extends Controller
                 $totalInserted += count($batch);
             }
 
+            fclose($handle);
             DB::commit();
 
+            $message = '✓ Import berhasil! Total data: ' . number_format($totalInserted, 0, ',', '.') . ' baris';
+            if ($skippedRows > 0) {
+                $message .= ' (Dilewati: ' . $skippedRows . ' baris)';
+            }
+            $message .= ' | Delimiter: ' . \App\Helpers\CsvHelper::getDelimiterName($delimiter);
+
             return redirect()->route('existing-payroll.index')
-                            ->with('success', '✓ Import berhasil! Total data: ' . number_format($totalInserted, 0, ',', '.') . ' baris');
+                            ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();

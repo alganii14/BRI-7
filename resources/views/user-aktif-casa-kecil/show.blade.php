@@ -14,16 +14,37 @@
         margin: 0 auto;
     }
 
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        justify-content: flex-end;
+    }
+
+    .section-title {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
     .detail-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 20px;
         margin-bottom: 30px;
     }
 
     .detail-item {
         padding: 15px;
-        border-bottom: 1px solid #eee;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 3px solid #667eea;
     }
 
     .detail-item.full-width {
@@ -32,157 +53,136 @@
 
     .detail-label {
         font-weight: 600;
-        color: #666;
-        font-size: 13px;
-        text-transform: uppercase;
-        margin-bottom: 5px;
+        color: #495057;
+        margin-bottom: 8px;
+        font-size: 14px;
     }
 
     .detail-value {
+        color: #212529;
         font-size: 16px;
-        color: #333;
-    }
-
-    .btn {
-        padding: 12px 24px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s;
-        margin-right: 10px;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
     }
 
     .btn-warning {
-        background-color: #ffc107;
-        color: #333;
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
 
     .btn-secondary {
-        background-color: #6c757d;
+        background: #6c757d;
         color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
     }
 
-    .btn:hover {
+    .btn-secondary:hover {
+        background: #5a6268;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
-    .actions {
-        display: flex;
-        gap: 10px;
-    }
-
-    .delta-negative {
-        color: #dc3545;
-        font-weight: 600;
-    }
-
-    .delta-positive {
-        color: #28a745;
-        font-weight: 600;
-    }
-
-    .section-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #667eea;
-        margin: 30px 0 20px 0;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #667eea;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
 </style>
 
 <div class="detail-container">
-    <div class="section-title">Informasi Unit Kerja</div>
+    <div class="action-buttons">
+        <a href="{{ route('user-aktif-casa-kecil.edit', $userAktifCasaKecil->id) }}" class="btn btn-warning">
+            ✏️ Edit
+        </a>
+        <a href="{{ route('user-aktif-casa-kecil.index') }}" class="btn btn-secondary">
+            ↩️ Kembali
+        </a>
+    </div>
+
+    <div class="section-title">
+        📋 Informasi User Aktif Casa Kecil
+    </div>
+
     <div class="detail-grid">
         <div class="detail-item">
             <div class="detail-label">Kode Kanca</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->kode_kanca ?? '-' }}</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->kode_kanca }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">Kanca</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->kanca ?? '-' }}</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->kanca }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">Kode Uker</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->kode_uker ?? '-' }}</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->kode_uker }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">Uker</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->uker ?? '-' }}</div>
-        </div>
-    </div>
-
-    <div class="section-title">Informasi Nasabah</div>
-    <div class="detail-grid">
-        <div class="detail-item full-width">
-            <div class="detail-label">Nama Nasabah</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->nama_nasabah ?? '-' }}</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->uker }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">CIFNO</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->cifno ?? '-' }}</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->cifno }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">Norek Pinjaman</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->norek_pinjaman ?? '-' }}</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->norek_pinjaman ?: '-' }}</div>
         </div>
 
         <div class="detail-item">
-            <div class="detail-label">Nama RM Pemrakarsa</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->nama_rm_pemrakarsa ?? '-' }}</div>
-        </div>
-    </div>
-
-    <div class="section-title">Informasi Saldo</div>
-    <div class="detail-grid">
-        <div class="detail-item">
-            <div class="detail-label">Saldo Bulan Lalu</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->saldo_bulan_lalu ?? '-' }}</div>
+            <div class="detail-label">Norek Simpanan</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->norek_simpanan ?: '-' }}</div>
         </div>
 
         <div class="detail-item">
-            <div class="detail-label">Saldo Bulan Berjalan</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->saldo_bulan_berjalan ?? '-' }}</div>
+            <div class="detail-label">Balance</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->balance ?: '-' }}</div>
+        </div>
+
+        <div class="detail-item">
+            <div class="detail-label">Volume</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->volume ?: '-' }}</div>
+        </div>
+
+        <div class="detail-item">
+            <div class="detail-label">Nama Debitur</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->nama_debitur }}</div>
+        </div>
+
+        <div class="detail-item">
+            <div class="detail-label">Plafon</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->plafon ?: '-' }}</div>
+        </div>
+
+        <div class="detail-item">
+            <div class="detail-label">PN Pengelola</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->pn_pengelola_1 ?: '-' }}</div>
         </div>
 
         <div class="detail-item full-width">
-            <div class="detail-label">Delta Saldo</div>
-            <div class="detail-value {{ strpos($userAktifCasaKecil->delta_saldo, '-') === 0 ? 'delta-negative' : 'delta-positive' }}">
-                {{ $userAktifCasaKecil->delta_saldo ?? '-' }}
-            </div>
-        </div>
-    </div>
-
-    <div class="section-title">Informasi Lainnya</div>
-    <div class="detail-grid">
-        <div class="detail-item">
-            <div class="detail-label">QCash</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->qcash ?? '-' }}</div>
+            <div class="detail-label">Keterangan</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->keterangan ?: '-' }}</div>
         </div>
 
-        <div class="detail-item">
-            <div class="detail-label">QIB</div>
-            <div class="detail-value">{{ $userAktifCasaKecil->qib ?? '-' }}</div>
+        <div class="detail-item full-width">
+            <div class="detail-label">Dibuat Pada</div>
+            <div class="detail-value">{{ $userAktifCasaKecil->created_at->format('d M Y H:i') }}</div>
         </div>
-    </div>
-
-    <div class="actions">
-        <a href="{{ route('user-aktif-casa-kecil.edit', $userAktifCasaKecil->id) }}" class="btn btn-warning">✏️ Edit</a>
-        <a href="{{ route('user-aktif-casa-kecil.index') }}" class="btn btn-secondary">↩️ Kembali</a>
     </div>
 </div>
 @endsection

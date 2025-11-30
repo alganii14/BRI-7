@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'User Aktif Casa Kecil')
-@section('page-title', 'Data User Aktif Casa Kecil')
+@section('title', 'Debitur Belum Memiliki Qlola')
+@section('page-title', 'Data Debitur Belum Memiliki Qlola')
 
 @section('content')
 <style>
@@ -23,7 +23,7 @@
     }
 
     th {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0066CC 0%, #003D82 100%);
         color: white;
         font-weight: 600;
         font-size: 14px;
@@ -45,7 +45,7 @@
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0066CC 0%, #003D82 100%);
         color: white;
     }
 
@@ -142,22 +142,12 @@
         font-size: 14px;
         margin: 0;
     }
-
-    .delta-negative {
-        color: #dc3545;
-        font-weight: 600;
-    }
-
-    .delta-positive {
-        color: #28a745;
-        font-weight: 600;
-    }
 </style>
 
 <div class="header-actions">
     <div style="display: flex; gap: 10px;">
-        @if($userAktifCasaKecils->total() > 0)
-        <form action="{{ route('user-aktif-casa-kecil.delete-all') }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ PERHATIAN!\n\nAnda akan menghapus SEMUA data user aktif casa kecil ({{ number_format($userAktifCasaKecils->total(), 0, ',', '.') }} baris).\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda yakin ingin melanjutkan?')">
+        @if($debiturQlolas->total() > 0)
+        <form action="{{ route('debitur-belum-memiliki-qlola.delete-all') }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ PERHATIAN!\n\nAnda akan menghapus SEMUA data debitur belum memiliki qlola ({{ number_format($debiturQlolas->total(), 0, ',', '.') }} baris).\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda yakin ingin melanjutkan?')">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger-gradient">
@@ -165,37 +155,21 @@
             </button>
         </form>
         @endif
-        <a href="{{ route('user-aktif-casa-kecil.create') }}" class="btn btn-primary">
+        <a href="{{ route('debitur-belum-memiliki-qlola.create') }}" class="btn btn-primary">
             ➕ Tambah Data
         </a>
-        <a href="{{ route('user-aktif-casa-kecil.import.form') }}" class="btn btn-success">
+        <a href="{{ route('debitur-belum-memiliki-qlola.import.form') }}" class="btn btn-success">
             📁 Import CSV
         </a>
     </div>
     
-    <form method="GET" action="{{ route('user-aktif-casa-kecil.index') }}" class="search-form" style="display:flex;gap:10px;align-items:end;">
-        <div style="flex:1;">
-            <select name="year" style="width:100%;padding:10px 16px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:white;">
-                <option value="">Semua Tahun</option>
-                @foreach($availableYears as $availableYear)
-                    <option value="{{ $availableYear }}" {{ request('year') == $availableYear ? 'selected' : '' }}>{{ $availableYear }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div style="flex:1;">
-            <select name="month" style="width:100%;padding:10px 16px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:white;">
-                <option value="">Semua Bulan</option>
-                @for($i=1;$i<=12;$i++)
-                    <option value="{{ $i }}" {{ request('month') == $i ? 'selected' : '' }}>{{ ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][$i] }}</option>
-                @endfor
-            </select>
-        </div>
+    <form method="GET" action="{{ route('debitur-belum-memiliki-qlola.index') }}" class="search-form" style="display:flex;gap:10px;align-items:end;">
         <div style="flex:2;">
-            <input type="text" name="search" placeholder="Cari nasabah, rekening, CIFNO, unit kerja atau kanca..." value="{{ request('search') }}" style="width:100%;">
+            <input type="text" name="search" placeholder="Cari nama debitur, CIFNO, rekening..." value="{{ request('search') }}" style="width:100%;">
         </div>
         <button type="submit" class="btn btn-primary">🔍 Cari</button>
-        @if(request('search') || request('month') || request('year'))
-            <a href="{{ route('user-aktif-casa-kecil.index') }}" class="btn btn-warning">✖ Reset</a>
+        @if(request('search'))
+            <a href="{{ route('debitur-belum-memiliki-qlola.index') }}" class="btn btn-warning">✖ Reset</a>
         @endif
     </form>
 </div>
@@ -217,15 +191,12 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Kode Kanca</th>
                 <th>Kanca</th>
-                <th>Kode Uker</th>
-                <th>Uker</th>
+                <th>Unit</th>
                 <th>CIFNO</th>
-                <th>Norek Pinjaman</th>
-                <th>Norek Simpanan</th>
+                <th>No. Pinjaman</th>
+                <th>No. Simpanan</th>
                 <th>Balance</th>
-                <th>Volume</th>
                 <th>Nama Debitur</th>
                 <th>Plafon</th>
                 <th>PN Pengelola</th>
@@ -234,27 +205,24 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($userAktifCasaKecils as $index => $item)
+            @forelse($debiturQlolas as $index => $item)
             <tr>
-                <td>{{ $userAktifCasaKecils->firstItem() + $index }}</td>
-                <td>{{ $item->kode_kanca }}</td>
+                <td>{{ $debiturQlolas->firstItem() + $index }}</td>
                 <td>{{ $item->kanca }}</td>
-                <td>{{ $item->kode_uker }}</td>
                 <td>{{ $item->uker }}</td>
                 <td>{{ $item->cifno }}</td>
                 <td>{{ $item->norek_pinjaman }}</td>
                 <td>{{ $item->norek_simpanan }}</td>
                 <td>{{ $item->balance }}</td>
-                <td>{{ $item->volume }}</td>
                 <td>{{ $item->nama_debitur }}</td>
                 <td>{{ $item->plafon }}</td>
                 <td>{{ $item->pn_pengelola_1 }}</td>
                 <td>{{ $item->keterangan }}</td>
                 <td>
                     <div class="actions">
-                        <a href="{{ route('user-aktif-casa-kecil.show', $item->id) }}" class="btn btn-sm btn-info">👁️ View</a>
-                        <a href="{{ route('user-aktif-casa-kecil.edit', $item->id) }}" class="btn btn-sm btn-warning">✏️ Edit</a>
-                        <form action="{{ route('user-aktif-casa-kecil.destroy', $item->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                        <a href="{{ route('debitur-belum-memiliki-qlola.show', $item->id) }}" class="btn btn-sm btn-info">👁️ View</a>
+                        <a href="{{ route('debitur-belum-memiliki-qlola.edit', $item->id) }}" class="btn btn-sm btn-warning">✏️ Edit</a>
+                        <form action="{{ route('debitur-belum-memiliki-qlola.destroy', $item->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete</button>
@@ -264,9 +232,9 @@
             </tr>
             @empty
             <tr>
-                <td colspan="15" style="text-align: center; padding: 40px;">
-                    <p style="color: #999; font-size: 16px;">Tidak ada data user aktif casa kecil.</p>
-                    <a href="{{ route('user-aktif-casa-kecil.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
+                <td colspan="12" style="text-align: center; padding: 40px;">
+                    <p style="color: #999; font-size: 16px;">Tidak ada data debitur belum memiliki qlola.</p>
+                    <a href="{{ route('debitur-belum-memiliki-qlola.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
                 </td>
             </tr>
             @endforelse
@@ -275,34 +243,33 @@
 </div>
 
 <div class="pagination-wrapper">
-    <p class="pagination-info">Showing {{ $userAktifCasaKecils->firstItem() }} to {{ $userAktifCasaKecils->lastItem() }} of {{ $userAktifCasaKecils->total() }} results</p>
+    <p class="pagination-info">Showing {{ $debiturQlolas->firstItem() }} to {{ $debiturQlolas->lastItem() }} of {{ $debiturQlolas->total() }} results</p>
     
     <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-        @if ($userAktifCasaKecils->onFirstPage())
+        @if ($debiturQlolas->onFirstPage())
             <span style="padding: 10px 20px; background: #f0f0f0; color: #999; border: 1px solid #ddd; border-radius: 4px; cursor: not-allowed;">← Previous</span>
         @else
-            <a href="{{ $userAktifCasaKecils->previousPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">← Previous</a>
+            <a href="{{ $debiturQlolas->previousPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">← Previous</a>
         @endif
 
-        {{-- Show pages 1 to 5 only --}}
         @php
-            $currentPage = $userAktifCasaKecils->currentPage();
-            $lastPage = $userAktifCasaKecils->lastPage();
+            $currentPage = $debiturQlolas->currentPage();
+            $lastPage = $debiturQlolas->lastPage();
             $startPage = 1;
             $endPage = min(5, $lastPage);
         @endphp
 
         @foreach (range($startPage, $endPage) as $page)
-            @php $url = $userAktifCasaKecils->url($page); @endphp
+            @php $url = $debiturQlolas->url($page); @endphp
             @if ($page == $currentPage)
-                <span style="padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 1px solid #667eea; border-radius: 4px;">{{ $page }}</span>
+                <span style="padding: 10px 20px; background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); color: white; border: 1px solid #0066CC; border-radius: 4px;">{{ $page }}</span>
             @else
                 <a href="{{ $url }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">{{ $page }}</a>
             @endif
         @endforeach
 
-        @if ($userAktifCasaKecils->hasMorePages())
-            <a href="{{ $userAktifCasaKecils->nextPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">Next →</a>
+        @if ($debiturQlolas->hasMorePages())
+            <a href="{{ $debiturQlolas->nextPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">Next →</a>
         @else
             <span style="padding: 10px 20px; background: #f0f0f0; color: #999; border: 1px solid #ddd; border-radius: 4px; cursor: not-allowed;">Next →</span>
         @endif

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Qlola Nonaktif')
-@section('page-title', 'Tambah Data Qlola Nonaktif')
+@section('title', 'Tambah Debitur Belum Memiliki Qlola')
+@section('page-title', 'Tambah Data Debitur Belum Memiliki Qlola')
 
 @section('content')
 <style>
@@ -89,7 +89,7 @@
 </style>
 
 <div class="form-container">
-    <form action="{{ route('qlola-nonaktif.store') }}" method="POST">
+    <form action="{{ route('debitur-belum-memiliki-qlola.store') }}" method="POST">
         @csrf
         
         <div class="form-grid">
@@ -192,7 +192,7 @@
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">💾 Simpan</button>
-            <a href="{{ route('qlola-nonaktif.index') }}" class="btn btn-secondary">↩️ Kembali</a>
+            <a href="{{ route('debitur-belum-memiliki-qlola.index') }}" class="btn btn-secondary">↩️ Kembali</a>
         </div>
     </form>
 </div>

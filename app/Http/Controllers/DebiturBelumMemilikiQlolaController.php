@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\QlolaNonaktif;
+use App\Models\DebiturBelumMemilikiQlola;
+use App\Helpers\CsvHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class QlolaNonaktifController extends Controller
+class DebiturBelumMemilikiQlolaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = QlolaNonaktif::query();
+        $query = DebiturBelumMemilikiQlola::query();
 
         // Filter berdasarkan pencarian
         if ($request->filled('search')) {
@@ -35,14 +36,14 @@ class QlolaNonaktifController extends Controller
             $query->whereMonth('created_at', $request->month);
         }
 
-        $qlolaNonaktifs = $query->orderBy('id', 'desc')->paginate(20);
+        $debiturQlolas = $query->orderBy('id', 'desc')->paginate(20);
 
-        return view('qlola-nonaktif.index', compact('qlolaNonaktifs'));
+        return view('debitur-belum-memiliki-qlola.index', compact('debiturQlolas'));
     }
 
     public function create()
     {
-        return view('qlola-nonaktif.create');
+        return view('debitur-belum-memiliki-qlola.create');
     }
 
     public function store(Request $request)
@@ -62,23 +63,23 @@ class QlolaNonaktifController extends Controller
             'keterangan' => 'nullable',
         ]);
 
-        QlolaNonaktif::create($validated);
+        DebiturBelumMemilikiQlola::create($validated);
 
-        return redirect()->route('qlola-nonaktif.index')
+        return redirect()->route('debitur-belum-memiliki-qlola.index')
             ->with('success', 'Data berhasil ditambahkan');
     }
 
-    public function show(QlolaNonaktif $qlolaNonaktif)
+    public function show(DebiturBelumMemilikiQlola $debiturBelumMemilikiQlola)
     {
-        return view('qlola-nonaktif.show', compact('qlolaNonaktif'));
+        return view('debitur-belum-memiliki-qlola.show', compact('debiturBelumMemilikiQlola'));
     }
 
-    public function edit(QlolaNonaktif $qlolaNonaktif)
+    public function edit(DebiturBelumMemilikiQlola $debiturBelumMemilikiQlola)
     {
-        return view('qlola-nonaktif.edit', compact('qlolaNonaktif'));
+        return view('debitur-belum-memiliki-qlola.edit', compact('debiturBelumMemilikiQlola'));
     }
 
-    public function update(Request $request, QlolaNonaktif $qlolaNonaktif)
+    public function update(Request $request, DebiturBelumMemilikiQlola $debiturBelumMemilikiQlola)
     {
         $validated = $request->validate([
             'kode_kanca' => 'required',
@@ -95,23 +96,23 @@ class QlolaNonaktifController extends Controller
             'keterangan' => 'nullable',
         ]);
 
-        $qlolaNonaktif->update($validated);
+        $debiturBelumMemilikiQlola->update($validated);
 
-        return redirect()->route('qlola-nonaktif.index')
+        return redirect()->route('debitur-belum-memiliki-qlola.index')
             ->with('success', 'Data berhasil diupdate');
     }
 
-    public function destroy(QlolaNonaktif $qlolaNonaktif)
+    public function destroy(DebiturBelumMemilikiQlola $debiturBelumMemilikiQlola)
     {
-        $qlolaNonaktif->delete();
+        $debiturBelumMemilikiQlola->delete();
 
-        return redirect()->route('qlola-nonaktif.index')
+        return redirect()->route('debitur-belum-memiliki-qlola.index')
             ->with('success', 'Data berhasil dihapus');
     }
 
     public function importForm()
     {
-        return view('qlola-nonaktif.import');
+        return view('debitur-belum-memiliki-qlola.import');
     }
 
     public function import(Request $request)
@@ -125,23 +126,11 @@ class QlolaNonaktifController extends Controller
         
         DB::beginTransaction();
         try {
-            // Auto-detect delimiter using CsvHelper
-            $delimiter = \App\Helpers\CsvHelper::detectDelimiter($path);
+            // Auto-detect delimiter (comma or semicolon)
+            $delimiter = CsvHelper::detectDelimiter($path);
             
             $handle = fopen($path, 'r');
-            $header = fgetcsv($handle, 0, $delimiter); // Read header
-            
-            // Log header for debugging
-            \Log::info('CSV Import - Header:', ['header' => $header, 'delimiter' => $delimiter, 'count' => count($header)]);
-            
-            // Read first data row for debugging
-            $firstRow = fgetcsv($handle, 0, $delimiter);
-            if ($firstRow) {
-                \Log::info('CSV Import - First Row:', ['row' => $firstRow, 'count' => count($firstRow)]);
-                // Reset file pointer to after header
-                fseek($handle, 0);
-                fgetcsv($handle, 0, $delimiter); // Skip header again
-            }
+            $header = fgetcsv($handle, 0, $delimiter); // Skip header
             
             $batchData = [];
             $batchSize = 1000;
@@ -149,54 +138,37 @@ class QlolaNonaktifController extends Controller
             $skippedRows = 0;
             
             while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
-                // Skip empty rows
-                if (empty(array_filter($row))) {
-                    $skippedRows++;
-                    continue;
-                }
-                
                 if (count($row) < 12) {
                     $skippedRows++;
                     continue;
                 }
                 
-                // Clean and validate data
-                $cleanedRow = array_map(function($value) {
-                    return trim($value ?? '');
-                }, $row);
-                
-                // Skip if all important fields are empty
-                if (empty($cleanedRow[4]) && empty($cleanedRow[8])) { // cifno and nama_debitur
-                    $skippedRows++;
-                    continue;
-                }
-                
                 $batchData[] = [
-                    'kode_kanca' => $cleanedRow[0] ?: null,
-                    'kanca' => $cleanedRow[1] ?: null,
-                    'kode_uker' => $cleanedRow[2] ?: null,
-                    'uker' => $cleanedRow[3] ?: null,
-                    'cifno' => $cleanedRow[4] ?: null,
-                    'norek_pinjaman' => $cleanedRow[5] ?: null,
-                    'norek_simpanan' => $cleanedRow[6] ?: null,
-                    'balance' => $cleanedRow[7] ?: null,
-                    'nama_debitur' => $cleanedRow[8] ?: null,
-                    'plafon' => $cleanedRow[9] ?: null,
-                    'pn_pengelola_1' => $cleanedRow[10] ?: null,
-                    'keterangan' => $cleanedRow[11] ?? null,
+                    'kode_kanca' => trim($row[0]),
+                    'kanca' => trim($row[1]),
+                    'kode_uker' => trim($row[2]),
+                    'uker' => trim($row[3]),
+                    'cifno' => trim($row[4]),
+                    'norek_pinjaman' => trim($row[5]),
+                    'norek_simpanan' => trim($row[6]),
+                    'balance' => trim($row[7]),
+                    'nama_debitur' => trim($row[8]),
+                    'plafon' => trim($row[9]),
+                    'pn_pengelola_1' => trim($row[10]),
+                    'keterangan' => trim($row[11]),
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
                 
                 if (count($batchData) >= $batchSize) {
-                    QlolaNonaktif::insert($batchData);
+                    DebiturBelumMemilikiQlola::insert($batchData);
                     $totalInserted += count($batchData);
                     $batchData = [];
                 }
             }
             
             if (!empty($batchData)) {
-                QlolaNonaktif::insert($batchData);
+                DebiturBelumMemilikiQlola::insert($batchData);
                 $totalInserted += count($batchData);
             }
             
@@ -207,9 +179,9 @@ class QlolaNonaktifController extends Controller
             if ($skippedRows > 0) {
                 $message .= ' (Dilewati: ' . $skippedRows . ' baris)';
             }
-            $message .= ' | Delimiter: ' . \App\Helpers\CsvHelper::getDelimiterName($delimiter);
+            $message .= ' | Delimiter: ' . CsvHelper::getDelimiterName($delimiter);
             
-            return redirect()->route('qlola-nonaktif.index')
+            return redirect()->route('debitur-belum-memiliki-qlola.index')
                 ->with('success', $message);
                 
         } catch (\Exception $e) {
@@ -221,14 +193,16 @@ class QlolaNonaktifController extends Controller
     public function deleteAll()
     {
         try {
+            $count = DebiturBelumMemilikiQlola::count();
+            
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-            QlolaNonaktif::truncate();
+            DebiturBelumMemilikiQlola::truncate();
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
             
-            return redirect()->route('qlola-nonaktif.index')
-                ->with('success', 'Semua data berhasil dihapus');
+            return redirect()->route('debitur-belum-memiliki-qlola.index')
+                ->with('success', '✓ Berhasil menghapus semua data! Total: ' . number_format($count, 0, ',', '.') . ' baris');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error: ' . $e->getMessage());
+            return back()->with('error', '✗ Error: ' . $e->getMessage());
         }
     }
 }

@@ -34,8 +34,9 @@ class UserAktifCasaKecilController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('nama_nasabah', 'like', "%{$search}%")
+                $q->where('nama_debitur', 'like', "%{$search}%")
                   ->orWhere('norek_pinjaman', 'like', "%{$search}%")
+                  ->orWhere('norek_simpanan', 'like', "%{$search}%")
                   ->orWhere('cifno', 'like', "%{$search}%")
                   ->orWhere('uker', 'like', "%{$search}%")
                   ->orWhere('kanca', 'like', "%{$search}%");
@@ -72,19 +73,19 @@ class UserAktifCasaKecilController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'kode_kanca' => 'nullable|string',
-            'kanca' => 'nullable|string',
-            'kode_uker' => 'nullable|string',
-            'uker' => 'nullable|string',
-            'nama_nasabah' => 'nullable|string',
-            'cifno' => 'nullable|string',
+            'kode_kanca' => 'required|string',
+            'kanca' => 'required|string',
+            'kode_uker' => 'required|string',
+            'uker' => 'required|string',
+            'cifno' => 'required|string',
             'norek_pinjaman' => 'nullable|string',
-            'saldo_bulan_lalu' => 'nullable|string',
-            'saldo_bulan_berjalan' => 'nullable|string',
-            'delta_saldo' => 'nullable|string',
-            'nama_rm_pemrakarsa' => 'nullable|string',
-            'qcash' => 'nullable|string',
-            'qib' => 'nullable|string',
+            'norek_simpanan' => 'nullable|string',
+            'balance' => 'nullable|string',
+            'volume' => 'nullable|string',
+            'nama_debitur' => 'required|string',
+            'plafon' => 'nullable|string',
+            'pn_pengelola_1' => 'nullable|string',
+            'keterangan' => 'nullable|string',
         ]);
 
         UserAktifCasaKecil::create($validated);
@@ -125,19 +126,19 @@ class UserAktifCasaKecilController extends Controller
     public function update(Request $request, UserAktifCasaKecil $userAktifCasaKecil)
     {
         $validated = $request->validate([
-            'kode_kanca' => 'nullable|string',
-            'kanca' => 'nullable|string',
-            'kode_uker' => 'nullable|string',
-            'uker' => 'nullable|string',
-            'nama_nasabah' => 'nullable|string',
-            'cifno' => 'nullable|string',
+            'kode_kanca' => 'required|string',
+            'kanca' => 'required|string',
+            'kode_uker' => 'required|string',
+            'uker' => 'required|string',
+            'cifno' => 'required|string',
             'norek_pinjaman' => 'nullable|string',
-            'saldo_bulan_lalu' => 'nullable|string',
-            'saldo_bulan_berjalan' => 'nullable|string',
-            'delta_saldo' => 'nullable|string',
-            'nama_rm_pemrakarsa' => 'nullable|string',
-            'qcash' => 'nullable|string',
-            'qib' => 'nullable|string',
+            'norek_simpanan' => 'nullable|string',
+            'balance' => 'nullable|string',
+            'volume' => 'nullable|string',
+            'nama_debitur' => 'required|string',
+            'plafon' => 'nullable|string',
+            'pn_pengelola_1' => 'nullable|string',
+            'keterangan' => 'nullable|string',
         ]);
 
         $userAktifCasaKecil->update($validated);
@@ -183,14 +184,18 @@ class UserAktifCasaKecilController extends Controller
         try {
             DB::beginTransaction();
 
+            // Auto-detect delimiter
+            $delimiter = \App\Helpers\CsvHelper::detectDelimiter($path);
+
             $handle = fopen($path, 'r');
-            $header = fgetcsv($handle, 0, ';'); // Skip header row, CSV uses semicolon delimiter
+            $header = fgetcsv($handle, 0, $delimiter); // Skip header row
             
             $batch = [];
             $batchSize = 1000; // Process 1000 rows at a time
             $totalInserted = 0;
+            $skippedRows = 0;
 
-            while (($row = fgetcsv($handle, 0, ';')) !== false) {
+            while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
                 // Skip empty rows and rows with no meaningful data
                 if (count($row) >= 13 && !empty(array_filter($row))) {
                     $batch[] = [
@@ -198,15 +203,15 @@ class UserAktifCasaKecilController extends Controller
                         'kanca' => trim($row[1]) ?: null,
                         'kode_uker' => trim($row[2]) ?: null,
                         'uker' => trim($row[3]) ?: null,
-                        'nama_nasabah' => trim($row[4]) ?: null,
-                        'cifno' => trim($row[5]) ?: null,
-                        'norek_pinjaman' => trim($row[6]) ?: null,
-                        'saldo_bulan_lalu' => trim($row[7]) ?: null,
-                        'saldo_bulan_berjalan' => trim($row[8]) ?: null,
-                        'delta_saldo' => trim($row[9]) ?: null,
-                        'nama_rm_pemrakarsa' => trim($row[10]) ?: null,
-                        'qcash' => trim($row[11]) ?: null,
-                        'qib' => trim($row[12]) ?: null,
+                        'cifno' => trim($row[4]) ?: null,
+                        'norek_pinjaman' => trim($row[5]) ?: null,
+                        'norek_simpanan' => trim($row[6]) ?: null,
+                        'balance' => trim($row[7]) ?: null,
+                        'volume' => trim($row[8]) ?: null,
+                        'nama_debitur' => trim($row[9]) ?: null,
+                        'plafon' => trim($row[10]) ?: null,
+                        'pn_pengelola_1' => trim($row[11]) ?: null,
+                        'keterangan' => trim($row[12]) ?: null,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];
@@ -216,6 +221,8 @@ class UserAktifCasaKecilController extends Controller
                         $totalInserted += count($batch);
                         $batch = [];
                     }
+                } else {
+                    $skippedRows++;
                 }
             }
 
@@ -228,8 +235,14 @@ class UserAktifCasaKecilController extends Controller
             fclose($handle);
             DB::commit();
 
+            $message = '✓ Import berhasil! Total data: ' . number_format($totalInserted, 0, ',', '.') . ' baris';
+            if ($skippedRows > 0) {
+                $message .= ' (Dilewati: ' . $skippedRows . ' baris)';
+            }
+            $message .= ' | Delimiter: ' . \App\Helpers\CsvHelper::getDelimiterName($delimiter);
+
             return redirect()->route('user-aktif-casa-kecil.index')
-                            ->with('success', '✓ Import berhasil! Total data: ' . number_format($totalInserted, 0, ',', '.') . ' baris');
+                            ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();

@@ -196,6 +196,7 @@
                 <th>CIFNO</th>
                 <th>No. Pinjaman</th>
                 <th>No. Simpanan</th>
+                <th>Balance</th>
                 <th>Nama Debitur</th>
                 <th>Plafon</th>
                 <th>PN Pengelola</th>
@@ -212,9 +213,10 @@
                 <td>{{ $item->cifno }}</td>
                 <td>{{ $item->norek_pinjaman }}</td>
                 <td>{{ $item->norek_simpanan }}</td>
+                <td>{{ $item->balance }}</td>
                 <td>{{ $item->nama_debitur }}</td>
                 <td>{{ $item->plafon }}</td>
-                <td>{{ $item->pn_pengelola }}</td>
+                <td>{{ $item->pn_pengelola_1 }}</td>
                 <td>{{ $item->keterangan }}</td>
                 <td>
                     <div class="actions">
@@ -230,7 +232,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="11" style="text-align: center; padding: 40px;">
+                <td colspan="12" style="text-align: center; padding: 40px;">
                     <p style="color: #999; font-size: 16px;">Tidak ada data qlola nonaktif.</p>
                     <a href="{{ route('qlola-nonaktif.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
                 </td>

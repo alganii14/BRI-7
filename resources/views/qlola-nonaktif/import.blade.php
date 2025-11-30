@@ -248,7 +248,7 @@
                     <div style="color: #dc3545; margin-top: 10px;">{{ $message }}</div>
                 @enderror
                 <small style="display: block; margin-top: 15px; color: #6c757d;">
-                    Format: CSV dengan delimiter semicolon (;). Max 10MB.
+                    Format: CSV dengan delimiter comma (,) atau semicolon (;). Max 10MB.
                 </small>
             </div>
 
@@ -262,10 +262,11 @@
                     <li>Kolom 5: CIFNO</li>
                     <li>Kolom 6: NOREK PINJAMAN</li>
                     <li>Kolom 7: NOREK SIMPANAN</li>
-                    <li>Kolom 8: NAMA DEBITUR</li>
-                    <li>Kolom 9: PLAFON</li>
-                    <li>Kolom 10: PN PENGELOLA</li>
-                    <li>Kolom 11: KETERANGAN</li>
+                    <li>Kolom 8: BALANCE</li>
+                    <li>Kolom 9: NAMA DEBITUR</li>
+                    <li>Kolom 10: PLAFON</li>
+                    <li>Kolom 11: PN PENGELOLA</li>
+                    <li>Kolom 12: KETERANGAN</li>
                 </ul>
             </div>
 
@@ -284,7 +285,8 @@
             <div class="info-box">
                 <ul>
                     <li>Pastikan format CSV sesuai dengan template</li>
-                    <li>Gunakan delimiter semicolon (;)</li>
+                    <li>Gunakan delimiter <strong>comma (,)</strong> atau <strong>semicolon (;)</strong></li>
+                    <li>Sistem akan otomatis mendeteksi delimiter</li>
                     <li>Baris pertama adalah header (akan di-skip)</li>
                     <li>Data akan ditambahkan ke database</li>
                     <li>Proses import mungkin memakan waktu untuk file besar</li>

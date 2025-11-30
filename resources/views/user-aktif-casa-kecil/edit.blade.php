@@ -95,48 +95,40 @@
         
         <div class="form-grid">
             <div class="form-group">
-                <label for="kode_kanca">Kode Kanca</label>
-                <input type="text" id="kode_kanca" name="kode_kanca" value="{{ old('kode_kanca', $userAktifCasaKecil->kode_kanca) }}">
+                <label for="kode_kanca">Kode Kanca <span style="color:red;">*</span></label>
+                <input type="text" id="kode_kanca" name="kode_kanca" value="{{ old('kode_kanca', $userAktifCasaKecil->kode_kanca) }}" required>
                 @error('kode_kanca')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label for="kanca">Kanca</label>
-                <input type="text" id="kanca" name="kanca" value="{{ old('kanca', $userAktifCasaKecil->kanca) }}">
+                <label for="kanca">Kanca <span style="color:red;">*</span></label>
+                <input type="text" id="kanca" name="kanca" value="{{ old('kanca', $userAktifCasaKecil->kanca) }}" required>
                 @error('kanca')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label for="kode_uker">Kode Uker</label>
-                <input type="text" id="kode_uker" name="kode_uker" value="{{ old('kode_uker', $userAktifCasaKecil->kode_uker) }}">
+                <label for="kode_uker">Kode Uker <span style="color:red;">*</span></label>
+                <input type="text" id="kode_uker" name="kode_uker" value="{{ old('kode_uker', $userAktifCasaKecil->kode_uker) }}" required>
                 @error('kode_uker')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label for="uker">Uker</label>
-                <input type="text" id="uker" name="uker" value="{{ old('uker', $userAktifCasaKecil->uker) }}">
+                <label for="uker">Uker <span style="color:red;">*</span></label>
+                <input type="text" id="uker" name="uker" value="{{ old('uker', $userAktifCasaKecil->uker) }}" required>
                 @error('uker')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
 
-            <div class="form-group full-width">
-                <label for="nama_nasabah">Nama Nasabah</label>
-                <input type="text" id="nama_nasabah" name="nama_nasabah" value="{{ old('nama_nasabah', $userAktifCasaKecil->nama_nasabah) }}">
-                @error('nama_nasabah')
-                    <span class="error">{{ $message }}</span>
-                @enderror
-            </div>
-
             <div class="form-group">
-                <label for="cifno">CIFNO</label>
-                <input type="text" id="cifno" name="cifno" value="{{ old('cifno', $userAktifCasaKecil->cifno) }}">
+                <label for="cifno">CIFNO <span style="color:red;">*</span></label>
+                <input type="text" id="cifno" name="cifno" value="{{ old('cifno', $userAktifCasaKecil->cifno) }}" required>
                 @error('cifno')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -151,49 +143,57 @@
             </div>
 
             <div class="form-group">
-                <label for="saldo_bulan_lalu">Saldo Bulan Lalu</label>
-                <input type="text" id="saldo_bulan_lalu" name="saldo_bulan_lalu" value="{{ old('saldo_bulan_lalu', $userAktifCasaKecil->saldo_bulan_lalu) }}">
-                @error('saldo_bulan_lalu')
+                <label for="norek_simpanan">Norek Simpanan</label>
+                <input type="text" id="norek_simpanan" name="norek_simpanan" value="{{ old('norek_simpanan', $userAktifCasaKecil->norek_simpanan) }}">
+                @error('norek_simpanan')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label for="saldo_bulan_berjalan">Saldo Bulan Berjalan</label>
-                <input type="text" id="saldo_bulan_berjalan" name="saldo_bulan_berjalan" value="{{ old('saldo_bulan_berjalan', $userAktifCasaKecil->saldo_bulan_berjalan) }}">
-                @error('saldo_bulan_berjalan')
+                <label for="balance">Balance</label>
+                <input type="text" id="balance" name="balance" value="{{ old('balance', $userAktifCasaKecil->balance) }}">
+                @error('balance')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label for="delta_saldo">Delta Saldo</label>
-                <input type="text" id="delta_saldo" name="delta_saldo" value="{{ old('delta_saldo', $userAktifCasaKecil->delta_saldo) }}">
-                @error('delta_saldo')
+                <label for="volume">Volume</label>
+                <input type="text" id="volume" name="volume" value="{{ old('volume', $userAktifCasaKecil->volume) }}">
+                @error('volume')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label for="nama_rm_pemrakarsa">Nama RM Pemrakarsa</label>
-                <input type="text" id="nama_rm_pemrakarsa" name="nama_rm_pemrakarsa" value="{{ old('nama_rm_pemrakarsa', $userAktifCasaKecil->nama_rm_pemrakarsa) }}">
-                @error('nama_rm_pemrakarsa')
+                <label for="nama_debitur">Nama Debitur <span style="color:red;">*</span></label>
+                <input type="text" id="nama_debitur" name="nama_debitur" value="{{ old('nama_debitur', $userAktifCasaKecil->nama_debitur) }}" required>
+                @error('nama_debitur')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label for="qcash">QCash</label>
-                <input type="text" id="qcash" name="qcash" value="{{ old('qcash', $userAktifCasaKecil->qcash) }}">
-                @error('qcash')
+                <label for="plafon">Plafon</label>
+                <input type="text" id="plafon" name="plafon" value="{{ old('plafon', $userAktifCasaKecil->plafon) }}">
+                @error('plafon')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label for="qib">QIB</label>
-                <input type="text" id="qib" name="qib" value="{{ old('qib', $userAktifCasaKecil->qib) }}">
-                @error('qib')
+                <label for="pn_pengelola_1">PN Pengelola</label>
+                <input type="text" id="pn_pengelola_1" name="pn_pengelola_1" value="{{ old('pn_pengelola_1', $userAktifCasaKecil->pn_pengelola_1) }}">
+                @error('pn_pengelola_1')
+                    <span class="error">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group full-width">
+                <label for="keterangan">Keterangan</label>
+                <textarea id="keterangan" name="keterangan" rows="3">{{ old('keterangan', $userAktifCasaKecil->keterangan) }}</textarea>
+                @error('keterangan')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>

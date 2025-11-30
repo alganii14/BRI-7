@@ -106,12 +106,13 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>CIF</th>
+                        <th>CIFNO</th>
                         @if(auth()->user()->isAdmin())
                         <th>Norek Pinjaman</th>
                         <th>Norek Simpanan</th>
                         @endif
                         <th>Nama Debitur</th>
+                        <th>Balance</th>
                         <th>Plafon</th>
                         <th>PN Pengelola</th>
                         <th>Kode KC</th>
@@ -130,8 +131,9 @@
                             <td>{{ $item->norek_simpanan }}</td>
                             @endif
                             <td>{{ $item->nama_debitur }}</td>
+                            <td>{{ $item->balance }}</td>
                             <td>{{ $item->plafon }}</td>
-                            <td>{{ $item->pn_pengelola }}</td>
+                            <td>{{ $item->pn_pengelola_1 }}</td>
                             <td>{{ $item->kode_kanca }}</td>
                             <td>{{ $item->kanca }}</td>
                             <td>{{ $item->uker }}</td>

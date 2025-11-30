@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Import User Aktif Casa Kecil')
-@section('page-title', 'Import Data User Aktif Casa Kecil')
+@section('title', 'Import Debitur Belum Memiliki Qlola')
+
+@section('page-title', 'Import Data Debitur Belum Memiliki Qlola')
 
 @section('content')
 <style>
@@ -21,7 +22,7 @@
     }
 
     .card-title {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0066CC 0%, #003D82 100%);
         color: white;
         padding: 12px 20px;
         border-radius: 8px;
@@ -33,23 +34,23 @@
     }
 
     .upload-area {
-        border: 2px dashed #667eea;
+        border: 2px dashed #0066CC;
         border-radius: 12px;
         padding: 40px;
         text-align: center;
-        background: linear-gradient(135deg, rgba(102,126,234,0.05) 0%, rgba(118,75,162,0.05) 100%);
+        background: linear-gradient(135deg, rgba(0,102,204,0.05) 0%, rgba(0,61,130,0.05) 100%);
         margin-bottom: 25px;
         transition: all 0.3s ease;
     }
 
     .upload-area:hover {
-        border-color: #764ba2;
-        background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+        border-color: #003D82;
+        background: linear-gradient(135deg, rgba(0,102,204,0.1) 0%, rgba(0,61,130,0.1) 100%);
     }
 
     .upload-icon {
         font-size: 48px;
-        color: #667eea;
+        color: #0066CC;
         margin-bottom: 15px;
     }
 
@@ -67,7 +68,7 @@
     .file-input-label {
         display: inline-block;
         padding: 12px 24px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0066CC 0%, #003D82 100%);
         color: white;
         border-radius: 8px;
         cursor: pointer;
@@ -134,7 +135,7 @@
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #0066CC 0%, #003D82 100%);
         color: white;
         padding: 12px 24px;
         border: none;
@@ -146,7 +147,7 @@
 
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102,126,234,0.3);
+        box-shadow: 0 4px 12px rgba(0,102,204,0.3);
     }
 
     .btn-danger {
@@ -209,7 +210,7 @@
     }
 </style>
 
-<a href="{{ route('user-aktif-casa-kecil.index') }}" class="btn btn-secondary">
+<a href="{{ route('debitur-belum-memiliki-qlola.index') }}" class="btn btn-secondary">
     ↩️ Kembali
 </a>
 
@@ -231,19 +232,19 @@
             📤 Upload File CSV
         </div>
 
-        <form action="{{ route('user-aktif-casa-kecil.import') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('debitur-belum-memiliki-qlola.import') }}" method="POST" enctype="multipart/form-data">
             @csrf
             
             <div class="upload-area">
                 <div class="upload-icon">📁</div>
                 <div class="file-input-wrapper">
-                    <input type="file" id="csv_file" name="csv_file" accept=".csv" required onchange="updateFileName(this)">
-                    <label for="csv_file" class="file-input-label">
+                    <input type="file" id="file" name="file" accept=".csv" required onchange="updateFileName(this)">
+                    <label for="file" class="file-input-label">
                         📂 Pilih File CSV
                     </label>
                 </div>
                 <div class="file-name" id="fileName">Belum ada file dipilih</div>
-                @error('csv_file')
+                @error('file')
                     <div style="color: #dc3545; margin-top: 10px;">{{ $message }}</div>
                 @enderror
                 <small style="display: block; margin-top: 15px; color: #6c757d;">
@@ -262,11 +263,10 @@
                     <li>Kolom 6: NOREK PINJAMAN</li>
                     <li>Kolom 7: NOREK SIMPANAN</li>
                     <li>Kolom 8: BALANCE</li>
-                    <li>Kolom 9: VOLUME</li>
-                    <li>Kolom 10: NAMA DEBITUR</li>
-                    <li>Kolom 11: PLAFON</li>
-                    <li>Kolom 12: PN PENGELOLA</li>
-                    <li>Kolom 13: KETERANGAN</li>
+                    <li>Kolom 9: NAMA DEBITUR</li>
+                    <li>Kolom 10: PLAFON</li>
+                    <li>Kolom 11: PN PENGELOLA</li>
+                    <li>Kolom 12: KETERANGAN</li>
                 </ul>
             </div>
 
@@ -303,8 +303,8 @@
                 <p><strong>Gunakan dengan hati-hati!</strong></p>
                 <p>Tombol ini akan menghapus semua data sebelum import data baru.</p>
                 
-                <form action="{{ route('user-aktif-casa-kecil.delete-all') }}" method="POST" 
-                      onsubmit="return confirm('PERHATIAN: Ini akan menghapus SEMUA data User Aktif Casa Kecil. Yakin ingin melanjutkan?');">
+                <form action="{{ route('debitur-belum-memiliki-qlola.delete-all') }}" method="POST" 
+                      onsubmit="return confirm('PERHATIAN: Ini akan menghapus SEMUA data Debitur Belum Memiliki Qlola. Yakin ingin melanjutkan?');">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">

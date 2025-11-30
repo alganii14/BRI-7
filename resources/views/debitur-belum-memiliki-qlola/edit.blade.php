@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Tambah Qlola Nonaktif')
-@section('page-title', 'Tambah Data Qlola Nonaktif')
+@section('title', 'Edit Debitur Belum Memiliki Qlola')
+@section('page-title', 'Edit Data Debitur Belum Memiliki Qlola')
 
 @section('content')
 <style>
@@ -89,13 +89,14 @@
 </style>
 
 <div class="form-container">
-    <form action="{{ route('qlola-nonaktif.store') }}" method="POST">
+    <form action="{{ route('debitur-belum-memiliki-qlola.update', $debiturBelumMemilikiQlola->id) }}" method="POST">
         @csrf
+        @method('PUT')
         
         <div class="form-grid">
             <div class="form-group">
                 <label for="kode_kanca">Kode Kanca</label>
-                <input type="text" id="kode_kanca" name="kode_kanca" value="{{ old('kode_kanca') }}" required>
+                <input type="text" id="kode_kanca" name="kode_kanca" value="{{ old('kode_kanca', $debiturBelumMemilikiQlola->kode_kanca) }}" required>
                 @error('kode_kanca')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -103,7 +104,7 @@
 
             <div class="form-group">
                 <label for="kanca">Kanca</label>
-                <input type="text" id="kanca" name="kanca" value="{{ old('kanca') }}" required>
+                <input type="text" id="kanca" name="kanca" value="{{ old('kanca', $debiturBelumMemilikiQlola->kanca) }}" required>
                 @error('kanca')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -111,7 +112,7 @@
 
             <div class="form-group">
                 <label for="kode_uker">Kode Unit</label>
-                <input type="text" id="kode_uker" name="kode_uker" value="{{ old('kode_uker') }}" required>
+                <input type="text" id="kode_uker" name="kode_uker" value="{{ old('kode_uker', $debiturBelumMemilikiQlola->kode_uker) }}" required>
                 @error('kode_uker')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -119,7 +120,7 @@
 
             <div class="form-group">
                 <label for="uker">Unit</label>
-                <input type="text" id="uker" name="uker" value="{{ old('uker') }}" required>
+                <input type="text" id="uker" name="uker" value="{{ old('uker', $debiturBelumMemilikiQlola->uker) }}" required>
                 @error('uker')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -127,7 +128,7 @@
 
             <div class="form-group">
                 <label for="cifno">CIFNO</label>
-                <input type="text" id="cifno" name="cifno" value="{{ old('cifno') }}" required>
+                <input type="text" id="cifno" name="cifno" value="{{ old('cifno', $debiturBelumMemilikiQlola->cifno) }}" required>
                 @error('cifno')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -135,7 +136,7 @@
 
             <div class="form-group">
                 <label for="nama_debitur">Nama Debitur</label>
-                <input type="text" id="nama_debitur" name="nama_debitur" value="{{ old('nama_debitur') }}" required>
+                <input type="text" id="nama_debitur" name="nama_debitur" value="{{ old('nama_debitur', $debiturBelumMemilikiQlola->nama_debitur) }}" required>
                 @error('nama_debitur')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -143,7 +144,7 @@
 
             <div class="form-group">
                 <label for="norek_pinjaman">No. Rekening Pinjaman</label>
-                <input type="text" id="norek_pinjaman" name="norek_pinjaman" value="{{ old('norek_pinjaman') }}">
+                <input type="text" id="norek_pinjaman" name="norek_pinjaman" value="{{ old('norek_pinjaman', $debiturBelumMemilikiQlola->norek_pinjaman) }}">
                 @error('norek_pinjaman')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -151,7 +152,7 @@
 
             <div class="form-group">
                 <label for="norek_simpanan">No. Rekening Simpanan</label>
-                <input type="text" id="norek_simpanan" name="norek_simpanan" value="{{ old('norek_simpanan') }}">
+                <input type="text" id="norek_simpanan" name="norek_simpanan" value="{{ old('norek_simpanan', $debiturBelumMemilikiQlola->norek_simpanan) }}">
                 @error('norek_simpanan')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -159,7 +160,7 @@
 
             <div class="form-group">
                 <label for="balance">Balance</label>
-                <input type="text" id="balance" name="balance" value="{{ old('balance') }}">
+                <input type="text" id="balance" name="balance" value="{{ old('balance', $debiturBelumMemilikiQlola->balance) }}">
                 @error('balance')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -167,7 +168,7 @@
 
             <div class="form-group">
                 <label for="plafon">Plafon</label>
-                <input type="text" id="plafon" name="plafon" value="{{ old('plafon') }}">
+                <input type="text" id="plafon" name="plafon" value="{{ old('plafon', $debiturBelumMemilikiQlola->plafon) }}">
                 @error('plafon')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -175,7 +176,7 @@
 
             <div class="form-group">
                 <label for="pn_pengelola_1">PN Pengelola</label>
-                <input type="text" id="pn_pengelola_1" name="pn_pengelola_1" value="{{ old('pn_pengelola_1') }}">
+                <input type="text" id="pn_pengelola_1" name="pn_pengelola_1" value="{{ old('pn_pengelola_1', $debiturBelumMemilikiQlola->pn_pengelola_1) }}">
                 @error('pn_pengelola_1')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -183,7 +184,7 @@
 
             <div class="form-group full-width">
                 <label for="keterangan">Keterangan</label>
-                <textarea id="keterangan" name="keterangan" rows="3">{{ old('keterangan') }}</textarea>
+                <textarea id="keterangan" name="keterangan" rows="3">{{ old('keterangan', $debiturBelumMemilikiQlola->keterangan) }}</textarea>
                 @error('keterangan')
                     <span class="error">{{ $message }}</span>
                 @enderror
@@ -191,8 +192,8 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary">💾 Simpan</button>
-            <a href="{{ route('qlola-nonaktif.index') }}" class="btn btn-secondary">↩️ Kembali</a>
+            <button type="submit" class="btn btn-primary">💾 Update</button>
+            <a href="{{ route('debitur-belum-memiliki-qlola.index') }}" class="btn btn-secondary">↩️ Kembali</a>
         </div>
     </form>
 </div>

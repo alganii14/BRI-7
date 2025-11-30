@@ -182,14 +182,18 @@ class MerchantSavolController extends Controller
         try {
             DB::beginTransaction();
 
+            // Auto-detect delimiter
+            $delimiter = \App\Helpers\CsvHelper::detectDelimiter($path);
+
             $handle = fopen($path, 'r');
-            $header = fgetcsv($handle, 0, ';'); // Skip header row, use semicolon delimiter
+            $header = fgetcsv($handle, 0, $delimiter); // Skip header row
             
             $batch = [];
             $batchSize = 1000; // Process 1000 rows at a time
             $totalInserted = 0;
+            $skippedRows = 0;
 
-            while (($row = fgetcsv($handle, 0, ';')) !== false) {
+            while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
                 if (count($row) >= 12 && !empty(array_filter($row))) {
                     $batch[] = [
                         'kode_kanca' => trim($row[0]) ?: null,
@@ -213,6 +217,8 @@ class MerchantSavolController extends Controller
                         $totalInserted += count($batch);
                         $batch = [];
                     }
+                } else {
+                    $skippedRows++;
                 }
             }
 
@@ -225,8 +231,14 @@ class MerchantSavolController extends Controller
             fclose($handle);
             DB::commit();
 
+            $message = '✓ Import berhasil! Total data: ' . number_format($totalInserted, 0, ',', '.') . ' baris';
+            if ($skippedRows > 0) {
+                $message .= ' (Dilewati: ' . $skippedRows . ' baris)';
+            }
+            $message .= ' | Delimiter: ' . \App\Helpers\CsvHelper::getDelimiterName($delimiter);
+
             return redirect()->route('merchant-savol.index')
-                            ->with('success', '✓ Import berhasil! Total data: ' . number_format($totalInserted, 0, ',', '.') . ' baris');
+                            ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();

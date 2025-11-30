@@ -159,6 +159,14 @@
             </div>
 
             <div class="form-group">
+                <label for="balance">Balance</label>
+                <input type="text" id="balance" name="balance" value="{{ old('balance', $qlolaNonaktif->balance) }}">
+                @error('balance')
+                    <span class="error">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
                 <label for="plafon">Plafon</label>
                 <input type="text" id="plafon" name="plafon" value="{{ old('plafon', $qlolaNonaktif->plafon) }}">
                 @error('plafon')
@@ -167,9 +175,9 @@
             </div>
 
             <div class="form-group">
-                <label for="pn_pengelola">PN Pengelola</label>
-                <input type="text" id="pn_pengelola" name="pn_pengelola" value="{{ old('pn_pengelola', $qlolaNonaktif->pn_pengelola) }}">
-                @error('pn_pengelola')
+                <label for="pn_pengelola_1">PN Pengelola</label>
+                <input type="text" id="pn_pengelola_1" name="pn_pengelola_1" value="{{ old('pn_pengelola_1', $qlolaNonaktif->pn_pengelola_1) }}">
+                @error('pn_pengelola_1')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>

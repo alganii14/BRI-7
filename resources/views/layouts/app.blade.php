@@ -982,6 +982,12 @@
                                 </svg>
                                 Qlola (Belum ada Qlola / ada namun nonaktif)
                             </a>
+                            <a href="{{ route('manager-pull-pipeline.debitur-belum-memiliki-qlola') }}" class="sub-submenu-item {{ request()->routeIs('manager-pull-pipeline.debitur-belum-memiliki-qlola') ? 'active' : '' }}">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                                Debitur Belum Memiliki Qlola
+                            </a>
                             <a href="{{ route('manager-pull-pipeline.user-aktif-casa-kecil') }}" class="sub-submenu-item {{ request()->routeIs('manager-pull-pipeline.user-aktif-casa-kecil') ? 'active' : '' }}">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -1206,6 +1212,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
                                 Qlola (Belum ada Qlola / ada namun nonaktif)
+                            </a>
+                            <a href="{{ route('debitur-belum-memiliki-qlola.index') }}" class="sub-submenu-item {{ request()->routeIs('debitur-belum-memiliki-qlola.*') ? 'active' : '' }}">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                                Debitur Belum Memiliki Qlola
                             </a>
                             <a href="{{ route('user-aktif-casa-kecil.index') }}" class="sub-submenu-item {{ request()->routeIs('user-aktif-casa-kecil.*') ? 'active' : '' }}">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">

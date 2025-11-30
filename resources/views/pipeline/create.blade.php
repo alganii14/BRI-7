@@ -714,6 +714,7 @@ function handleStrategyChange() {
         ],
         'Strategi 2': [
             'Qlola (Belum ada Qlola / ada namun nonaktif)',
+            'Debitur Belum Memiliki Qlola',
             'User Aktif Casa Kecil'
         ],
         'Strategi 3': [

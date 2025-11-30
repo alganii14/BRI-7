@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Qlola Nonaktif')
+@section('title', 'Detail Debitur Belum Memiliki Qlola')
 
-@section('page-title', 'Detail Data Qlola Nonaktif')
+@section('page-title', 'Detail Data Debitur Belum Memiliki Qlola')
 
 @section('content')
 <style>
@@ -102,82 +102,82 @@
 
 <div class="detail-container">
     <div class="action-buttons">
-        <a href="{{ route('qlola-nonaktif.edit', $qlolaNonaktif->id) }}" class="btn btn-warning">
+        <a href="{{ route('debitur-belum-memiliki-qlola.edit', $debiturBelumMemilikiQlola->id) }}" class="btn btn-warning">
             ✏️ Edit
         </a>
-        <a href="{{ route('qlola-nonaktif.index') }}" class="btn btn-secondary">
+        <a href="{{ route('debitur-belum-memiliki-qlola.index') }}" class="btn btn-secondary">
             ↩️ Kembali
         </a>
     </div>
 
     <div class="section-title">
-        📋 Informasi Qlola Nonaktif
+        📋 Informasi Debitur Belum Memiliki Qlola
     </div>
 
     <div class="detail-grid">
         <div class="detail-item">
             <div class="detail-label">Kode Kanca</div>
-            <div class="detail-value">{{ $qlolaNonaktif->kode_kanca }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->kode_kanca }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">Kanca</div>
-            <div class="detail-value">{{ $qlolaNonaktif->kanca }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->kanca }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">Kode Unit</div>
-            <div class="detail-value">{{ $qlolaNonaktif->kode_uker }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->kode_uker }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">Unit</div>
-            <div class="detail-value">{{ $qlolaNonaktif->uker }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->uker }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">CIFNO</div>
-            <div class="detail-value">{{ $qlolaNonaktif->cifno }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->cifno }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">Nama Debitur</div>
-            <div class="detail-value">{{ $qlolaNonaktif->nama_debitur }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->nama_debitur }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">No. Rekening Pinjaman</div>
-            <div class="detail-value">{{ $qlolaNonaktif->norek_pinjaman ?: '-' }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->norek_pinjaman ?: '-' }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">No. Rekening Simpanan</div>
-            <div class="detail-value">{{ $qlolaNonaktif->norek_simpanan ?: '-' }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->norek_simpanan ?: '-' }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">Balance</div>
-            <div class="detail-value">{{ $qlolaNonaktif->balance ?: '-' }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->balance ?: '-' }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">Plafon</div>
-            <div class="detail-value">{{ $qlolaNonaktif->plafon ?: '-' }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->plafon ?: '-' }}</div>
         </div>
 
         <div class="detail-item">
             <div class="detail-label">PN Pengelola</div>
-            <div class="detail-value">{{ $qlolaNonaktif->pn_pengelola_1 ?: '-' }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->pn_pengelola_1 ?: '-' }}</div>
         </div>
 
         <div class="detail-item full-width">
             <div class="detail-label">Keterangan</div>
-            <div class="detail-value">{{ $qlolaNonaktif->keterangan ?: '-' }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->keterangan ?: '-' }}</div>
         </div>
 
         <div class="detail-item full-width">
             <div class="detail-label">Dibuat Pada</div>
-            <div class="detail-value">{{ $qlolaNonaktif->created_at->format('d M Y H:i') }}</div>
+            <div class="detail-value">{{ $debiturBelumMemilikiQlola->created_at->format('d M Y H:i') }}</div>
         </div>
     </div>
 </div>

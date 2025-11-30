@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'User Aktif Casa Kecil')
-@section('page-title', 'User Aktif Casa Kecil')
+@section('title', 'Debitur Belum Memiliki Qlola')
+@section('page-title', 'Debitur Belum Memiliki Qlola')
 
 @section('content')
 <style>
@@ -91,11 +91,11 @@
     <span class="read-only-badge">📊 View Only - Read-Only Access</span>
     
     <div class="search-box">
-        <form action="{{ route('manager-pull-pipeline.user-aktif-casa-kecil') }}" method="GET">
+        <form action="{{ route('manager-pull-pipeline.debitur-belum-memiliki-qlola') }}" method="GET">
             <input type="text" name="search" placeholder="Cari norek, nama debitur, atau CIFNO..." value="{{ request('search') }}">
             <button type="submit" class="btn-search">🔍 Cari</button>
             @if(request('search'))
-                <a href="{{ route('manager-pull-pipeline.user-aktif-casa-kecil') }}" class="btn-search" style="background: #6c757d;">Reset</a>
+                <a href="{{ route('manager-pull-pipeline.debitur-belum-memiliki-qlola') }}" class="btn-search" style="background: #6c757d;">Reset</a>
             @endif
         </form>
     </div>
@@ -113,7 +113,6 @@
                         @endif
                         <th>Nama Debitur</th>
                         <th>Balance</th>
-                        <th>Volume</th>
                         <th>Plafon</th>
                         <th>PN Pengelola</th>
                         <th>Kode KC</th>
@@ -133,7 +132,6 @@
                             @endif
                             <td>{{ $item->nama_debitur }}</td>
                             <td>{{ $item->balance }}</td>
-                            <td>{{ $item->volume }}</td>
                             <td>{{ $item->plafon }}</td>
                             <td>{{ $item->pn_pengelola_1 }}</td>
                             <td>{{ $item->kode_kanca }}</td>
