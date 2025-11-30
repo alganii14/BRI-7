@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\PotensiPayroll;
+use App\Helpers\CsvHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -153,7 +154,30 @@ class PotensiPayrollController extends Controller
     }
 
     /**
-     * Import CSV file
+     * Detect CSV delimiter automatically
+     */
+    private function detectDelimiter($filePath, $checkLines = 5)
+    {
+        $delimiters = [';' => 0, ',' => 0, "\t" => 0, '|' => 0];
+        $handle = fopen($filePath, 'r');
+        
+        // Check first few lines to detect delimiter
+        $lineCount = 0;
+        while (($line = fgets($handle)) !== false && $lineCount < $checkLines) {
+            foreach ($delimiters as $delimiter => $count) {
+                $delimiters[$delimiter] += substr_count($line, $delimiter);
+            }
+            $lineCount++;
+        }
+        
+        fclose($handle);
+        
+        // Return delimiter with highest count
+        return array_search(max($delimiters), $delimiters);
+    }
+
+    /**
+     * Import CSV file with auto-detect delimiter (supports comma and semicolon)
      */
     public function import(Request $request)
     {
@@ -167,15 +191,19 @@ class PotensiPayrollController extends Controller
         try {
             DB::beginTransaction();
 
+            // Auto-detect delimiter
+            $delimiter = $this->detectDelimiter($path);
+            
             $handle = fopen($path, 'r');
-            $header = fgetcsv($handle, 1000, ';'); // Skip header row, using semicolon delimiter
+            $header = fgetcsv($handle, 1000, $delimiter); // Skip header row with detected delimiter
             
             $batch = [];
             $batchSize = 1000; // Process 1000 rows at a time
             $totalInserted = 0;
+            $skippedRows = 0;
 
-            while (($row = fgetcsv($handle, 1000, ';')) !== false) {
-                // Skip rows with empty data or only containing semicolons
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
+                // Skip rows with empty data or insufficient columns
                 if (count($row) >= 5 && !empty(trim($row[2]))) { // Check if perusahaan is not empty
                     $batch[] = [
                         'kode_cabang_induk' => trim($row[0]) ?: null,
@@ -192,6 +220,8 @@ class PotensiPayrollController extends Controller
                         $totalInserted += count($batch);
                         $batch = [];
                     }
+                } else {
+                    $skippedRows++;
                 }
             }
 
@@ -204,8 +234,14 @@ class PotensiPayrollController extends Controller
             fclose($handle);
             DB::commit();
 
+            $message = '✓ Import berhasil! Total data: ' . number_format($totalInserted, 0, ',', '.') . ' baris';
+            if ($skippedRows > 0) {
+                $message .= ' (Dilewati: ' . $skippedRows . ' baris kosong)';
+            }
+            $message .= ' | Delimiter: ' . ($delimiter === ',' ? 'Comma (,)' : ($delimiter === ';' ? 'Semicolon (;)' : $delimiter));
+
             return redirect()->route('potensi-payroll.index')
-                            ->with('success', '✓ Import berhasil! Total data: ' . number_format($totalInserted, 0, ',', '.') . ' baris');
+                            ->with('success', $message);
 
         } catch (\Exception $e) {
             DB::rollBack();

@@ -1,0 +1,189 @@
+# Flowchart Admin - Sistem Pipeline Management
+
+## Deskripsi
+Flowchart ini menggambarkan alur kerja Admin dalam sistem manajemen pipeline BRI.
+
+## Flowchart Diagram
+
+```mermaid
+flowchart TD
+    Start([Admin Login]) --> Dashboard[Dashboard Admin]
+    
+    Dashboard --> Menu{Pilih Menu}
+    
+    Menu -->|Manajemen User| UserMgmt[Manajemen User]
+    Menu -->|Manajemen Pipeline| PipelineMgmt[Manajemen Pipeline]
+    Menu -->|Manajemen Nasabah| NasabahMgmt[Manajemen Nasabah]
+    Menu -->|Import Data| ImportData[Import Data]
+    Menu -->|Laporan| Report[Laporan & Rekap]
+    Menu -->|Logout| End([Logout])
+    
+    %% User Management Flow
+    UserMgmt --> UserAction{Aksi User}
+    UserAction -->|Tambah User| AddUser[Input Data User Baru]
+    UserAction -->|Edit User| EditUser[Edit Data User]
+    UserAction -->|Hapus User| DeleteUser[Hapus User]
+    UserAction -->|Assign Role| AssignRole[Assign Role<br/>Admin/Manager/RMFT]
+    
+    AddUser --> ValidateUser{Validasi Data}
+    EditUser --> ValidateUser
+    ValidateUser -->|Valid| SaveUser[Simpan Data User]
+    ValidateUser -->|Tidak Valid| ErrorUser[Tampilkan Error]
+    ErrorUser --> UserAction
+    SaveUser --> SuccessUser[Sukses]
+    DeleteUser --> ConfirmDelete{Konfirmasi Hapus?}
+    ConfirmDelete -->|Ya| DeleteConfirmed[User Dihapus]
+    ConfirmDelete -->|Tidak| UserAction
+    AssignRole --> SaveRole[Simpan Role]
+    
+    DeleteConfirmed --> SuccessUser
+    SaveRole --> SuccessUser
+    SuccessUser --> Dashboard
+    
+    %% Pipeline Management Flow
+    PipelineMgmt --> PipelineAction{Aksi Pipeline}
+    PipelineAction -->|Lihat Semua Pipeline| ViewAllPipeline[Tampilkan Semua Pipeline]
+    PipelineAction -->|Tambah Pipeline| AddPipeline[Input Data Pipeline]
+    PipelineAction -->|Edit Pipeline| EditPipeline[Edit Data Pipeline]
+    PipelineAction -->|Hapus Pipeline| DeletePipeline[Hapus Pipeline]
+    PipelineAction -->|Assign ke RMFT| AssignRMFT[Assign Pipeline ke RMFT]
+    
+    AddPipeline --> ValidatePipeline{Validasi Data}
+    EditPipeline --> ValidatePipeline
+    ValidatePipeline -->|Valid| SavePipeline[Simpan Data Pipeline]
+    ValidatePipeline -->|Tidak Valid| ErrorPipeline[Tampilkan Error]
+    ErrorPipeline --> PipelineAction
+    SavePipeline --> SuccessPipeline[Sukses]
+    
+    DeletePipeline --> ConfirmDeletePipeline{Konfirmasi Hapus?}
+    ConfirmDeletePipeline -->|Ya| PipelineDeleted[Pipeline Dihapus]
+    ConfirmDeletePipeline -->|Tidak| PipelineAction
+    
+    AssignRMFT --> SelectRMFT[Pilih RMFT]
+    SelectRMFT --> SaveAssignment[Simpan Assignment]
+    SaveAssignment --> NotifyRMFT[Notifikasi ke RMFT]
+    
+    ViewAllPipeline --> SuccessPipeline
+    PipelineDeleted --> SuccessPipeline
+    NotifyRMFT --> SuccessPipeline
+    SuccessPipeline --> Dashboard
+    
+    %% Nasabah Management Flow
+    NasabahMgmt --> NasabahAction{Aksi Nasabah}
+    NasabahAction -->|Lihat Data Nasabah| ViewNasabah[Tampilkan Data Nasabah]
+    NasabahAction -->|Tambah Nasabah| AddNasabah[Input Data Nasabah]
+    NasabahAction -->|Edit Nasabah| EditNasabah[Edit Data Nasabah]
+    NasabahAction -->|Hapus Nasabah| DeleteNasabah[Hapus Nasabah]
+    
+    AddNasabah --> ValidateNasabah{Validasi Data}
+    EditNasabah --> ValidateNasabah
+    ValidateNasabah -->|Valid| SaveNasabah[Simpan Data Nasabah]
+    ValidateNasabah -->|Tidak Valid| ErrorNasabah[Tampilkan Error]
+    ErrorNasabah --> NasabahAction
+    SaveNasabah --> SuccessNasabah[Sukses]
+    
+    DeleteNasabah --> ConfirmDeleteNasabah{Konfirmasi Hapus?}
+    ConfirmDeleteNasabah -->|Ya| NasabahDeleted[Nasabah Dihapus]
+    ConfirmDeleteNasabah -->|Tidak| NasabahAction
+    
+    ViewNasabah --> SuccessNasabah
+    NasabahDeleted --> SuccessNasabah
+    SuccessNasabah --> Dashboard
+    
+    %% Import Data Flow
+    ImportData --> ImportType{Pilih Jenis Import}
+    ImportType -->|AUM DPK| ImportAUM[Import AUM]
+    ImportType -->|Brilink| ImportBrilink[Import Brilink]
+    ImportType -->|Merchant Savol| ImportMerchant[Import Merchant]
+    ImportType -->|Nasabah| ImportNasabah[Import Nasabah]
+    ImportType -->|Layering| ImportLayering[Import Layering]
+    ImportType -->|Lainnya| ImportOther[Import Data Lainnya]
+    
+    ImportAUM --> UploadFile[Upload File Excel/CSV]
+    ImportBrilink --> UploadFile
+    ImportMerchant --> UploadFile
+    ImportNasabah --> UploadFile
+    ImportLayering --> UploadFile
+    ImportOther --> UploadFile
+    
+    UploadFile --> ValidateFile{Validasi File}
+    ValidateFile -->|Valid| ProcessImport[Proses Import Data]
+    ValidateFile -->|Tidak Valid| ErrorImport[Tampilkan Error Format]
+    ErrorImport --> ImportType
+    
+    ProcessImport --> ImportResult{Hasil Import}
+    ImportResult -->|Sukses| SuccessImport[Tampilkan Hasil Import<br/>Jumlah Data Berhasil]
+    ImportResult -->|Sebagian Gagal| PartialImport[Tampilkan Data Gagal<br/>Download Error Log]
+    ImportResult -->|Gagal Semua| FailedImport[Tampilkan Error<br/>Semua Data Gagal]
+    
+    SuccessImport --> Dashboard
+    PartialImport --> Dashboard
+    FailedImport --> ImportType
+    
+    %% Report Flow
+    Report --> ReportType{Pilih Jenis Laporan}
+    ReportType -->|Rekap Pipeline| RekapPipeline[Rekap Pipeline per Status]
+    ReportType -->|Rekap per RMFT| RekapRMFT[Rekap per RMFT]
+    ReportType -->|Rekap per Uker| RekapUker[Rekap per Unit Kerja]
+    ReportType -->|Aktivitas| RekapAktivitas[Rekap Aktivitas]
+    
+    RekapPipeline --> FilterReport[Set Filter & Periode]
+    RekapRMFT --> FilterReport
+    RekapUker --> FilterReport
+    RekapAktivitas --> FilterReport
+    
+    FilterReport --> GenerateReport[Generate Laporan]
+    GenerateReport --> DisplayReport[Tampilkan Laporan]
+    DisplayReport --> ExportOption{Export?}
+    ExportOption -->|Ya| ExportReport[Export Excel/PDF]
+    ExportOption -->|Tidak| Dashboard
+    ExportReport --> Dashboard
+    
+    style Start fill:#90EE90
+    style End fill:#FFB6C1
+    style Dashboard fill:#87CEEB
+    style SuccessUser fill:#98FB98
+    style SuccessPipeline fill:#98FB98
+    style SuccessNasabah fill:#98FB98
+    style SuccessImport fill:#98FB98
+    style ErrorUser fill:#FFB6C1
+    style ErrorPipeline fill:#FFB6C1
+    style ErrorNasabah fill:#FFB6C1
+    style ErrorImport fill:#FFB6C1
+    style FailedImport fill:#FFB6C1
+```
+
+## Penjelasan Alur Kerja Admin
+
+### 1. Manajemen User
+- Menambah, mengedit, dan menghapus user
+- Mengassign role (Admin, Manager, RMFT) ke user
+- Validasi data user sebelum disimpan
+
+### 2. Manajemen Pipeline
+- Melihat semua pipeline dalam sistem
+- Menambah, mengedit, dan menghapus pipeline
+- Mengassign pipeline ke RMFT
+- Mengirim notifikasi ke RMFT yang ditugaskan
+
+### 3. Manajemen Nasabah
+- Melihat, menambah, mengedit, dan menghapus data nasabah
+- Validasi data nasabah
+- Konfirmasi sebelum menghapus data
+
+### 4. Import Data
+- Import berbagai jenis data (AUM, Brilink, Merchant, Nasabah, dll)
+- Validasi format file
+- Menampilkan hasil import dengan detail sukses/gagal
+- Download error log untuk data yang gagal diimport
+
+### 5. Laporan & Rekap
+- Generate berbagai jenis laporan
+- Filter berdasarkan periode dan kriteria
+- Export laporan ke Excel/PDF
+
+## Catatan
+- Setiap aksi penting memerlukan validasi
+- Penghapusan data memerlukan konfirmasi
+- Sistem memberikan feedback sukses/error untuk setiap aksi
+- Admin memiliki akses penuh ke semua fitur sistem
