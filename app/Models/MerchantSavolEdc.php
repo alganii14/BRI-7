@@ -5,20 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class QlolaNonDebitur extends Model
+class MerchantSavolEdc extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'kode_kanca',
-        'kanca',
+        'nama_kanca',
         'kode_uker',
-        'uker',
+        'nama_uker',
+        'nama_merchant',
+        'norek',
         'cifno',
-        'norek_simpanan',
-        'norek_pinjaman',
-        'balance',
-        'nama_nasabah',
-        'keterangan',
+        'jumlah_tid',
+        'jumlah_trx',
+        'sales_volume',
+        'saldo_posisi',
     ];
 }

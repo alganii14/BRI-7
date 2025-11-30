@@ -92,7 +92,7 @@
     
     <div class="search-box">
         <form action="{{ route('manager-pull-pipeline.qlola-non-debitur') }}" method="GET">
-            <input type="text" name="search" placeholder="Cari no rekening, nama nasabah, atau CIF..." value="{{ request('search') }}">
+            <input type="text" name="search" placeholder="Cari norek simpanan, norek pinjaman, nama nasabah, atau CIF..." value="{{ request('search') }}">
             <button type="submit" class="btn-search">🔍 Cari</button>
             @if(request('search'))
                 <a href="{{ route('manager-pull-pipeline.qlola-non-debitur') }}" class="btn-search" style="background: #6c757d;">Reset</a>
@@ -107,17 +107,15 @@
                     <tr>
                         <th>No</th>
                         @if(auth()->user()->isAdmin())
-                        <th>No Rekening</th>
+                        <th>Norek Simpanan</th>
+                        <th>Norek Pinjaman</th>
                         @endif
                         <th>CIF</th>
                         <th>Nama Nasabah</th>
-                        <th>Segmentasi</th>
+                        <th>Balance</th>
                         <th>Kode KC</th>
                         <th>Nama KC</th>
                         <th>Unit Kerja</th>
-                        <th>Cek QCash</th>
-                        <th>Cek CMS</th>
-                        <th>Cek IB</th>
                         <th>Keterangan</th>
                     </tr>
                 </thead>
@@ -126,17 +124,15 @@
                         <tr>
                             <td>{{ $data->firstItem() + $index }}</td>
                             @if(auth()->user()->isAdmin())
-                            <td>{{ $item->no_rekening }}</td>
+                            <td>{{ $item->norek_simpanan }}</td>
+                            <td>{{ $item->norek_pinjaman }}</td>
                             @endif
                             <td>{{ $item->cifno }}</td>
                             <td>{{ $item->nama_nasabah }}</td>
-                            <td>{{ $item->segmentasi }}</td>
+                            <td>{{ $item->balance }}</td>
                             <td>{{ $item->kode_kanca }}</td>
                             <td>{{ $item->kanca }}</td>
                             <td>{{ $item->uker }}</td>
-                            <td>{{ $item->cek_qcash }}</td>
-                            <td>{{ $item->cek_cms }}</td>
-                            <td>{{ $item->cek_ib }}</td>
                             <td>{{ $item->keterangan }}</td>
                         </tr>
                     @endforeach

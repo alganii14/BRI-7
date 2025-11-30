@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Qlola Non Debitur')
-@section('page-title', 'Data Qlola Non Debitur')
+@section('title', 'Non Debitur Memiliki Qlola Namun User Tdk Aktif')
+@section('page-title', 'Data Non Debitur Memiliki Qlola Namun User Tdk Aktif')
 
 @section('content')
 <style>
@@ -146,8 +146,8 @@
 
 <div class="header-actions">
     <div style="display: flex; gap: 10px;">
-        @if($qlolaNonDebiturs->total() > 0)
-        <form action="{{ route('qlola-non-debitur.delete-all') }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ PERHATIAN!\n\nAnda akan menghapus SEMUA data Qlola Non Debitur ({{ number_format($qlolaNonDebiturs->total(), 0, ',', '.') }} baris).\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda yakin ingin melanjutkan?')">
+        @if($qlolaUserTidakAktifs->total() > 0)
+        <form action="{{ route('qlola-user-tidak-aktif.delete-all') }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ PERHATIAN!\n\nAnda akan menghapus SEMUA data ({{ number_format($qlolaUserTidakAktifs->total(), 0, ',', '.') }} baris).\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda yakin ingin melanjutkan?')">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger-gradient">
@@ -155,15 +155,15 @@
             </button>
         </form>
         @endif
-        <a href="{{ route('qlola-non-debitur.create') }}" class="btn btn-primary">
+        <a href="{{ route('qlola-user-tidak-aktif.create') }}" class="btn btn-primary">
             ➕ Tambah Data
         </a>
-        <a href="{{ route('qlola-non-debitur.import.form') }}" class="btn btn-success">
+        <a href="{{ route('qlola-user-tidak-aktif.import.form') }}" class="btn btn-success">
             📁 Import CSV
         </a>
     </div>
     
-    <form method="GET" action="{{ route('qlola-non-debitur.index') }}" class="search-form" style="display:flex;gap:10px;align-items:end;">
+    <form method="GET" action="{{ route('qlola-user-tidak-aktif.index') }}" class="search-form" style="display:flex;gap:10px;align-items:end;">
         <div style="flex:1;">
             <select name="year" style="width:100%;padding:10px 16px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:white;">
                 <option value="">Semua Tahun</option>
@@ -181,11 +181,11 @@
             </select>
         </div>
         <div style="flex:2;">
-            <input type="text" name="search" placeholder="Cari nasabah, norek simpanan, norek pinjaman, CIFNO, uker, atau kanca..." value="{{ request('search') }}" style="width:100%;">
+            <input type="text" name="search" placeholder="Cari nasabah, norek, CIFNO, uker, atau kanca..." value="{{ request('search') }}" style="width:100%;">
         </div>
         <button type="submit" class="btn btn-primary">🔍 Cari</button>
         @if(request('search') || request('month') || request('year'))
-            <a href="{{ route('qlola-non-debitur.index') }}" class="btn btn-warning">✖ Reset</a>
+            <a href="{{ route('qlola-user-tidak-aktif.index') }}" class="btn btn-warning">✖ Reset</a>
         @endif
     </form>
 </div>
@@ -221,9 +221,9 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($qlolaNonDebiturs as $index => $item)
+            @forelse($qlolaUserTidakAktifs as $index => $item)
             <tr>
-                <td>{{ $qlolaNonDebiturs->firstItem() + $index }}</td>
+                <td>{{ $qlolaUserTidakAktifs->firstItem() + $index }}</td>
                 <td>{{ $item->kode_kanca }}</td>
                 <td>{{ $item->kanca }}</td>
                 <td>{{ $item->kode_uker }}</td>
@@ -236,9 +236,9 @@
                 <td>{{ $item->keterangan }}</td>
                 <td>
                     <div class="actions">
-                        <a href="{{ route('qlola-non-debitur.show', $item->id) }}" class="btn btn-sm btn-info">👁️ View</a>
-                        <a href="{{ route('qlola-non-debitur.edit', $item->id) }}" class="btn btn-sm btn-warning">✏️ Edit</a>
-                        <form action="{{ route('qlola-non-debitur.destroy', $item->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                        <a href="{{ route('qlola-user-tidak-aktif.show', $item->id) }}" class="btn btn-sm btn-info">👁️ View</a>
+                        <a href="{{ route('qlola-user-tidak-aktif.edit', $item->id) }}" class="btn btn-sm btn-warning">✏️ Edit</a>
+                        <form action="{{ route('qlola-user-tidak-aktif.destroy', $item->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete</button>
@@ -249,8 +249,8 @@
             @empty
             <tr>
                 <td colspan="12" style="text-align: center; padding: 40px;">
-                    <p style="color: #999; font-size: 16px;">Tidak ada data Qlola Non Debitur.</p>
-                    <a href="{{ route('qlola-non-debitur.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
+                    <p style="color: #999; font-size: 16px;">Tidak ada data.</p>
+                    <a href="{{ route('qlola-user-tidak-aktif.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
                 </td>
             </tr>
             @endforelse
@@ -259,25 +259,24 @@
 </div>
 
 <div class="pagination-wrapper">
-    <p class="pagination-info">Showing {{ $qlolaNonDebiturs->firstItem() }} to {{ $qlolaNonDebiturs->lastItem() }} of {{ $qlolaNonDebiturs->total() }} results</p>
+    <p class="pagination-info">Showing {{ $qlolaUserTidakAktifs->firstItem() }} to {{ $qlolaUserTidakAktifs->lastItem() }} of {{ $qlolaUserTidakAktifs->total() }} results</p>
     
     <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
-        @if ($qlolaNonDebiturs->onFirstPage())
+        @if ($qlolaUserTidakAktifs->onFirstPage())
             <span style="padding: 10px 20px; background: #f0f0f0; color: #999; border: 1px solid #ddd; border-radius: 4px; cursor: not-allowed;">← Previous</span>
         @else
-            <a href="{{ $qlolaNonDebiturs->previousPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">← Previous</a>
+            <a href="{{ $qlolaUserTidakAktifs->previousPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">← Previous</a>
         @endif
 
-        {{-- Show pages 1 to 5 only --}}
         @php
-            $currentPage = $qlolaNonDebiturs->currentPage();
-            $lastPage = $qlolaNonDebiturs->lastPage();
+            $currentPage = $qlolaUserTidakAktifs->currentPage();
+            $lastPage = $qlolaUserTidakAktifs->lastPage();
             $startPage = 1;
             $endPage = min(5, $lastPage);
         @endphp
 
         @foreach (range($startPage, $endPage) as $page)
-            @php $url = $qlolaNonDebiturs->url($page); @endphp
+            @php $url = $qlolaUserTidakAktifs->url($page); @endphp
             @if ($page == $currentPage)
                 <span style="padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 1px solid #667eea; border-radius: 4px;">{{ $page }}</span>
             @else
@@ -285,8 +284,8 @@
             @endif
         @endforeach
 
-        @if ($qlolaNonDebiturs->hasMorePages())
-            <a href="{{ $qlolaNonDebiturs->nextPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">Next →</a>
+        @if ($qlolaUserTidakAktifs->hasMorePages())
+            <a href="{{ $qlolaUserTidakAktifs->nextPageUrl() }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">Next →</a>
         @else
             <span style="padding: 10px 20px; background: #f0f0f0; color: #999; border: 1px solid #ddd; border-radius: 4px; cursor: not-allowed;">Next →</span>
         @endif

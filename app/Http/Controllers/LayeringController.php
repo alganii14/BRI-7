@@ -37,7 +37,9 @@ class LayeringController extends Controller
                 $q->where('nama_nasabah', 'like', "%{$search}%")
                   ->orWhere('no_rekening', 'like', "%{$search}%")
                   ->orWhere('cifno', 'like', "%{$search}%")
-                  ->orWhere('unit_kerja', 'like', "%{$search}%");
+                  ->orWhere('unit_kerja', 'like', "%{$search}%")
+                  ->orWhere('cabang_induk', 'like', "%{$search}%")
+                  ->orWhere('kode_cabang_induk', 'like', "%{$search}%");
             });
         }
 

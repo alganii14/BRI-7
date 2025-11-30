@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('qlola_non_debiturs', function (Blueprint $table) {
+        Schema::create('qlola_user_tidak_aktifs', function (Blueprint $table) {
             $table->id();
             $table->string('kode_kanca')->nullable();
             $table->string('kanca')->nullable();
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('norek_pinjaman')->nullable();
             $table->string('balance')->nullable();
             $table->string('nama_nasabah')->nullable();
-            $table->text('keterangan')->nullable();
+            $table->string('keterangan')->nullable();
             $table->timestamps();
         });
     }
@@ -36,6 +36,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('qlola_non_debiturs');
+        Schema::dropIfExists('qlola_user_tidak_aktifs');
     }
 };

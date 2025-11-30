@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Import CSV Qlola Non Debitur')
-@section('page-title', 'Import Data Qlola Non Debitur dari CSV')
+@section('title', 'Import CSV')
+@section('page-title', 'Import Data Non Debitur Memiliki Qlola Namun User Tdk Aktif dari CSV')
 
 @section('content')
 <style>
@@ -194,7 +194,7 @@
         </ul>
     </div>
 
-    <form action="{{ route('qlola-non-debitur.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
+    <form action="{{ route('qlola-user-tidak-aktif.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
         @csrf
         
         <div class="upload-area">
@@ -220,27 +220,27 @@
             <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
                 ⬆️ Upload & Import
             </button>
-            <a href="{{ route('qlola-non-debitur.index') }}" class="btn btn-secondary">
+            <a href="{{ route('qlola-user-tidak-aktif.index') }}" class="btn btn-secondary">
                 ↩️ Kembali
             </a>
         </div>
     </form>
 
     @php
-        $totalQlolaNonDebitur = \App\Models\QlolaNonDebitur::count();
+        $totalData = \App\Models\QlolaUserTidakAktif::count();
     @endphp
 
-    @if($totalQlolaNonDebitur > 0)
+    @if($totalData > 0)
     <div style="margin-top: 30px; padding-top: 30px; border-top: 2px solid #f0f0f0;">
         <h3 style="color: #dc3545; margin-bottom: 16px;">⚠️ Zona Berbahaya</h3>
         <p style="color: #666; font-size: 14px; margin-bottom: 16px;">
-            Menghapus semua data Qlola Non Debitur akan menghapus <strong>{{ number_format($totalQlolaNonDebitur, 0, ',', '.') }} data</strong> secara permanen dan tidak dapat dikembalikan.
+            Menghapus semua data akan menghapus <strong>{{ number_format($totalData, 0, ',', '.') }} data</strong> secara permanen dan tidak dapat dikembalikan.
         </p>
-        <form action="{{ route('qlola-non-debitur.delete-all') }}" method="POST" onsubmit="return confirm('⚠️ PERINGATAN KERAS!\n\nAnda akan menghapus SEMUA {{ number_format($totalQlolaNonDebitur, 0, ",", ".") }} data Qlola Non Debitur!\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda BENAR-BENAR yakin?')">
+        <form action="{{ route('qlola-user-tidak-aktif.delete-all') }}" method="POST" onsubmit="return confirm('⚠️ PERINGATAN KERAS!\n\nAnda akan menghapus SEMUA {{ number_format($totalData, 0, ",", ".") }} data!\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda BENAR-BENAR yakin?')">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger">
-                🗑️ Hapus Semua Data Qlola Non Debitur
+                🗑️ Hapus Semua Data
             </button>
         </form>
     </div>

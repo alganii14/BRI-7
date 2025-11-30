@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Penurunan Merchant')
-@section('page-title', 'Penurunan Casa Merchant (Qris & EDC)')
+@section('title', 'Non Debitur Memiliki Qlola Namun User Tdk Aktif')
+@section('page-title', 'Non Debitur Memiliki Qlola Namun User Tdk Aktif')
 
 @section('content')
 <style>
@@ -91,11 +91,11 @@
     <span class="read-only-badge">📊 View Only - Read-Only Access</span>
     
     <div class="search-box">
-        <form action="{{ route('manager-pull-pipeline.penurunan-merchant') }}" method="GET">
-            <input type="text" name="search" placeholder="Cari no rekening, nama nasabah, atau CIF..." value="{{ request('search') }}">
+        <form action="{{ route('manager-pull-pipeline.qlola-user-tidak-aktif') }}" method="GET">
+            <input type="text" name="search" placeholder="Cari norek simpanan, norek pinjaman, nama nasabah, atau CIF..." value="{{ request('search') }}">
             <button type="submit" class="btn-search">🔍 Cari</button>
             @if(request('search'))
-                <a href="{{ route('manager-pull-pipeline.penurunan-merchant') }}" class="btn-search" style="background: #6c757d;">Reset</a>
+                <a href="{{ route('manager-pull-pipeline.qlola-user-tidak-aktif') }}" class="btn-search" style="background: #6c757d;">Reset</a>
             @endif
         </form>
     </div>
@@ -107,18 +107,16 @@
                     <tr>
                         <th>No</th>
                         @if(auth()->user()->isAdmin())
-                        <th>No Rekening</th>
+                        <th>Norek Simpanan</th>
+                        <th>Norek Pinjaman</th>
                         @endif
                         <th>CIF</th>
                         <th>Nama Nasabah</th>
-                        <th>Segmentasi</th>
-                        <th>Jenis Simpanan</th>
+                        <th>Balance</th>
                         <th>Kode KC</th>
-                        <th>Cabang Induk</th>
+                        <th>Nama KC</th>
                         <th>Unit Kerja</th>
-                        <th>Saldo Last EOM</th>
-                        <th>Saldo Terupdate</th>
-                        <th>Delta</th>
+                        <th>Keterangan</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -126,18 +124,16 @@
                         <tr>
                             <td>{{ $data->firstItem() + $index }}</td>
                             @if(auth()->user()->isAdmin())
-                            <td>{{ $item->no_rekening }}</td>
+                            <td>{{ $item->norek_simpanan }}</td>
+                            <td>{{ $item->norek_pinjaman }}</td>
                             @endif
                             <td>{{ $item->cifno }}</td>
                             <td>{{ $item->nama_nasabah }}</td>
-                            <td>{{ $item->segmentasi }}</td>
-                            <td>{{ $item->jenis_simpanan }}</td>
-                            <td>{{ $item->kode_cabang_induk }}</td>
-                            <td>{{ $item->cabang_induk }}</td>
-                            <td>{{ $item->unit_kerja }}</td>
-                            <td>{{ $item->saldo_last_eom }}</td>
-                            <td>{{ $item->saldo_terupdate }}</td>
-                            <td>{{ $item->delta }}</td>
+                            <td>{{ $item->balance }}</td>
+                            <td>{{ $item->kode_kanca }}</td>
+                            <td>{{ $item->kanca }}</td>
+                            <td>{{ $item->uker }}</td>
+                            <td>{{ $item->keterangan }}</td>
                         </tr>
                     @endforeach
                 </tbody>

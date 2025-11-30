@@ -2,35 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\QlolaNonDebitur;
+use App\Models\QlolaUserTidakAktif;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class QlolaNonDebiturController extends Controller
+class QlolaUserTidakAktifController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
-        $query = QlolaNonDebitur::query();
+        $query = QlolaUserTidakAktif::query();
         
         $month = $request->get('month');
         $year = $request->get('year');
         
-        // Filter by year
         if ($year) {
             $query->whereYear('created_at', $year);
         }
         
-        // Filter by month
         if ($month) {
             $query->whereMonth('created_at', $month);
         }
 
-        // Search functionality
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -43,33 +35,21 @@ class QlolaNonDebiturController extends Controller
             });
         }
 
-        $qlolaNonDebiturs = $query->latest()->paginate(20);
+        $qlolaUserTidakAktifs = $query->latest()->paginate(20);
         
-        // Get available years
-        $availableYears = QlolaNonDebitur::selectRaw('DISTINCT YEAR(created_at) as year')
+        $availableYears = QlolaUserTidakAktif::selectRaw('DISTINCT YEAR(created_at) as year')
             ->whereNotNull('created_at')
             ->orderBy('year', 'desc')
             ->pluck('year');
         
-        return view('qlola-non-debitur.index', compact('qlolaNonDebiturs', 'month', 'year', 'availableYears'));
+        return view('qlola-user-tidak-aktif.index', compact('qlolaUserTidakAktifs', 'month', 'year', 'availableYears'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        return view('qlola-non-debitur.create');
+        return view('qlola-user-tidak-aktif.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -85,42 +65,23 @@ class QlolaNonDebiturController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        QlolaNonDebitur::create($validated);
+        QlolaUserTidakAktif::create($validated);
 
-        return redirect()->route('qlola-non-debitur.index')
-            ->with('success', 'Data Qlola Non Debitur berhasil ditambahkan.');
+        return redirect()->route('qlola-user-tidak-aktif.index')
+            ->with('success', 'Data Qlola User Tidak Aktif berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(QlolaNonDebitur $qlolaNonDebitur)
+    public function show(QlolaUserTidakAktif $qlolaUserTidakAktif)
     {
-        return view('qlola-non-debitur.show', compact('qlolaNonDebitur'));
+        return view('qlola-user-tidak-aktif.show', compact('qlolaUserTidakAktif'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(QlolaNonDebitur $qlolaNonDebitur)
+    public function edit(QlolaUserTidakAktif $qlolaUserTidakAktif)
     {
-        return view('qlola-non-debitur.edit', compact('qlolaNonDebitur'));
+        return view('qlola-user-tidak-aktif.edit', compact('qlolaUserTidakAktif'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, QlolaNonDebitur $qlolaNonDebitur)
+    public function update(Request $request, QlolaUserTidakAktif $qlolaUserTidakAktif)
     {
         $validated = $request->validate([
             'kode_kanca' => 'nullable|string',
@@ -135,37 +96,25 @@ class QlolaNonDebiturController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
-        $qlolaNonDebitur->update($validated);
+        $qlolaUserTidakAktif->update($validated);
 
-        return redirect()->route('qlola-non-debitur.index')
-            ->with('success', 'Data Qlola Non Debitur berhasil diupdate.');
+        return redirect()->route('qlola-user-tidak-aktif.index')
+            ->with('success', 'Data Qlola User Tidak Aktif berhasil diupdate.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(QlolaNonDebitur $qlolaNonDebitur)
+    public function destroy(QlolaUserTidakAktif $qlolaUserTidakAktif)
     {
-        $qlolaNonDebitur->delete();
+        $qlolaUserTidakAktif->delete();
 
-        return redirect()->route('qlola-non-debitur.index')
-            ->with('success', 'Data Qlola Non Debitur berhasil dihapus.');
+        return redirect()->route('qlola-user-tidak-aktif.index')
+            ->with('success', 'Data Qlola User Tidak Aktif berhasil dihapus.');
     }
 
-    /**
-     * Show import form
-     */
     public function importForm()
     {
-        return view('qlola-non-debitur.import');
+        return view('qlola-user-tidak-aktif.import');
     }
 
-    /**
-     * Import CSV file
-     */
     public function import(Request $request)
     {
         $request->validate([
@@ -180,11 +129,10 @@ class QlolaNonDebiturController extends Controller
 
             $handle = fopen($path, 'r');
             
-            // Read and skip header row
-            $header = fgetcsv($handle, 0, ';');
+            fgetcsv($handle, 0, ';');
             
             $batch = [];
-            $batchSize = 1000; // Process 1000 rows at a time
+            $batchSize = 1000;
             $totalInserted = 0;
 
             while (($row = fgetcsv($handle, 0, ';')) !== false) {
@@ -205,23 +153,22 @@ class QlolaNonDebiturController extends Controller
                     ];
 
                     if (count($batch) >= $batchSize) {
-                        DB::table('qlola_non_debiturs')->insert($batch);
+                        DB::table('qlola_user_tidak_aktifs')->insert($batch);
                         $totalInserted += count($batch);
                         $batch = [];
                     }
                 }
             }
 
-            // Insert remaining batch
             if (!empty($batch)) {
-                DB::table('qlola_non_debiturs')->insert($batch);
+                DB::table('qlola_user_tidak_aktifs')->insert($batch);
                 $totalInserted += count($batch);
             }
 
             fclose($handle);
             DB::commit();
 
-            return redirect()->route('qlola-non-debitur.index')
+            return redirect()->route('qlola-user-tidak-aktif.index')
                             ->with('success', '✓ Import berhasil! Total data: ' . number_format($totalInserted, 0, ',', '.') . ' baris');
 
         } catch (\Exception $e) {
@@ -231,35 +178,25 @@ class QlolaNonDebiturController extends Controller
         }
     }
 
-    /**
-     * Delete all qlola non debitur records
-     */
     public function deleteAll()
     {
         try {
-            $count = QlolaNonDebitur::count();
+            $count = QlolaUserTidakAktif::count();
             
             if ($count > 0) {
-                // Disable foreign key checks temporarily
                 DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-                
-                // Truncate the table
-                DB::table('qlola_non_debiturs')->truncate();
-                
-                // Re-enable foreign key checks
+                DB::table('qlola_user_tidak_aktifs')->truncate();
                 DB::statement('SET FOREIGN_KEY_CHECKS=1;');
                 
-                return redirect()->route('qlola-non-debitur.index')
-                                ->with('success', '✓ Berhasil menghapus semua data Qlola Non Debitur! Total data terhapus: ' . number_format($count, 0, ',', '.') . ' baris');
+                return redirect()->route('qlola-user-tidak-aktif.index')
+                                ->with('success', '✓ Berhasil menghapus semua data! Total data terhapus: ' . number_format($count, 0, ',', '.') . ' baris');
             }
             
-            return redirect()->route('qlola-non-debitur.index')
-                            ->with('success', '✓ Tidak ada data Qlola Non Debitur untuk dihapus.');
+            return redirect()->route('qlola-user-tidak-aktif.index')
+                            ->with('success', '✓ Tidak ada data untuk dihapus.');
                             
         } catch (\Exception $e) {
-            // Re-enable foreign key checks in case of error
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-            
             return redirect()->back()->with('error', '✗ Gagal menghapus data: ' . $e->getMessage());
         }
     }

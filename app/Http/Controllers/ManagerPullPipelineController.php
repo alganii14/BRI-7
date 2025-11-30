@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\MerchantSavol;
-use App\Models\PenurunanMerchant;
+use App\Models\MerchantSavolQris;
+use App\Models\MerchantSavolEdc;
 use App\Models\PenurunanCasaBrilink;
 use App\Models\QlolaNonDebitur;
+use App\Models\QlolaUserTidakAktif;
 use App\Models\NonDebiturVolBesar;
 use App\Models\QlolaNonaktif;
 use App\Models\UserAktifCasaKecil;
@@ -87,9 +88,9 @@ class ManagerPullPipelineController extends Controller
     }
 
     /**
-     * Merchant Savol - Strategi 1
+     * Merchant Savol QRIS - Strategi 1
      */
-    public function merchantSavol(Request $request)
+    public function merchantSavolQris(Request $request)
     {
         $user = Auth::user();
         
@@ -98,7 +99,7 @@ class ManagerPullPipelineController extends Controller
         }
         
         $kodeKanca = $this->getUserKodeKanca($user);
-        $query = MerchantSavol::where('kode_kanca', $kodeKanca);
+        $query = MerchantSavolQris::where('kode_kanca', $kodeKanca);
         
         // Apply date filters
         $this->applyDateFilters($query, $request);
@@ -107,21 +108,22 @@ class ManagerPullPipelineController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('norekening', 'like', "%{$search}%")
+                $q->where('no_rek', 'like', "%{$search}%")
                   ->orWhere('nama_merchant', 'like', "%{$search}%")
-                  ->orWhere('tid_store_id', 'like', "%{$search}%");
+                  ->orWhere('storeid', 'like', "%{$search}%")
+                  ->orWhere('cif', 'like', "%{$search}%");
             });
         }
         
         $data = $query->orderBy('nama_merchant')->paginate(20);
         
-        return view('manager-pull-pipeline.merchant-savol', compact('data'));
+        return view('manager-pull-pipeline.merchant-savol-qris', compact('data'));
     }
 
     /**
-     * Penurunan Merchant - Strategi 1
+     * Merchant Savol EDC - Strategi 1
      */
-    public function penurunanMerchant(Request $request)
+    public function merchantSavolEdc(Request $request)
     {
         $user = Auth::user();
         
@@ -130,24 +132,35 @@ class ManagerPullPipelineController extends Controller
         }
         
         $kodeKanca = $this->getUserKodeKanca($user);
-        $query = PenurunanMerchant::where('kode_cabang_induk', $kodeKanca);
+        $query = MerchantSavolEdc::where('kode_kanca', $kodeKanca);
         
         // Apply date filters
         $this->applyDateFilters($query, $request);
         
+        // Filter by search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('no_rekening', 'like', "%{$search}%")
-                  ->orWhere('nama_nasabah', 'like', "%{$search}%")
+                $q->where('norek', 'like', "%{$search}%")
+                  ->orWhere('nama_merchant', 'like', "%{$search}%")
                   ->orWhere('cifno', 'like', "%{$search}%");
             });
         }
         
-        $data = $query->orderBy('nama_nasabah')->paginate(20);
+        $data = $query->orderBy('nama_merchant')->paginate(20);
         
-        return view('manager-pull-pipeline.penurunan-merchant', compact('data'));
+        return view('manager-pull-pipeline.merchant-savol-edc', compact('data'));
     }
+    
+    /**
+     * Merchant Savol - Redirect to QRIS (for backward compatibility)
+     */
+    public function merchantSavol(Request $request)
+    {
+        return redirect()->route('manager-pull-pipeline.merchant-savol-qris');
+    }
+
+
 
     /**
      * Penurunan Casa Brilink - Strategi 1
@@ -200,15 +213,48 @@ class ManagerPullPipelineController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('norek', 'like', "%{$search}%")
+                $q->where('norek_simpanan', 'like', "%{$search}%")
+                  ->orWhere('norek_pinjaman', 'like', "%{$search}%")
                   ->orWhere('nama_nasabah', 'like', "%{$search}%")
-                  ->orWhere('cif', 'like', "%{$search}%");
+                  ->orWhere('cifno', 'like', "%{$search}%");
             });
         }
         
         $data = $query->orderBy('id')->paginate(20);
         
         return view('manager-pull-pipeline.qlola-non-debitur', compact('data'));
+    }
+
+    /**
+     * Qlola User Tidak Aktif - Strategi 1
+     */
+    public function qlolaUserTidakAktif(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$this->canAccessPullPipeline($user)) {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        $kodeKanca = $this->getUserKodeKanca($user);
+        $query = QlolaUserTidakAktif::where('kode_kanca', $kodeKanca);
+        
+        // Apply date filters
+        $this->applyDateFilters($query, $request);
+        
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('norek_simpanan', 'like', "%{$search}%")
+                  ->orWhere('norek_pinjaman', 'like', "%{$search}%")
+                  ->orWhere('nama_nasabah', 'like', "%{$search}%")
+                  ->orWhere('cifno', 'like', "%{$search}%");
+            });
+        }
+        
+        $data = $query->orderBy('id')->paginate(20);
+        
+        return view('manager-pull-pipeline.qlola-user-tidak-aktif', compact('data'));
     }
 
     /**
