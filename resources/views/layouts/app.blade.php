@@ -900,8 +900,8 @@
                 </a>
                 @endif
                 
-                @if(auth()->user()->isManager() || auth()->user()->isRMFT())
-                <!-- Pull Of Pipeline Menu for Manager & RMFT (Read-only) -->
+                @if(auth()->user()->isManager())
+                <!-- Pull Of Pipeline Menu for Manager (Read-only) -->
                 <div class="menu-group">
                     <div class="menu-item-dropdown" onclick="toggleDropdown(this)">
                         <span style="display: flex; align-items: center;">
@@ -927,11 +927,17 @@
                             </svg>
                         </div>
                         <div class="sub-submenu">
-                            <a href="{{ route('manager-pull-pipeline.merchant-savol') }}" class="sub-submenu-item {{ request()->routeIs('manager-pull-pipeline.merchant-savol') ? 'active' : '' }}">
+                            <a href="{{ route('manager-pull-pipeline.merchant-savol-qris') }}" class="sub-submenu-item {{ request()->routeIs('manager-pull-pipeline.merchant-savol-qris') ? 'active' : '' }}">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
                                 </svg>
-                                Merchant Savol
+                                Merchant QRIS Savol
+                            </a>
+                            <a href="{{ route('manager-pull-pipeline.merchant-savol-edc') }}" class="sub-submenu-item {{ request()->routeIs('manager-pull-pipeline.merchant-savol-edc') ? 'active' : '' }}">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                </svg>
+                                Merchant EDC Savol
                             </a>
                             <a href="{{ route('manager-pull-pipeline.penurunan-merchant') }}" class="sub-submenu-item {{ request()->routeIs('manager-pull-pipeline.penurunan-merchant') ? 'active' : '' }}">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
@@ -956,6 +962,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
                                 Qlola Non Debitur
+                            </a>
+                            <a href="{{ route('manager-pull-pipeline.qlola-user-tidak-aktif') }}" class="sub-submenu-item {{ request()->routeIs('manager-pull-pipeline.qlola-user-tidak-aktif') ? 'active' : '' }}">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                                Non Debitur Memiliki Qlola Namun User Tdk Aktif
                             </a>
                             <a href="{{ route('manager-pull-pipeline.non-debitur-vol-besar') }}" class="sub-submenu-item {{ request()->routeIs('manager-pull-pipeline.non-debitur-vol-besar') ? 'active' : '' }}">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
@@ -1158,17 +1170,17 @@
                             </svg>
                         </div>
                         <div class="sub-submenu">
-                            <a href="{{ route('merchant-savol.index') }}" class="sub-submenu-item {{ request()->routeIs('merchant-savol.*') ? 'active' : '' }}">
+                            <a href="{{ route('merchant-savol-qris.index') }}" class="sub-submenu-item {{ request()->routeIs('merchant-savol-qris.*') ? 'active' : '' }}">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
                                 </svg>
-                                MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)
+                                MERCHANT QRIS SAVOL BESAR CASA KECIL
                             </a>
-                            <a href="{{ route('penurunan-merchant.index') }}" class="sub-submenu-item {{ request()->routeIs('penurunan-merchant.*') ? 'active' : '' }}">
+                            <a href="{{ route('merchant-savol-edc.index') }}" class="sub-submenu-item {{ request()->routeIs('merchant-savol-edc.*') ? 'active' : '' }}">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                                 </svg>
-                                PENURUNAN CASA MERCHANT (QRIS & EDC)
+                                MERCHANT EDC SAVOL BESAR CASA KECIL
                             </a>
                             <a href="{{ route('penurunan-casa-brilink.index') }}" class="sub-submenu-item {{ request()->routeIs('penurunan-casa-brilink.*') ? 'active' : '' }}">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
@@ -1187,6 +1199,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
                                 Qlola Non Debitur
+                            </a>
+                            <a href="{{ route('qlola-user-tidak-aktif.index') }}" class="sub-submenu-item {{ request()->routeIs('qlola-user-tidak-aktif.*') ? 'active' : '' }}">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                                Non Debitur Memiliki Qlola Namun User Tdk Aktif
                             </a>
                             <a href="{{ route('non-debitur-vol-besar.index') }}" class="sub-submenu-item {{ request()->routeIs('non-debitur-vol-besar.*') ? 'active' : '' }}">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-right: 8px;">

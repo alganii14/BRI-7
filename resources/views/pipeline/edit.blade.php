@@ -227,18 +227,21 @@ function handleStrategyChange() {
     
     const kategoriMap = {
         'Strategi 1': [
-            'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)',
-            'Qlola (Belum ada Qlola / ada namun nonaktif)',
-            'Qlola Non Debitur'
-        ],
-        'Strategi 2': [
+            'MERCHANT QRIS SAVOL BESAR CASA KECIL',
+            'MERCHANT EDC SAVOL BESAR CASA KECIL',
+            'PENURUNAN CASA BRILINK',
+            'BRILINK SALDO < 10 JUTA',
+            'Qlola Non Debitur',
             'Non Debitur Vol Besar CASA Kecil'
         ],
+        'Strategi 2': [
+            'Qlola (Belum ada Qlola / ada namun nonaktif)',
+            'User Aktif Casa Kecil'
+        ],
         'Strategi 3': [
-            'AUM>2M DPK<50 juta'
+            'Optimalisasi Business Cluster'
         ],
         'Strategi 4': [
-            'User Aktif Casa Kecil',
             'Existing Payroll',
             'Potensi Payroll'
         ],
@@ -246,11 +249,14 @@ function handleStrategyChange() {
             'List Perusahaan Anak'
         ],
         'Strategi 7': [
-            'PENURUNAN CASA PRIORITAS RITEL MIKRO'
+            'Penurunan Prioritas Ritel & Mikro',
+            'AUM>2M DPK<50 juta',
+            'Nasabah Downgrade'
         ],
         'Strategi 8': [
-            'PENURUNAN CASA BRILINK',
-            'PENURUNAN CASA MERCHANT (QRIS & EDC)',
+            'Wingback Penguatan Produk & Fungsi RM'
+        ],
+        'Layering': [
             'Winback'
         ]
     };

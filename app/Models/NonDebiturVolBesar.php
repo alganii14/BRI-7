@@ -15,11 +15,11 @@ class NonDebiturVolBesar extends Model
         'kode_uker',
         'uker',
         'cifno',
-        'no_rekening',
+        'norek_pinjaman',
+        'norek_simpanan',
+        'balance',
+        'volume',
         'nama_nasabah',
-        'segmentasi',
-        'vol_qcash',
-        'vol_qib',
-        'saldo',
+        'keterangan',
     ];
 }

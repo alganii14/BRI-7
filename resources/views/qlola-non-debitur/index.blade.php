@@ -181,7 +181,7 @@
             </select>
         </div>
         <div style="flex:2;">
-            <input type="text" name="search" placeholder="Cari nasabah, rekening, CIFNO, uker, atau kanca..." value="{{ request('search') }}" style="width:100%;">
+            <input type="text" name="search" placeholder="Cari nasabah, norek simpanan, norek pinjaman, CIFNO, uker, atau kanca..." value="{{ request('search') }}" style="width:100%;">
         </div>
         <button type="submit" class="btn btn-primary">🔍 Cari</button>
         @if(request('search') || request('month') || request('year'))
@@ -212,12 +212,10 @@
                 <th>Kode Uker</th>
                 <th>Uker</th>
                 <th>CIFNO</th>
-                <th>No. Rekening</th>
+                <th>Norek Simpanan</th>
+                <th>Norek Pinjaman</th>
+                <th>Balance</th>
                 <th>Nama Nasabah</th>
-                <th>Segmentasi</th>
-                <th>Cek QCash</th>
-                <th>Cek CMS</th>
-                <th>Cek IB</th>
                 <th>Keterangan</th>
                 <th>Actions</th>
             </tr>
@@ -231,12 +229,10 @@
                 <td>{{ $item->kode_uker }}</td>
                 <td>{{ $item->uker }}</td>
                 <td>{{ $item->cifno }}</td>
-                <td>{{ $item->no_rekening }}</td>
+                <td>{{ $item->norek_simpanan }}</td>
+                <td>{{ $item->norek_pinjaman }}</td>
+                <td>{{ $item->balance }}</td>
                 <td>{{ $item->nama_nasabah }}</td>
-                <td>{{ $item->segmentasi }}</td>
-                <td>{{ $item->cek_qcash }}</td>
-                <td>{{ $item->cek_cms }}</td>
-                <td>{{ $item->cek_ib }}</td>
                 <td>{{ $item->keterangan }}</td>
                 <td>
                     <div class="actions">
@@ -252,7 +248,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="14" style="text-align: center; padding: 40px;">
+                <td colspan="12" style="text-align: center; padding: 40px;">
                     <p style="color: #999; font-size: 16px;">Tidak ada data Qlola Non Debitur.</p>
                     <a href="{{ route('qlola-non-debitur.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
                 </td>

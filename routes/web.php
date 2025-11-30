@@ -10,10 +10,11 @@ use App\Http\Controllers\AkunController;
 use App\Http\Controllers\NasabahController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PenurunanCasaBrilinkController;
-use App\Http\Controllers\PenurunanMerchantController;
 use App\Http\Controllers\PenurunanPrioritasRitelMikroController;
-use App\Http\Controllers\MerchantSavolController;
+use App\Http\Controllers\MerchantSavolQrisController;
+use App\Http\Controllers\MerchantSavolEdcController;
 use App\Http\Controllers\QlolaNonDebiturController;
+use App\Http\Controllers\QlolaUserTidakAktifController;
 use App\Http\Controllers\NonDebiturVolBesarController;
 use App\Http\Controllers\QlolaNonaktifController;
 use App\Http\Controllers\DebiturBelumMemilikiQlolaController;
@@ -121,9 +122,11 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
     Route::middleware(['role:manager,rmft'])->group(function () {
         // Strategi 1
         Route::get('manager-pull-pipeline/merchant-savol', [ManagerPullPipelineController::class, 'merchantSavol'])->name('manager-pull-pipeline.merchant-savol');
-        Route::get('manager-pull-pipeline/penurunan-merchant', [ManagerPullPipelineController::class, 'penurunanMerchant'])->name('manager-pull-pipeline.penurunan-merchant');
+        Route::get('manager-pull-pipeline/merchant-savol-qris', [ManagerPullPipelineController::class, 'merchantSavolQris'])->name('manager-pull-pipeline.merchant-savol-qris');
+        Route::get('manager-pull-pipeline/merchant-savol-edc', [ManagerPullPipelineController::class, 'merchantSavolEdc'])->name('manager-pull-pipeline.merchant-savol-edc');
         Route::get('manager-pull-pipeline/penurunan-casa-brilink', [ManagerPullPipelineController::class, 'penurunanCasaBrilink'])->name('manager-pull-pipeline.penurunan-casa-brilink');
         Route::get('manager-pull-pipeline/qlola-non-debitur', [ManagerPullPipelineController::class, 'qlolaNonDebitur'])->name('manager-pull-pipeline.qlola-non-debitur');
+        Route::get('manager-pull-pipeline/qlola-user-tidak-aktif', [ManagerPullPipelineController::class, 'qlolaUserTidakAktif'])->name('manager-pull-pipeline.qlola-user-tidak-aktif');
         Route::get('manager-pull-pipeline/non-debitur-vol-besar', [ManagerPullPipelineController::class, 'nonDebiturVolBesar'])->name('manager-pull-pipeline.non-debitur-vol-besar');
         
         // Strategi 2
@@ -234,6 +237,14 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
             Route::resource('qlola-non-debitur', QlolaNonDebiturController::class);
         });
 
+        // Qlola User Tidak Aktif Routes (Strategi 1: NON DEBITUR MEMILIKI QLOLA NAMUN USER TDK AKTIF) - Admin Only
+        Route::middleware(['role:admin'])->group(function () {
+            Route::get('qlola-user-tidak-aktif/import', [QlolaUserTidakAktifController::class, 'importForm'])->name('qlola-user-tidak-aktif.import.form');
+            Route::post('qlola-user-tidak-aktif/import', [QlolaUserTidakAktifController::class, 'import'])->name('qlola-user-tidak-aktif.import');
+            Route::delete('qlola-user-tidak-aktif-delete-all', [QlolaUserTidakAktifController::class, 'deleteAll'])->name('qlola-user-tidak-aktif.delete-all');
+            Route::resource('qlola-user-tidak-aktif', QlolaUserTidakAktifController::class);
+        });
+
         // Non Debitur Vol Besar Routes (Strategi 1: NON DEBITUR VOL BESAR CASA KECIL) - Admin Only
         Route::middleware(['role:admin'])->group(function () {
             Route::get('non-debitur-vol-besar/import', [NonDebiturVolBesarController::class, 'importForm'])->name('non-debitur-vol-besar.import.form');
@@ -266,12 +277,20 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
             Route::resource('user-aktif-casa-kecil', UserAktifCasaKecilController::class);
         });
 
-        // Merchant Savol Routes (Strategi 1: MERCHANT SAVOL BESAR CASA KECIL) - Admin Only
+        // Merchant Savol QRIS Routes (Strategi 1: MERCHANT QRIS SAVOL BESAR CASA KECIL) - Admin Only
         Route::middleware(['role:admin'])->group(function () {
-            Route::get('merchant-savol/import', [MerchantSavolController::class, 'importForm'])->name('merchant-savol.import.form');
-            Route::post('merchant-savol/import', [MerchantSavolController::class, 'import'])->name('merchant-savol.import');
-            Route::delete('merchant-savol-delete-all', [MerchantSavolController::class, 'deleteAll'])->name('merchant-savol.delete-all');
-            Route::resource('merchant-savol', MerchantSavolController::class);
+            Route::get('merchant-savol-qris/import', [MerchantSavolQrisController::class, 'importForm'])->name('merchant-savol-qris.import.form');
+            Route::post('merchant-savol-qris/import', [MerchantSavolQrisController::class, 'import'])->name('merchant-savol-qris.import');
+            Route::delete('merchant-savol-qris-delete-all', [MerchantSavolQrisController::class, 'deleteAll'])->name('merchant-savol-qris.delete-all');
+            Route::resource('merchant-savol-qris', MerchantSavolQrisController::class);
+        });
+
+        // Merchant Savol EDC Routes (Strategi 1: MERCHANT EDC SAVOL BESAR CASA KECIL) - Admin Only
+        Route::middleware(['role:admin'])->group(function () {
+            Route::get('merchant-savol-edc/import', [MerchantSavolEdcController::class, 'importForm'])->name('merchant-savol-edc.import.form');
+            Route::post('merchant-savol-edc/import', [MerchantSavolEdcController::class, 'import'])->name('merchant-savol-edc.import');
+            Route::delete('merchant-savol-edc-delete-all', [MerchantSavolEdcController::class, 'deleteAll'])->name('merchant-savol-edc.delete-all');
+            Route::resource('merchant-savol-edc', MerchantSavolEdcController::class);
         });
 
         // Non Debitur Vol Besar Routes (Strategi 1: NON DEBITUR VOL BESAR CASA KECIL) - Admin Only
@@ -282,13 +301,7 @@ Route::middleware(['auth', 'check.password.changed', 'update.last.activity'])->g
             Route::resource('non-debitur-vol-besar', NonDebiturVolBesarController::class);
         });
 
-        // Penurunan Merchant Routes (Strategi 1: PENURUNAN CASA MERCHANT QRIS & EDC) - Admin Only
-        Route::middleware(['role:admin'])->group(function () {
-            Route::get('penurunan-merchant/import', [PenurunanMerchantController::class, 'importForm'])->name('penurunan-merchant.import.form');
-            Route::post('penurunan-merchant/import', [PenurunanMerchantController::class, 'import'])->name('penurunan-merchant.import');
-            Route::delete('penurunan-merchant-delete-all', [PenurunanMerchantController::class, 'deleteAll'])->name('penurunan-merchant.delete-all');
-            Route::resource('penurunan-merchant', PenurunanMerchantController::class);
-        });
+
 
         // Optimalisasi Business Cluster Routes - Admin Only
         Route::middleware(['role:admin'])->group(function () {

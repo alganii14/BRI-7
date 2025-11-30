@@ -238,17 +238,20 @@ class PipelineController extends Controller
         }
         
         $kategoriBebas = [
-            'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)',
+            'MERCHANT QRIS SAVOL BESAR CASA KECIL',
+            'MERCHANT EDC SAVOL BESAR CASA KECIL',
             'Qlola (Belum ada Qlola / ada namun nonaktif)',
             'Qlola Non Debitur',
             'Non Debitur Vol Besar CASA Kecil',
             'AUM>2M DPK<50 juta',
             'User Aktif Casa Kecil',
             'PENURUNAN CASA BRILINK',
+            'BRILINK SALDO < 10 JUTA',
             'PENURUNAN CASA MERCHANT (QRIS & EDC)',
             'Existing Payroll',
             'Potensi Payroll',
-            'List Perusahaan Anak'
+            'List Perusahaan Anak',
+            'Nasabah Downgrade'
         ];
         
         $isPipelineData = in_array($request->kategori_strategi, $kategoriBebas) || 
@@ -758,6 +761,32 @@ class PipelineController extends Controller
         $kategori = $request->get('kategori');
         $pnRmft = $request->get('pn_rmft'); // PN RMFT yang sedang login/dipilih
         
+        // Cek apakah kategori ini harus langsung ambil dari tabel sumber
+        $searchDirectFromSource = in_array($kategori, [
+            'MERCHANT QRIS SAVOL BESAR CASA KECIL',
+            'MERCHANT EDC SAVOL BESAR CASA KECIL',
+            'PENURUNAN CASA MERCHANT (QRIS & EDC)',
+            'PENURUNAN CASA BRILINK',
+            'BRILINK SALDO < 10 JUTA',
+            'Qlola Non Debitur',
+            'Non Debitur Vol Besar CASA Kecil',
+            'Qlola (Belum ada Qlola / ada namun nonaktif)',
+            'User Aktif Casa Kecil',
+            'Optimalisasi Business Cluster',
+            'Existing Payroll',
+            'Potensi Payroll',
+            'List Perusahaan Anak',
+            'Penurunan Prioritas Ritel & Mikro',
+            'AUM>2M DPK<50 juta',
+            'Nasabah Downgrade',
+            'Wingback Penguatan Produk & Fungsi RM',
+            'Winback'
+        ]);
+        
+        if ($searchDirectFromSource) {
+            return $this->searchDirectFromSourceTable($request, $kodeKc, $kodeUker, $kategori, $search);
+        }
+        
         // Get list nasabah dari pipelines
         $query = Pipeline::query();
         
@@ -836,6 +865,144 @@ class PipelineController extends Controller
     }
     
     /**
+     * Search directly from source table (for pull of pipeline data)
+     */
+    private function searchDirectFromSourceTable($request, $kodeKc, $kodeUker, $kategori, $search)
+    {
+        $model = null;
+        $nameField = 'nama_nasabah';
+        $norekField = 'norek';
+        $cifField = 'cifno';
+        
+        // Map kategori to model
+        switch ($kategori) {
+            case 'MERCHANT QRIS SAVOL BESAR CASA KECIL':
+                $model = \App\Models\MerchantSavolQris::class;
+                $nameField = 'nama_merchant';
+                $norekField = 'no_rek';
+                $cifField = 'cif';
+                break;
+            case 'MERCHANT EDC SAVOL BESAR CASA KECIL':
+                $model = \App\Models\MerchantSavolEdc::class;
+                $nameField = 'nama_merchant';
+                $norekField = 'norek';
+                $cifField = 'cifno';
+                break;
+            case 'PENURUNAN CASA MERCHANT (QRIS & EDC)':
+                $model = \App\Models\PenurunanMerchant::class;
+                break;
+            case 'PENURUNAN CASA BRILINK':
+                $model = \App\Models\PenurunanCasaBrilink::class;
+                $nameField = 'nama_agen';
+                break;
+            case 'BRILINK SALDO < 10 JUTA':
+                $model = \App\Models\Brilink::class;
+                $nameField = 'nama_agen';
+                break;
+            case 'Qlola Non Debitur':
+                $model = \App\Models\QlolaNonDebitur::class;
+                break;
+            case 'Non Debitur Vol Besar CASA Kecil':
+                $model = \App\Models\NonDebiturVolBesar::class;
+                break;
+            case 'Qlola (Belum ada Qlola / ada namun nonaktif)':
+                $model = \App\Models\QlolaNonaktif::class;
+                $nameField = 'nama_debitur';
+                break;
+            case 'User Aktif Casa Kecil':
+                $model = \App\Models\UserAktifCasaKecil::class;
+                break;
+            case 'Optimalisasi Business Cluster':
+                $model = \App\Models\OptimalisasiBusinessCluster::class;
+                $nameField = 'nama_usaha_pusat_bisnis';
+                break;
+            case 'Existing Payroll':
+                $model = \App\Models\ExistingPayroll::class;
+                $nameField = 'nama_perusahaan';
+                break;
+            case 'Potensi Payroll':
+                $model = \App\Models\PotensiPayroll::class;
+                $nameField = 'perusahaan';
+                break;
+            case 'List Perusahaan Anak':
+                $model = \App\Models\PerusahaanAnak::class;
+                $nameField = 'nama_partner_vendor';
+                break;
+            case 'Penurunan Prioritas Ritel & Mikro':
+                $model = \App\Models\PenurunanPrioritasRitelMikro::class;
+                break;
+            case 'AUM>2M DPK<50 juta':
+                $model = \App\Models\AumDpk::class;
+                break;
+            case 'Nasabah Downgrade':
+                $model = \App\Models\NasabahDowngrade::class;
+                break;
+            case 'Wingback Penguatan Produk & Fungsi RM':
+                $model = \App\Models\Strategi8::class;
+                break;
+            case 'Winback':
+                $model = \App\Models\Layering::class;
+                break;
+            default:
+                return response()->json([
+                    'data' => [],
+                    'current_page' => 1,
+                    'last_page' => 1,
+                    'total' => 0,
+                ]);
+        }
+        
+        $query = $model::query();
+        
+        // Filter by KC
+        if ($kodeKc) {
+            $query->where('kode_kanca', $kodeKc);
+        }
+        
+        // Filter by Uker - use appropriate column based on model
+        if ($kodeUker) {
+            $kodeUkerArray = explode(',', $kodeUker);
+            // Most models use kode_uker, some use kode_sub_kanca
+            $ukerColumn = in_array($kategori, [
+                'MERCHANT QRIS SAVOL BESAR CASA KECIL',
+                'MERCHANT EDC SAVOL BESAR CASA KECIL',
+                'PENURUNAN CASA MERCHANT (QRIS & EDC)',
+                'PENURUNAN CASA BRILINK',
+                'BRILINK SALDO < 10 JUTA',
+                'Qlola Non Debitur',
+                'Non Debitur Vol Besar CASA Kecil',
+                'Qlola (Belum ada Qlola / ada namun nonaktif)',
+                'User Aktif Casa Kecil',
+                'Nasabah Downgrade'
+            ]) ? 'kode_uker' : 'kode_sub_kanca';
+            
+            $query->whereIn($ukerColumn, $kodeUkerArray);
+        }
+        
+        // Search
+        if ($search) {
+            $query->where(function($q) use ($search, $nameField, $norekField, $cifField) {
+                $q->where($nameField, 'like', '%' . $search . '%');
+                if ($norekField) {
+                    $q->orWhere($norekField, 'like', '%' . $search . '%');
+                }
+                if ($cifField) {
+                    $q->orWhere($cifField, 'like', '%' . $search . '%');
+                }
+            });
+        }
+        
+        $results = $query->orderBy($nameField)->paginate(50);
+        
+        return response()->json([
+            'data' => $results->items(),
+            'current_page' => $results->currentPage(),
+            'last_page' => $results->lastPage(),
+            'total' => $results->total(),
+        ]);
+    }
+    
+    /**
      * Helper method untuk mengambil data lengkap dari tabel pull of pipeline
      */
     private function getSourceData($namaNasabah, $kategori, $kodeKc)
@@ -874,12 +1041,13 @@ class PipelineController extends Controller
             case 'Wingback Penguatan Produk & Fungsi RM':
                 $model = \App\Models\Strategi8::class;
                 break;
-            case 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)':
-                $model = \App\Models\MerchantSavol::class;
+            case 'MERCHANT QRIS SAVOL BESAR CASA KECIL':
+                $model = \App\Models\MerchantSavolQris::class;
                 $nameField = 'nama_merchant';
                 break;
-            case 'PENURUNAN CASA MERCHANT (QRIS & EDC)':
-                $model = \App\Models\PenurunanMerchant::class;
+            case 'MERCHANT EDC SAVOL BESAR CASA KECIL':
+                $model = \App\Models\MerchantSavolEdc::class;
+                $nameField = 'nama_merchant';
                 break;
             case 'PENURUNAN CASA BRILINK':
                 $model = \App\Models\PenurunanCasaBrilink::class;
@@ -903,11 +1071,6 @@ class PipelineController extends Controller
                 break;
             case 'Penurunan Prioritas Ritel & Mikro':
                 $model = \App\Models\PenurunanPrioritasRitelMikro::class;
-                break;
-            
-            // Strategi 1 - Kategori lainnya
-            case 'PENURUNAN CASA MERCHANT (QRIS & EDC)':
-                $model = \App\Models\PenurunanMerchant::class;
                 break;
             
             // Strategi 2

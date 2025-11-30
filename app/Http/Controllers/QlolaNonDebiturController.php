@@ -35,7 +35,8 @@ class QlolaNonDebiturController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('nama_nasabah', 'like', "%{$search}%")
-                  ->orWhere('no_rekening', 'like', "%{$search}%")
+                  ->orWhere('norek_simpanan', 'like', "%{$search}%")
+                  ->orWhere('norek_pinjaman', 'like', "%{$search}%")
                   ->orWhere('cifno', 'like', "%{$search}%")
                   ->orWhere('uker', 'like', "%{$search}%")
                   ->orWhere('kanca', 'like', "%{$search}%");
@@ -77,12 +78,10 @@ class QlolaNonDebiturController extends Controller
             'kode_uker' => 'nullable|string',
             'uker' => 'nullable|string',
             'cifno' => 'nullable|string',
-            'no_rekening' => 'nullable|string',
+            'norek_simpanan' => 'nullable|string',
+            'norek_pinjaman' => 'nullable|string',
+            'balance' => 'nullable|string',
             'nama_nasabah' => 'nullable|string',
-            'segmentasi' => 'nullable|string',
-            'cek_qcash' => 'nullable|string',
-            'cek_cms' => 'nullable|string',
-            'cek_ib' => 'nullable|string',
             'keterangan' => 'nullable|string',
         ]);
 
@@ -129,12 +128,10 @@ class QlolaNonDebiturController extends Controller
             'kode_uker' => 'nullable|string',
             'uker' => 'nullable|string',
             'cifno' => 'nullable|string',
-            'no_rekening' => 'nullable|string',
+            'norek_simpanan' => 'nullable|string',
+            'norek_pinjaman' => 'nullable|string',
+            'balance' => 'nullable|string',
             'nama_nasabah' => 'nullable|string',
-            'segmentasi' => 'nullable|string',
-            'cek_qcash' => 'nullable|string',
-            'cek_cms' => 'nullable|string',
-            'cek_ib' => 'nullable|string',
             'keterangan' => 'nullable|string',
         ]);
 
@@ -191,20 +188,18 @@ class QlolaNonDebiturController extends Controller
             $totalInserted = 0;
 
             while (($row = fgetcsv($handle, 0, ';')) !== false) {
-                if (count($row) >= 12 && !empty(array_filter($row))) {
+                if (count($row) >= 10 && !empty(array_filter($row))) {
                     $batch[] = [
                         'kode_kanca' => trim($row[0]) ?: null,
                         'kanca' => trim($row[1]) ?: null,
                         'kode_uker' => trim($row[2]) ?: null,
                         'uker' => trim($row[3]) ?: null,
                         'cifno' => trim($row[4]) ?: null,
-                        'no_rekening' => trim($row[5]) ?: null,
-                        'nama_nasabah' => trim($row[6]) ?: null,
-                        'segmentasi' => trim($row[7]) ?: null,
-                        'cek_qcash' => trim($row[8]) ?: null,
-                        'cek_cms' => trim($row[9]) ?: null,
-                        'cek_ib' => trim($row[10]) ?: null,
-                        'keterangan' => trim($row[11]) ?: null,
+                        'norek_simpanan' => trim($row[5]) ?: null,
+                        'norek_pinjaman' => trim($row[6]) ?: null,
+                        'balance' => trim($row[7]) ?: null,
+                        'nama_nasabah' => trim($row[8]) ?: null,
+                        'keterangan' => trim($row[9]) ?: null,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

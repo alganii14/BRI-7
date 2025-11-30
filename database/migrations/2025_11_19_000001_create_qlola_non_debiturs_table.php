@@ -20,12 +20,10 @@ return new class extends Migration
             $table->string('kode_uker')->nullable();
             $table->string('uker')->nullable();
             $table->string('cifno')->nullable();
-            $table->string('no_rekening')->nullable();
+            $table->string('norek_simpanan')->nullable();
+            $table->string('norek_pinjaman')->nullable();
+            $table->string('balance')->nullable();
             $table->string('nama_nasabah')->nullable();
-            $table->string('segmentasi')->nullable();
-            $table->string('cek_qcash')->nullable();
-            $table->string('cek_cms')->nullable();
-            $table->string('cek_ib')->nullable();
             $table->text('keterangan')->nullable();
             $table->timestamps();
         });

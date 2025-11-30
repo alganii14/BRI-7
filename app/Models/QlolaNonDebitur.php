@@ -15,12 +15,10 @@ class QlolaNonDebitur extends Model
         'kode_uker',
         'uker',
         'cifno',
-        'no_rekening',
+        'norek_simpanan',
+        'norek_pinjaman',
+        'balance',
         'nama_nasabah',
-        'segmentasi',
-        'cek_qcash',
-        'cek_cms',
-        'cek_ib',
         'keterangan',
     ];
 }

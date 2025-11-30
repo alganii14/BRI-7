@@ -190,7 +190,7 @@
         <ul>
             <li>File harus dalam format CSV (.csv) dengan delimiter <strong>;</strong> (semicolon)</li>
             <li>Pastikan format CSV sesuai dengan template yang ada</li>
-            <li>Kolom CSV: Kode Kanca, Kanca, Kode Uker, Uker, CIFNO, No Rekening, Nama Nasabah, Segmentasi, Cek QCash, Cek CMS, Cek IB, Keterangan</li>
+            <li>Kolom CSV: Kode Kanca, Kanca, Kode Uker, Uker, CIFNO, Norek Simpanan, Norek Pinjaman, Balance, Nama Nasabah, Keterangan</li>
         </ul>
     </div>
 

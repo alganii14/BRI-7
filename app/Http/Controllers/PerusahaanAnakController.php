@@ -77,11 +77,15 @@ class PerusahaanAnakController extends Controller
             'alamat' => 'nullable|string',
             'kode_cabang_induk' => 'nullable|string',
             'cabang_induk_terdekat' => 'nullable|string',
+            'kode_uker' => 'nullable|string',
+            'nama_uker' => 'nullable|string',
             'nama_pic_partner' => 'nullable|string',
             'posisi_pic_partner' => 'nullable|string',
             'hp_pic_partner' => 'nullable|string',
             'nama_perusahaan_anak' => 'nullable|string',
             'status_pipeline' => 'nullable|string',
+            'rekening_terbentuk' => 'nullable|string',
+            'cif_terbentuk' => 'nullable|string',
         ]);
 
         PerusahaanAnak::create($validated);
@@ -127,11 +131,15 @@ class PerusahaanAnakController extends Controller
             'alamat' => 'nullable|string',
             'kode_cabang_induk' => 'nullable|string',
             'cabang_induk_terdekat' => 'nullable|string',
+            'kode_uker' => 'nullable|string',
+            'nama_uker' => 'nullable|string',
             'nama_pic_partner' => 'nullable|string',
             'posisi_pic_partner' => 'nullable|string',
             'hp_pic_partner' => 'nullable|string',
             'nama_perusahaan_anak' => 'nullable|string',
             'status_pipeline' => 'nullable|string',
+            'rekening_terbentuk' => 'nullable|string',
+            'cif_terbentuk' => 'nullable|string',
         ]);
 
         $perusahaanAnak->update($validated);
@@ -186,18 +194,22 @@ class PerusahaanAnakController extends Controller
             $totalInserted = 0;
 
             while (($row = fgetcsv($handle, 0, ';')) !== false) {
-                if (count($row) >= 10 && !empty(array_filter($row))) {
+                if (count($row) >= 14 && !empty(array_filter($row))) {
                     $batch[] = [
                         'nama_partner_vendor' => trim($row[0]) ?: null,
                         'jenis_usaha' => trim($row[1]) ?: null,
                         'alamat' => trim($row[2]) ?: null,
                         'kode_cabang_induk' => trim($row[3]) ?: null,
                         'cabang_induk_terdekat' => trim($row[4]) ?: null,
-                        'nama_pic_partner' => trim($row[5]) ?: null,
-                        'posisi_pic_partner' => trim($row[6]) ?: null,
-                        'hp_pic_partner' => trim($row[7]) ?: null,
-                        'nama_perusahaan_anak' => trim($row[8]) ?: null,
-                        'status_pipeline' => trim($row[9]) ?: null,
+                        'kode_uker' => trim($row[5]) ?: null,
+                        'nama_uker' => trim($row[6]) ?: null,
+                        'nama_pic_partner' => trim($row[7]) ?: null,
+                        'posisi_pic_partner' => trim($row[8]) ?: null,
+                        'hp_pic_partner' => trim($row[9]) ?: null,
+                        'nama_perusahaan_anak' => trim($row[10]) ?: null,
+                        'status_pipeline' => trim($row[11]) ?: null,
+                        'rekening_terbentuk' => trim($row[12]) ?: null,
+                        'cif_terbentuk' => trim($row[13]) ?: null,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

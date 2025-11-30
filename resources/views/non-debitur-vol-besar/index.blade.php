@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Non Debitur Vol Besar CASA Kecil')
-@section('page-title', 'Data Non Debitur Vol Besar CASA Kecil')
+@section('title', 'Non Debitur Vol Besar')
+@section('page-title', 'Data Non Debitur Vol Besar CASA Kecil (Strategi 1)')
 
 @section('content')
 <style>
@@ -23,7 +23,7 @@
     }
 
     th {
-        background: linear-gradient(135deg, #0066CC 0%, #003D82 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         font-weight: 600;
         font-size: 14px;
@@ -45,7 +45,7 @@
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, #0066CC 0%, #003D82 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
     }
 
@@ -67,11 +67,6 @@
     .btn-sm {
         padding: 6px 12px;
         font-size: 13px;
-    }
-
-    .btn-info {
-        background-color: #17a2b8;
-        color: white;
     }
 
     .btn-warning {
@@ -125,7 +120,6 @@
         border: 1px solid #ddd;
         border-radius: 6px;
         font-size: 14px;
-        min-width: 300px;
     }
 
     .pagination-wrapper {
@@ -147,7 +141,7 @@
 <div class="header-actions">
     <div style="display: flex; gap: 10px;">
         @if($nonDebiturVolBesars->total() > 0)
-        <form action="{{ route('non-debitur-vol-besar.delete-all') }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ PERHATIAN!\n\nAnda akan menghapus SEMUA data non debitur vol besar ({{ number_format($nonDebiturVolBesars->total(), 0, ',', '.') }} baris).\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda yakin ingin melanjutkan?')">
+        <form action="{{ route('non-debitur-vol-besar.delete-all') }}" method="POST" style="display: inline;" onsubmit="return confirm('⚠️ PERHATIAN!\n\nAnda akan menghapus SEMUA data Non Debitur Vol Besar ({{ number_format($nonDebiturVolBesars->total(), 0, ',', '.') }} baris).\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda yakin ingin melanjutkan?')">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger-gradient">
@@ -163,28 +157,10 @@
         </a>
     </div>
     
-    <form method="GET" action="{{ route('non-debitur-vol-besar.index') }}" class="search-form" style="display:flex;gap:10px;align-items:end;">
-        <div style="flex:1;">
-            <select name="year" style="width:100%;padding:10px 16px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:white;">
-                <option value="">Semua Tahun</option>
-                @foreach($availableYears as $availableYear)
-                    <option value="{{ $availableYear }}" {{ request('year') == $availableYear ? 'selected' : '' }}>{{ $availableYear }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div style="flex:1;">
-            <select name="month" style="width:100%;padding:10px 16px;border:1px solid #ddd;border-radius:6px;font-size:14px;background:white;">
-                <option value="">Semua Bulan</option>
-                @for($i=1;$i<=12;$i++)
-                    <option value="{{ $i }}" {{ request('month') == $i ? 'selected' : '' }}>{{ ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][$i] }}</option>
-                @endfor
-            </select>
-        </div>
-        <div style="flex:2;">
-            <input type="text" name="search" placeholder="Cari nasabah, rekening, CIFNO, atau unit kerja..." value="{{ request('search') }}" style="width:100%;">
-        </div>
+    <form method="GET" action="{{ route('non-debitur-vol-besar.index') }}" class="search-form">
+        <input type="text" name="search" placeholder="Cari nama, CIF, norek pinjaman/simpanan, atau uker..." value="{{ request('search') }}">
         <button type="submit" class="btn btn-primary">🔍 Cari</button>
-        @if(request('search') || request('month') || request('year'))
+        @if(request('search'))
             <a href="{{ route('non-debitur-vol-besar.index') }}" class="btn btn-warning">✖ Reset</a>
         @endif
     </form>
@@ -212,12 +188,12 @@
                 <th>Kode Uker</th>
                 <th>Uker</th>
                 <th>CIFNO</th>
-                <th>No. Rekening</th>
+                <th>Norek Pinjaman</th>
+                <th>Norek Simpanan</th>
+                <th>Balance</th>
+                <th>Volume</th>
                 <th>Nama Nasabah</th>
-                <th>Segmentasi</th>
-                <th>VOL QCASH</th>
-                <th>VOL QIB</th>
-                <th>Saldo</th>
+                <th>Keterangan</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -230,15 +206,14 @@
                 <td>{{ $item->kode_uker }}</td>
                 <td>{{ $item->uker }}</td>
                 <td>{{ $item->cifno }}</td>
-                <td>{{ $item->no_rekening }}</td>
+                <td>{{ $item->norek_pinjaman }}</td>
+                <td>{{ $item->norek_simpanan }}</td>
+                <td>{{ $item->balance }}</td>
+                <td>{{ $item->volume }}</td>
                 <td>{{ $item->nama_nasabah }}</td>
-                <td>{{ $item->segmentasi }}</td>
-                <td>{{ $item->vol_qcash }}</td>
-                <td>{{ $item->vol_qib }}</td>
-                <td>{{ $item->saldo }}</td>
+                <td>{{ $item->keterangan }}</td>
                 <td>
                     <div class="actions">
-                        <a href="{{ route('non-debitur-vol-besar.show', $item->id) }}" class="btn btn-sm btn-info">👁️ View</a>
                         <a href="{{ route('non-debitur-vol-besar.edit', $item->id) }}" class="btn btn-sm btn-warning">✏️ Edit</a>
                         <form action="{{ route('non-debitur-vol-besar.destroy', $item->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
                             @csrf
@@ -251,7 +226,7 @@
             @empty
             <tr>
                 <td colspan="13" style="text-align: center; padding: 40px;">
-                    <p style="color: #999; font-size: 16px;">Tidak ada data non debitur vol besar CASA kecil.</p>
+                    <p style="color: #999; font-size: 16px;">Tidak ada data Non Debitur Vol Besar.</p>
                     <a href="{{ route('non-debitur-vol-besar.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
                 </td>
             </tr>
@@ -280,7 +255,7 @@
         @foreach (range($startPage, $endPage) as $page)
             @php $url = $nonDebiturVolBesars->url($page); @endphp
             @if ($page == $currentPage)
-                <span style="padding: 10px 20px; background: linear-gradient(135deg, #0066CC 0%, #003D82 100%); color: white; border: 1px solid #0066CC; border-radius: 4px;">{{ $page }}</span>
+                <span style="padding: 10px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: 1px solid #667eea; border-radius: 4px;">{{ $page }}</span>
             @else
                 <a href="{{ $url }}" style="padding: 10px 20px; background: white; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; text-decoration: none;">{{ $page }}</a>
             @endif
@@ -293,4 +268,18 @@
         @endif
     </div>
 </div>
+
 @endsection
+
+<script>
+setTimeout(function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        alert.style.transition = 'opacity 0.5s';
+        alert.style.opacity = '0';
+        setTimeout(function() {
+            alert.remove();
+        }, 500);
+    });
+}, 5000);
+</script>

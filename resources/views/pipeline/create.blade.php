@@ -705,11 +705,12 @@ function handleStrategyChange() {
     
     const kategoriMap = {
         'Strategi 1': [
-            'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)',
-            'PENURUNAN CASA MERCHANT (QRIS & EDC)',
+            'MERCHANT QRIS SAVOL BESAR CASA KECIL',
+            'MERCHANT EDC SAVOL BESAR CASA KECIL',
             'PENURUNAN CASA BRILINK',
             'BRILINK SALDO < 10 JUTA',
             'Qlola Non Debitur',
+            'Non Debitur Memiliki Qlola Namun User Tdk Aktif',
             'Non Debitur Vol Besar CASA Kecil'
         ],
         'Strategi 2': [
@@ -868,14 +869,21 @@ function loadNasabahList(append = false) {
     }
     
     // Gunakan route khusus untuk pipeline - mencari dari tabel Pull of Pipeline dengan filter exclude per RMFT
-    let url = `{{ route('api.pipeline.search-from-pull') }}?search=${encodeURIComponent(search)}&kode_kc=${kodeKC}&kode_uker=${kodeUkerParam}&strategy=${encodeURIComponent(strategy)}&pn_rmft=${pnRmft}&page=${currentPage}`;
+    let url = `{{ route('api.pipeline.search-from-pull') }}?search=${encodeURIComponent(search)}&kode_kc=${kodeKC}&kode_uker=${kodeUkerParam}&strategy=${encodeURIComponent(strategy)}&pn_rmft=${pnRmft}&page=${currentPage}&_t=${Date.now()}`;
     if (kategori) {
         url += `&kategori=${encodeURIComponent(kategori)}`;
     }
     
     fetch(url)
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('Data received:', data);
+            console.log('Data count:', data.data ? data.data.length : 0);
+            console.log('Total:', data.total);
+            
             if (data.data && data.data.length > 0) {
                 displayNasabahList(data.data, data);
                 

@@ -122,36 +122,36 @@
         </div>
 
         <div class="detail-item">
-            <div class="detail-label">No Rekening</div>
-            <div class="detail-value">{{ $nonDebiturVolBesar->no_rekening ?? '-' }}</div>
+            <div class="detail-label">Norek Pinjaman</div>
+            <div class="detail-value">{{ $nonDebiturVolBesar->norek_pinjaman ?? '-' }}</div>
+        </div>
+
+        <div class="detail-item">
+            <div class="detail-label">Norek Simpanan</div>
+            <div class="detail-value">{{ $nonDebiturVolBesar->norek_simpanan ?? '-' }}</div>
         </div>
 
         <div class="detail-item full-width">
             <div class="detail-label">Nama Nasabah</div>
             <div class="detail-value">{{ $nonDebiturVolBesar->nama_nasabah ?? '-' }}</div>
         </div>
-
-        <div class="detail-item">
-            <div class="detail-label">Segmentasi</div>
-            <div class="detail-value">{{ $nonDebiturVolBesar->segmentasi ?? '-' }}</div>
-        </div>
     </div>
 
-    <div class="section-title">Informasi Volume & Saldo</div>
+    <div class="section-title">Informasi Volume & Balance</div>
     <div class="detail-grid">
         <div class="detail-item">
-            <div class="detail-label">VOL QCASH</div>
-            <div class="detail-value">{{ $nonDebiturVolBesar->vol_qcash ?? '-' }}</div>
+            <div class="detail-label">Balance</div>
+            <div class="detail-value">{{ $nonDebiturVolBesar->balance ?? '-' }}</div>
         </div>
 
         <div class="detail-item">
-            <div class="detail-label">VOL QIB</div>
-            <div class="detail-value">{{ $nonDebiturVolBesar->vol_qib ?? '-' }}</div>
+            <div class="detail-label">Volume</div>
+            <div class="detail-value">{{ $nonDebiturVolBesar->volume ?? '-' }}</div>
         </div>
 
         <div class="detail-item full-width">
-            <div class="detail-label">Saldo</div>
-            <div class="detail-value">{{ $nonDebiturVolBesar->saldo ?? '-' }}</div>
+            <div class="detail-label">Keterangan</div>
+            <div class="detail-value">{{ $nonDebiturVolBesar->keterangan ?? '-' }}</div>
         </div>
     </div>
 

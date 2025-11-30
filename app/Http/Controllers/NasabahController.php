@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Nasabah;
 use App\Models\PenurunanPrioritasRitelMikro;
-use App\Models\PenurunanMerchant;
 use App\Models\PenurunanCasaBrilink;
 use App\Models\MerchantSavol;
 use App\Models\QlolaNonDebitur;
+use App\Models\QlolaUserTidakAktif;
 use App\Models\NonDebiturVolBesar;
 use App\Models\QlolaNonaktif;
 use App\Models\UserAktifCasaKecil;
@@ -137,9 +137,6 @@ class NasabahController extends Controller
             case 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)':
                 $model = MerchantSavol::class;
                 break;
-            case 'PENURUNAN CASA MERCHANT (QRIS & EDC)':
-                $model = PenurunanMerchant::class;
-                break;
             case 'PENURUNAN CASA BRILINK':
                 $model = PenurunanCasaBrilink::class;
                 break;
@@ -259,9 +256,6 @@ class NasabahController extends Controller
             case 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)':
                 $model = \App\Models\MerchantSavol::class;
                 break;
-            case 'PENURUNAN CASA MERCHANT (QRIS & EDC)':
-                $model = PenurunanMerchant::class;
-                break;
             case 'PENURUNAN CASA BRILINK':
                 $model = PenurunanCasaBrilink::class;
                 break;
@@ -270,6 +264,9 @@ class NasabahController extends Controller
                 break;
             case 'Qlola Non Debitur':
                 $model = QlolaNonDebitur::class;
+                break;
+            case 'Non Debitur Memiliki Qlola Namun User Tdk Aktif':
+                $model = \App\Models\QlolaUserTidakAktif::class;
                 break;
             case 'AUM>2M DPK<50 juta':
             case 'Strategi 7':
@@ -1037,11 +1034,12 @@ class NasabahController extends Controller
                 }
             }
             
-            // Search by cifno, no_rekening or nama_nasabah
+            // Search by cifno, norek_simpanan, norek_pinjaman or nama_nasabah
             if ($search && strlen($search) >= 2) {
                 $query->where(function($q) use ($search) {
                     $q->where('cifno', 'LIKE', "%{$search}%")
-                      ->orWhere('no_rekening', 'LIKE', "%{$search}%")
+                      ->orWhere('norek_simpanan', 'LIKE', "%{$search}%")
+                      ->orWhere('norek_pinjaman', 'LIKE', "%{$search}%")
                       ->orWhere('nama_nasabah', 'LIKE', "%{$search}%");
                 });
             }
@@ -1063,7 +1061,9 @@ class NasabahController extends Controller
                                 return [
                                     'id' => $item->id,
                                     'cifno' => $item->cifno,
-                                    'no_rekening' => $item->no_rekening,
+                                    'no_rekening' => $item->norek_simpanan ?: $item->norek_pinjaman,
+                                    'norek_simpanan' => $item->norek_simpanan,
+                                    'norek_pinjaman' => $item->norek_pinjaman,
                                     'nama_nasabah' => $item->nama_nasabah,
                                     'kode_cabang_induk' => $item->kode_kanca,
                                     'kode_kanca' => $item->kode_kanca,
@@ -1072,10 +1072,79 @@ class NasabahController extends Controller
                                     'kode_uker' => $item->kode_uker,
                                     'unit_kerja' => $item->uker,
                                     'uker' => $item->uker,
-                                    'segmentasi' => $item->segmentasi,
-                                    'cek_qcash' => $item->cek_qcash,
-                                    'cek_cms' => $item->cek_cms,
-                                    'cek_ib' => $item->cek_ib,
+                                    'balance' => $item->balance,
+                                    'keterangan' => $item->keterangan,
+                                    'saldo_terupdate' => 0,
+                                    'saldo_last_eom' => 0,
+                                ];
+                            });
+            
+            return response()->json([
+                'data' => $results,
+                'current_page' => (int)$page,
+                'last_page' => $lastPage,
+                'total' => $total,
+                'per_page' => $perPage
+            ]);
+
+        } elseif ($model === \App\Models\QlolaUserTidakAktif::class) {
+            // Non Debitur Memiliki Qlola Namun User Tdk Aktif - Strategi 1
+            // Filter by KC first
+            if ($kode_kc) {
+                $query->where('kode_kanca', $kode_kc);
+            }
+            
+            if ($kode_uker) {
+                // Check if multiple units (comma-separated)
+                if (strpos($kode_uker, ',') !== false) {
+                    // Multiple units
+                    $unitArray = array_map('trim', explode(',', $kode_uker));
+                    $query->whereIn('kode_uker', $unitArray);
+                } else {
+                    // Single unit
+                    $query->where('kode_uker', $kode_uker);
+                }
+            }
+            
+            // Search by cifno, norek_simpanan, norek_pinjaman or nama_nasabah
+            if ($search && strlen($search) >= 2) {
+                $query->where(function($q) use ($search) {
+                    $q->where('cifno', 'LIKE', "%{$search}%")
+                      ->orWhere('norek_simpanan', 'LIKE', "%{$search}%")
+                      ->orWhere('norek_pinjaman', 'LIKE', "%{$search}%")
+                      ->orWhere('nama_nasabah', 'LIKE', "%{$search}%");
+                });
+            }
+            
+            // Exclude nasabah yang sudah ada di pipelines
+            if (!empty($usedNasabah)) {
+                $query->whereNotIn('nama_nasabah', $usedNasabah);
+            }
+            
+            // Get total count for pagination
+            $total = $query->count();
+            $lastPage = ceil($total / $perPage);
+            
+            $results = $query->skip(($page - 1) * $perPage)
+                            ->take($perPage)
+                            ->orderBy('id', 'desc')
+                            ->get()
+                            ->map(function($item) {
+                                return [
+                                    'id' => $item->id,
+                                    'cifno' => $item->cifno,
+                                    'no_rekening' => $item->norek_simpanan ?: $item->norek_pinjaman,
+                                    'norek_simpanan' => $item->norek_simpanan,
+                                    'norek_pinjaman' => $item->norek_pinjaman,
+                                    'nama_nasabah' => $item->nama_nasabah,
+                                    'kode_cabang_induk' => $item->kode_kanca,
+                                    'kode_kanca' => $item->kode_kanca,
+                                    'cabang_induk' => $item->kanca,
+                                    'kanca' => $item->kanca,
+                                    'kode_uker' => $item->kode_uker,
+                                    'unit_kerja' => $item->uker,
+                                    'uker' => $item->uker,
+                                    'balance' => $item->balance,
                                     'keterangan' => $item->keterangan,
                                     'saldo_terupdate' => 0,
                                     'saldo_last_eom' => 0,
@@ -2009,8 +2078,12 @@ class NasabahController extends Controller
             case 'Wingback Penguatan Produk & Fungsi RM':
                 $model = \App\Models\Strategi8::class;
                 break;
-            case 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)':
-                $model = \App\Models\MerchantSavol::class;
+            case 'MERCHANT QRIS SAVOL BESAR CASA KECIL':
+                $model = \App\Models\MerchantSavolQris::class;
+                $nameField = 'nama_merchant';
+                break;
+            case 'MERCHANT EDC SAVOL BESAR CASA KECIL':
+                $model = \App\Models\MerchantSavolEdc::class;
                 $nameField = 'nama_merchant';
                 break;
             case 'PENURUNAN CASA MERCHANT (QRIS & EDC)':
@@ -2022,6 +2095,9 @@ class NasabahController extends Controller
                 break;
             case 'Qlola Non Debitur':
                 $model = \App\Models\QlolaNonDebitur::class;
+                break;
+            case 'Non Debitur Memiliki Qlola Namun User Tdk Aktif':
+                $model = \App\Models\QlolaUserTidakAktif::class;
                 break;
             case 'Non Debitur Vol Besar CASA Kecil':
                 $model = \App\Models\NonDebiturVolBesar::class;
@@ -2093,10 +2169,14 @@ class NasabahController extends Controller
             // Sesuaikan field KC berdasarkan model
             if ($kategori === 'BRILINK SALDO < 10 JUTA') {
                 $query->where('kd_cabang', $kodeKc);
-            } elseif (in_array($kategori, ['List Perusahaan Anak', 'Potensi Payroll', 'Optimalisasi Business Cluster'])) {
+            } elseif (in_array($kategori, ['List Perusahaan Anak', 'Potensi Payroll', 'Optimalisasi Business Cluster', 'Winback'])) {
                 $query->where('kode_cabang_induk', $kodeKc);
             } elseif (in_array($kategori, ['Existing Payroll'])) {
                 $query->where('kode_cabang_induk', $kodeKc);
+            } elseif (in_array($kategori, ['MERCHANT QRIS SAVOL BESAR CASA KECIL', 'MERCHANT EDC SAVOL BESAR CASA KECIL'])) {
+                $query->where('kode_kanca', $kodeKc);
+            } elseif (in_array($kategori, ['Qlola Non Debitur', 'Non Debitur Memiliki Qlola Namun User Tdk Aktif', 'Non Debitur Vol Besar CASA Kecil', 'Qlola (Belum ada Qlola / ada namun nonaktif)'])) {
+                $query->where('kode_kanca', $kodeKc);
             } else {
                 // Default untuk kategori lain yang punya field kode_kc
                 if (\Schema::hasColumn($model::make()->getTable(), 'kode_kc')) {
@@ -2106,7 +2186,14 @@ class NasabahController extends Controller
         }
         
         // Filter by Unit - skip untuk kategori yang tidak punya field kode_uker
-        $skipUkerFilter = ['List Perusahaan Anak', 'Existing Payroll', 'Potensi Payroll'];
+        // SKIP uker filter untuk merchant QRIS/EDC karena data merchant bisa tersebar di berbagai uker dalam satu KC
+        $skipUkerFilter = [
+            'List Perusahaan Anak', 
+            'Existing Payroll', 
+            'Potensi Payroll',
+            'MERCHANT QRIS SAVOL BESAR CASA KECIL',
+            'MERCHANT EDC SAVOL BESAR CASA KECIL'
+        ];
         
         if ($kodeUker && !in_array($kategori, $skipUkerFilter)) {
             if ($kategori === 'BRILINK SALDO < 10 JUTA') {
@@ -2121,9 +2208,42 @@ class NasabahController extends Controller
             }
         }
         
-        // Search
+        // Search - search in multiple fields
         if ($search) {
-            $query->where($nameField, 'like', '%' . $search . '%');
+            $query->where(function($q) use ($search, $nameField, $kategori) {
+                // Always search in name field
+                $q->where($nameField, 'like', '%' . $search . '%');
+                
+                // Search in additional fields based on kategori
+                if (in_array($kategori, ['MERCHANT QRIS SAVOL BESAR CASA KECIL', 'MERCHANT EDC SAVOL BESAR CASA KECIL'])) {
+                    $q->orWhere('nama_kanca', 'like', '%' . $search . '%')
+                      ->orWhere('nama_uker', 'like', '%' . $search . '%');
+                    
+                    // Search in norek/cif fields
+                    if ($kategori === 'MERCHANT QRIS SAVOL BESAR CASA KECIL') {
+                        $q->orWhere('no_rek', 'like', '%' . $search . '%')
+                          ->orWhere('cif', 'like', '%' . $search . '%')
+                          ->orWhere('storeid', 'like', '%' . $search . '%');
+                    } else {
+                        $q->orWhere('norek', 'like', '%' . $search . '%')
+                          ->orWhere('cifno', 'like', '%' . $search . '%');
+                    }
+                } else {
+                    // For other categories, try to search in common fields
+                    if (\Schema::hasColumn($model::make()->getTable(), 'norek')) {
+                        $q->orWhere('norek', 'like', '%' . $search . '%');
+                    }
+                    if (\Schema::hasColumn($model::make()->getTable(), 'cifno')) {
+                        $q->orWhere('cifno', 'like', '%' . $search . '%');
+                    }
+                    if (\Schema::hasColumn($model::make()->getTable(), 'cif')) {
+                        $q->orWhere('cif', 'like', '%' . $search . '%');
+                    }
+                    if (\Schema::hasColumn($model::make()->getTable(), 'no_rekening')) {
+                        $q->orWhere('no_rekening', 'like', '%' . $search . '%');
+                    }
+                }
+            });
         }
         
         // Get total

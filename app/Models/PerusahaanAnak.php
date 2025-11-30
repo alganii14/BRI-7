@@ -17,10 +17,14 @@ class PerusahaanAnak extends Model
         'alamat',
         'kode_cabang_induk',
         'cabang_induk_terdekat',
+        'kode_uker',
+        'nama_uker',
         'nama_pic_partner',
         'posisi_pic_partner',
         'hp_pic_partner',
         'nama_perusahaan_anak',
         'status_pipeline',
+        'rekening_terbentuk',
+        'cif_terbentuk',
     ];
 }
