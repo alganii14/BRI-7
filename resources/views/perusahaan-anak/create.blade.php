@@ -154,6 +154,22 @@
             </div>
 
             <div class="form-group">
+                <label for="kode_uker">Kode Uker</label>
+                <input type="text" id="kode_uker" name="kode_uker" value="{{ old('kode_uker') }}">
+                @error('kode_uker')
+                    <span class="error">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="nama_uker">Nama Uker</label>
+                <input type="text" id="nama_uker" name="nama_uker" value="{{ old('nama_uker') }}">
+                @error('nama_uker')
+                    <span class="error">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
                 <label for="nama_pic_partner">Nama PIC Partner</label>
                 <input type="text" id="nama_pic_partner" name="nama_pic_partner" value="{{ old('nama_pic_partner') }}">
                 @error('nama_pic_partner')
@@ -185,6 +201,22 @@
                     <option value="Belum Terakuisisi/Rekening Belum Ada" {{ old('status_pipeline') == 'Belum Terakuisisi/Rekening Belum Ada' ? 'selected' : '' }}>Belum Terakuisisi/Rekening Belum Ada</option>
                 </select>
                 @error('status_pipeline')
+                    <span class="error">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="rekening_terbentuk">Rekening Terbentuk</label>
+                <input type="text" id="rekening_terbentuk" name="rekening_terbentuk" value="{{ old('rekening_terbentuk') }}">
+                @error('rekening_terbentuk')
+                    <span class="error">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
+                <label for="cif_terbentuk">CIF Terbentuk</label>
+                <input type="text" id="cif_terbentuk" name="cif_terbentuk" value="{{ old('cif_terbentuk') }}">
+                @error('cif_terbentuk')
                     <span class="error">{{ $message }}</span>
                 @enderror
             </div>

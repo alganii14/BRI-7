@@ -227,11 +227,14 @@
                 <th>Nama Partner/Vendor</th>
                 <th>Jenis Usaha</th>
                 <th>Alamat</th>
-                <th>Cabang Induk</th>
+                <th>Kode Uker</th>
+                <th>Nama Uker</th>
                 <th>Nama PIC</th>
                 <th>HP PIC</th>
                 <th>Perusahaan Anak</th>
                 <th>Status Pipeline</th>
+                <th>Rekening</th>
+                <th>CIF</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -242,7 +245,8 @@
                 <td>{{ $item->nama_partner_vendor }}</td>
                 <td>{{ $item->jenis_usaha }}</td>
                 <td style="max-width: 250px; white-space: normal;">{{ $item->alamat }}</td>
-                <td>{{ $item->cabang_induk_terdekat }}</td>
+                <td>{{ $item->kode_uker }}</td>
+                <td>{{ $item->nama_uker }}</td>
                 <td>{{ $item->nama_pic_partner }}</td>
                 <td>{{ $item->hp_pic_partner }}</td>
                 <td>{{ $item->nama_perusahaan_anak }}</td>
@@ -253,6 +257,8 @@
                         <span class="status-badge status-belum">{{ $item->status_pipeline }}</span>
                     @endif
                 </td>
+                <td>{{ $item->rekening_terbentuk }}</td>
+                <td>{{ $item->cif_terbentuk }}</td>
                 <td>
                     <div class="actions">
                         <a href="{{ route('perusahaan-anak.show', $item->id) }}" class="btn btn-sm btn-info">👁️ View</a>
@@ -267,7 +273,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="10" style="text-align: center; padding: 40px;">
+                <td colspan="13" style="text-align: center; padding: 40px;">
                     <p style="color: #999; font-size: 16px;">Tidak ada data perusahaan anak.</p>
                     <a href="{{ route('perusahaan-anak.import.form') }}" class="btn btn-success" style="margin-top: 10px;">Import CSV</a>
                 </td>

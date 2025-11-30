@@ -190,8 +190,8 @@
         <ul>
             <li>File harus dalam format CSV (.csv) dengan delimiter <strong>semicolon (;)</strong></li>
             <li>Pastikan format CSV sesuai dengan template yang ada</li>
-            <li>Kolom CSV: Nama Partner/Vendor, Jenis Usaha, Alamat, Kode Cabang Induk, Cabang Induk Terdekat, Nama PIC Partner, Posisi PIC Partner, HP PIC Partner, Nama Perusahaan Anak, Status Pipeline</li>
-            <li>Contoh: "LIst Partner Perusahaan Anak_Kolaborasi Perusahaan Anak_BDG AH NAS.csv"</li>
+            <li>Kolom CSV (14 kolom): Nama Partner/Vendor/Mitra/Distributor, Jenis Usaha, Alamat, Kode Cabang Induk, Cabang Induk Terdekat, Kode Uker, Nama Uker, Nama PIC Partner, Posisi PIC Partner, HP PIC Partner, Nama Perusahaan Anak, Status Pipeline (Rekening based), Rekening Terbentuk, CIF Terbentuk</li>
+            <li>Contoh: "Partner Perusahaan Anak.csv"</li>
         </ul>
     </div>
 

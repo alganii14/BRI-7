@@ -1,147 +1,30 @@
 @extends('layouts.app')
 
-@section('title', 'Import CSV Non Debitur Vol Besar')
-@section('page-title', 'Import Data Non Debitur Vol Besar CASA Kecil dari CSV')
+@section('title', 'Import Non Debitur Vol Besar')
+@section('page-title', 'Import Data Non Debitur Vol Besar')
 
 @section('content')
 <style>
     .import-container {
-        background: white;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        max-width: 800px;
+        max-width: 600px;
         margin: 0 auto;
-    }
-
-    .upload-area {
-        border: 2px dashed #0066CC;
-        border-radius: 12px;
-        padding: 60px 40px;
-        text-align: center;
-        background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(0, 61, 130, 0.05) 100%);
-        margin-bottom: 30px;
-        transition: all 0.3s;
-    }
-
-    .upload-area:hover {
-        border-color: #003D82;
-        background: linear-gradient(135deg, rgba(0, 102, 204, 0.1) 0%, rgba(0, 61, 130, 0.1) 100%);
-    }
-
-    .upload-icon {
-        font-size: 64px;
-        margin-bottom: 20px;
-    }
-
-    .upload-area h3 {
-        color: #0066CC;
-        margin-bottom: 10px;
-        font-size: 20px;
-    }
-
-    .upload-area p {
-        color: #666;
-        margin-bottom: 20px;
-    }
-
-    .file-input-wrapper {
-        position: relative;
-        overflow: hidden;
-        display: inline-block;
-    }
-
-    .file-input-wrapper input[type=file] {
-        position: absolute;
-        left: -9999px;
-    }
-
-    .file-input-label {
-        display: inline-block;
-        padding: 12px 30px;
-        background: linear-gradient(135deg, #0066CC 0%, #003D82 100%);
-        color: white;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.3s;
-        font-weight: 600;
-    }
-
-    .file-input-label:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
-    }
-
-    .file-name {
-        margin-top: 15px;
-        padding: 12px;
-        background: #f8f9fa;
-        border-radius: 6px;
-        color: #333;
-        font-weight: 500;
-        display: none;
-    }
-
-    .file-name.show {
-        display: block;
-    }
-
-    .btn {
-        padding: 14px 30px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 15px;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s;
-        font-weight: 600;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        color: white;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        color: white;
-    }
-
-    .btn-danger {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        color: white;
-    }
-
-    .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
-    .btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .form-actions {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .info-box {
         background: #e7f3ff;
         border-left: 4px solid #2196F3;
-        padding: 20px;
-        border-radius: 6px;
-        margin-bottom: 30px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
     }
 
     .info-box h4 {
-        color: #2196F3;
-        margin-bottom: 10px;
-        font-size: 16px;
+        margin: 0 0 10px 0;
+        color: #1976D2;
     }
 
     .info-box ul {
@@ -149,20 +32,61 @@
         color: #555;
     }
 
-    .info-box li {
-        margin-bottom: 5px;
-    }
-
-    .alert {
-        padding: 15px 20px;
-        border-radius: 6px;
+    .form-group {
         margin-bottom: 20px;
     }
 
-    .alert-success {
-        background-color: #d4edda;
-        border: 1px solid #c3e6cb;
-        color: #155724;
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-group input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border: 2px dashed #ddd;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+
+    .alert {
+        padding: 12px 20px;
+        border-radius: 6px;
+        margin-bottom: 20px;
     }
 
     .alert-error {
@@ -173,108 +97,43 @@
 </style>
 
 <div class="import-container">
-    @if(session('success'))
-        <div class="alert alert-success">
-            ✓ {{ session('success') }}
-        </div>
-    @endif
-
     @if(session('error'))
         <div class="alert alert-error">
-            ✗ {{ session('error') }}
+            {{ session('error') }}
         </div>
     @endif
 
     <div class="info-box">
-        <h4>ℹ️ Petunjuk Import CSV</h4>
+        <h4>📋 Format CSV</h4>
+        <p>File CSV harus memiliki format berikut (dengan delimiter semicolon <code>;</code>):</p>
         <ul>
-            <li>File harus dalam format CSV (.csv)</li>
-            <li>Pastikan format CSV sesuai dengan template yang ada</li>
-            <li>Kolom CSV (dengan delimiter semicolon ;): KODE KANCA, KANCA, KODE UKER, UKER, CIFNO, No Rekening, Nama Nasabah, Segmentasi, VOL QCASH, VOL QIB, SALDO</li>
+            <li>KODE KANCA</li>
+            <li>KANCA</li>
+            <li>KODE UKER</li>
+            <li>UKER</li>
+            <li>CIFNO</li>
+            <li>NOREK PINJAMAN</li>
+            <li>NOREK SIMPANAN</li>
+            <li>BALANCE</li>
+            <li>VOLUME</li>
+            <li>NAMA NASABAH</li>
+            <li>KETERANGAN</li>
         </ul>
+        <p style="margin-top: 10px;"><strong>Catatan:</strong> Baris pertama (header) akan diabaikan.</p>
     </div>
 
-    <form action="{{ route('non-debitur-vol-besar.import') }}" method="POST" enctype="multipart/form-data" id="importForm">
+    <form action="{{ route('non-debitur-vol-besar.import') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
-        <div class="upload-area">
-            <div class="upload-icon">📄</div>
-            <h3>Upload File CSV</h3>
-            <p>Pilih file CSV untuk diimport ke sistem</p>
-            
-            <div class="file-input-wrapper">
-                <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
-                <label for="csv_file" class="file-input-label">
-                    📁 Pilih File CSV
-                </label>
-            </div>
-            
-            <div class="file-name" id="fileName"></div>
-            
-            @error('csv_file')
-                <p style="color: #dc3545; margin-top: 10px;">{{ $message }}</p>
-            @enderror
+        <div class="form-group">
+            <label for="csv_file">Pilih File CSV</label>
+            <input type="file" id="csv_file" name="csv_file" accept=".csv,.txt" required>
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
-                ⬆️ Upload & Import
-            </button>
-            <a href="{{ route('non-debitur-vol-besar.index') }}" class="btn btn-secondary">
-                ↩️ Kembali
-            </a>
+            <button type="submit" class="btn btn-success">📁 Import Data</button>
+            <a href="{{ route('non-debitur-vol-besar.index') }}" class="btn btn-secondary">← Kembali</a>
         </div>
     </form>
-
-    @php
-        $totalNonDebiturVolBesar = \App\Models\NonDebiturVolBesar::count();
-    @endphp
-
-    @if($totalNonDebiturVolBesar > 0)
-    <div style="margin-top: 30px; padding-top: 30px; border-top: 2px solid #f0f0f0;">
-        <h3 style="color: #dc3545; margin-bottom: 16px;">⚠️ Zona Berbahaya</h3>
-        <p style="color: #666; font-size: 14px; margin-bottom: 16px;">
-            Menghapus semua data non debitur vol besar akan menghapus <strong>{{ number_format($totalNonDebiturVolBesar, 0, ',', '.') }} data</strong> secara permanen dan tidak dapat dikembalikan.
-        </p>
-        <form action="{{ route('non-debitur-vol-besar.delete-all') }}" method="POST" onsubmit="return confirm('⚠️ PERINGATAN KERAS!\n\nAnda akan menghapus SEMUA {{ number_format($totalNonDebiturVolBesar, 0, ",", ".") }} data non debitur vol besar!\n\nData yang sudah dihapus TIDAK DAPAT dikembalikan!\n\nApakah Anda BENAR-BENAR yakin?')">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">
-                🗑️ Hapus Semua Data Non Debitur Vol Besar
-            </button>
-        </form>
-    </div>
-    @endif
 </div>
-
-<script>
-    const fileInput = document.getElementById('csv_file');
-    const fileName = document.getElementById('fileName');
-    const submitBtn = document.getElementById('submitBtn');
-    
-    fileInput.addEventListener('change', function(e) {
-        if (this.files && this.files[0]) {
-            const file = this.files[0];
-            fileName.textContent = '📎 File terpilih: ' + file.name + ' (' + formatFileSize(file.size) + ')';
-            fileName.classList.add('show');
-            submitBtn.disabled = false;
-        } else {
-            fileName.classList.remove('show');
-            submitBtn.disabled = true;
-        }
-    });
-    
-    function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-    }
-    
-    document.getElementById('importForm').addEventListener('submit', function() {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '⏳ Mengimport...';
-    });
-</script>
 @endsection

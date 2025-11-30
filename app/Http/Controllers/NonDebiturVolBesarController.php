@@ -35,7 +35,8 @@ class NonDebiturVolBesarController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('nama_nasabah', 'like', "%{$search}%")
-                  ->orWhere('no_rekening', 'like', "%{$search}%")
+                  ->orWhere('norek_pinjaman', 'like', "%{$search}%")
+                  ->orWhere('norek_simpanan', 'like', "%{$search}%")
                   ->orWhere('cifno', 'like', "%{$search}%")
                   ->orWhere('uker', 'like', "%{$search}%");
             });
@@ -76,12 +77,12 @@ class NonDebiturVolBesarController extends Controller
             'kode_uker' => 'nullable|string',
             'uker' => 'nullable|string',
             'cifno' => 'nullable|string',
-            'no_rekening' => 'nullable|string',
+            'norek_pinjaman' => 'nullable|string',
+            'norek_simpanan' => 'nullable|string',
+            'balance' => 'nullable|string',
+            'volume' => 'nullable|string',
             'nama_nasabah' => 'nullable|string',
-            'segmentasi' => 'nullable|string',
-            'vol_qcash' => 'nullable|string',
-            'vol_qib' => 'nullable|string',
-            'saldo' => 'nullable|string',
+            'keterangan' => 'nullable|string',
         ]);
 
         NonDebiturVolBesar::create($validated);
@@ -127,12 +128,12 @@ class NonDebiturVolBesarController extends Controller
             'kode_uker' => 'nullable|string',
             'uker' => 'nullable|string',
             'cifno' => 'nullable|string',
-            'no_rekening' => 'nullable|string',
+            'norek_pinjaman' => 'nullable|string',
+            'norek_simpanan' => 'nullable|string',
+            'balance' => 'nullable|string',
+            'volume' => 'nullable|string',
             'nama_nasabah' => 'nullable|string',
-            'segmentasi' => 'nullable|string',
-            'vol_qcash' => 'nullable|string',
-            'vol_qib' => 'nullable|string',
-            'saldo' => 'nullable|string',
+            'keterangan' => 'nullable|string',
         ]);
 
         $nonDebiturVolBesar->update($validated);
@@ -201,12 +202,12 @@ class NonDebiturVolBesarController extends Controller
                         'kode_uker' => trim($row[2]) ?: null,
                         'uker' => trim($row[3]) ?: null,
                         'cifno' => trim($row[4]) ?: null,
-                        'no_rekening' => trim($row[5]) ?: null,
-                        'nama_nasabah' => trim($row[6]) ?: null,
-                        'segmentasi' => trim($row[7]) ?: null,
-                        'vol_qcash' => trim($row[8]) ?: null,
-                        'vol_qib' => trim($row[9]) ?: null,
-                        'saldo' => trim($row[10]) ?: null,
+                        'norek_pinjaman' => trim($row[5]) ?: null,
+                        'norek_simpanan' => trim($row[6]) ?: null,
+                        'balance' => trim($row[7]) ?: null,
+                        'volume' => trim($row[8]) ?: null,
+                        'nama_nasabah' => trim($row[9]) ?: null,
+                        'keterangan' => trim($row[10]) ?: null,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];
