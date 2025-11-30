@@ -6,6 +6,7 @@
 @section('content')
 @include('manager-pull-pipeline.partials.read-only-table', [
     'data' => $data,
+    'route' => route('manager-pull-pipeline.merchant-savol-qris'),
     'columns' => [
         'Kode Kanca' => 'kode_kanca',
         'Nama Kanca' => 'nama_kanca',
