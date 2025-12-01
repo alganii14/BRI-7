@@ -952,8 +952,8 @@ function displayNasabahList(nasabahs, paginationData) {
     
     // Data rows
     nasabahs.forEach((item, index) => {
-        const displayName = item.nama_nasabah || item.nama_partner_vendor || item.nama_perusahaan || item.perusahaan || item.nama_agen || item.nama_debitur || '-';
-        const displayNorek = item.norek || item.no_rekening || item.cifno || item.corporate_code || '-';
+        const displayName = item.nama_nasabah || item.nama_merchant || item.nama_partner_vendor || item.nama_perusahaan || item.perusahaan || item.nama_agen || item.nama_debitur || '-';
+        const displayNorek = item.norek || item.no_rek || item.no_rekening || item.cifno || item.corporate_code || '-';
         const displaySegmen = item.segmen_nasabah || item.segmentasi || item.segmentasi_bpr || '-';
         
         const nasabahObj = {
