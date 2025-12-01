@@ -479,7 +479,7 @@
 <script>
     // Kategori per strategi sesuai dengan dropdown Pull of Pipeline
     const kategoriPerStrategi = {
-        'Strategi 1': ['MERCHANT QRIS SAVOL BESAR CASA KECIL', 'MERCHANT EDC SAVOL BESAR CASA KECIL', 'PENURUNAN CASA BRILINK', 'PENURUNAN CASA MERCHANT (QRIS & EDC)', 'BRILINK SALDO < 10 JUTA', 'Qlola Non Debitur', 'Non Debitur Memiliki Qlola Namun User Tdk Aktif', 'Non Debitur Vol Besar CASA Kecil'],
+        'Strategi 1': ['MERCHANT QRIS SAVOL BESAR CASA KECIL', 'MERCHANT EDC SAVOL BESAR CASA KECIL', 'PENURUNAN CASA BRILINK', 'BRILINK SALDO < 10 JUTA', 'Qlola Non Debitur', 'Non Debitur Memiliki Qlola Namun User Tdk Aktif', 'Non Debitur Vol Besar CASA Kecil'],
         'Strategi 2': ['Qlola (Belum ada Qlola / ada namun nonaktif)', 'User Aktif Casa Kecil'],
         'Strategi 3': ['Optimalisasi Business Cluster'],
         'Strategi 4': ['Existing Payroll', 'Potensi Payroll'],

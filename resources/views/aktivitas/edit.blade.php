@@ -354,7 +354,6 @@
         'Strategi 1': [
             'MERCHANT QRIS SAVOL BESAR CASA KECIL',
             'MERCHANT EDC SAVOL BESAR CASA KECIL',
-            'PENURUNAN CASA MERCHANT (QRIS & EDC)',
             'PENURUNAN CASA BRILINK',
             'BRILINK SALDO < 10 JUTA',
             'Qlola Non Debitur',
