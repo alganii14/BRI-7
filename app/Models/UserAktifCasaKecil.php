@@ -25,5 +25,6 @@ class UserAktifCasaKecil extends Model
         'plafon',
         'pn_pengelola_1',
         'keterangan',
+        'tanggal_posisi_data',
     ];
 }

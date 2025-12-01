@@ -21,5 +21,6 @@ class AumDpk extends Model
         'nama_nasabah',
         'nomor_rekening',
         'aum',
+        'tanggal_posisi_data',
     ];
 }

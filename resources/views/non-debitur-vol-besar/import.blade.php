@@ -125,6 +125,34 @@
     <form action="{{ route('non-debitur-vol-besar.import') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
+        <div style="margin-bottom: 30px;">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">
+                    📅 Tanggal Posisi Data <span style="color: red;">*</span>
+                </label>
+                <input type="date" name="tanggal_posisi_data" id="tanggal_posisi_data" 
+                       style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" 
+                       value="{{ old('tanggal_posisi_data', date('Y-m-d')) }}" required>
+                <small style="color: #666; font-size: 12px;">Tanggal posisi data yang akan ditampilkan di atas tabel</small>
+                @error('tanggal_posisi_data')
+                    <p style="color: #dc3545; margin-top: 5px; font-size: 13px;">{{ $message }}</p>
+                @enderror
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 14px;">
+                    📆 Tanggal Upload Data <span style="color: red;">*</span>
+                </label>
+                <input type="date" name="tanggal_upload_data" id="tanggal_upload_data" 
+                       style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" 
+                       value="{{ old('tanggal_upload_data', date('Y-m-d')) }}" required>
+                <small style="color: #666; font-size: 12px;">Tanggal upload untuk filter bulan dan tahun (menggantikan created_at)</small>
+                @error('tanggal_upload_data')
+                    <p style="color: #dc3545; margin-top: 5px; font-size: 13px;">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+
         <div class="form-group">
             <label for="csv_file">Pilih File CSV</label>
             <input type="file" id="csv_file" name="csv_file" accept=".csv,.txt" required>

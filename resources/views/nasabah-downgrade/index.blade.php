@@ -190,6 +190,20 @@
     </div>
 @endif
 
+@php
+    $latestTanggalPosisi = \App\Models\NasabahDowngrade::whereNotNull('tanggal_posisi_data')
+                                              ->orderBy('tanggal_posisi_data', 'desc')
+                                              ->first();
+@endphp
+
+@if($latestTanggalPosisi && $latestTanggalPosisi->tanggal_posisi_data)
+<div style="background: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px 20px; border-radius: 6px; margin-bottom: 20px;">
+    <p style="margin: 0; color: #1976d2; font-weight: 600; font-size: 14px;">
+        📅 Posisi Data: {{ \Carbon\Carbon::parse($latestTanggalPosisi->tanggal_posisi_data)->format('d F Y') }}
+    </p>
+</div>
+@endif
+
 <div class="table-container">
     <table>
         <thead>

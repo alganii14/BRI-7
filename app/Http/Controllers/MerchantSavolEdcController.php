@@ -114,6 +114,9 @@ class MerchantSavolEdcController extends Controller
             $file = $request->file('file');
             $path = $file->getRealPath();
             
+            $tanggalPosisiData = $request->input('tanggal_posisi_data');
+            $tanggalUploadData = $request->input('tanggal_upload_data');
+            
             $csv = array_map(fn($line) => str_getcsv($line, ';'), file($path));
             
             $header = array_shift($csv);
@@ -136,6 +139,8 @@ class MerchantSavolEdcController extends Controller
                     'jumlah_trx' => trim($row[8] ?? ''),
                     'sales_volume' => trim($row[9] ?? ''),
                     'saldo_posisi' => trim($row[10] ?? ''),
+                    'tanggal_posisi_data' => $tanggalPosisiData,
+                    'tanggal_upload_data' => $tanggalUploadData,
                 ]);
                 
                 $imported++;

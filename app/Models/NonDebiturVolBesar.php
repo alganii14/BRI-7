@@ -21,5 +21,6 @@ class NonDebiturVolBesar extends Model
         'volume',
         'nama_nasabah',
         'keterangan',
+        'tanggal_posisi_data',
     ];
 }

@@ -182,6 +182,9 @@ class PerusahaanAnakController extends Controller
 
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
+        
+        $tanggalPosisiData = $request->input('tanggal_posisi_data');
+        $tanggalUploadData = $request->input('tanggal_upload_data');
 
         try {
             DB::beginTransaction();
@@ -210,6 +213,8 @@ class PerusahaanAnakController extends Controller
                         'status_pipeline' => trim($row[11]) ?: null,
                         'rekening_terbentuk' => trim($row[12]) ?: null,
                         'cif_terbentuk' => trim($row[13]) ?: null,
+                        'tanggal_posisi_data' => $tanggalPosisiData,
+                        'tanggal_upload_data' => $tanggalUploadData,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

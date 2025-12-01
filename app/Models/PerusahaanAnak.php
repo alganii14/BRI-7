@@ -26,5 +26,6 @@ class PerusahaanAnak extends Model
         'status_pipeline',
         'rekening_terbentuk',
         'cif_terbentuk',
+        'tanggal_posisi_data',
     ];
 }

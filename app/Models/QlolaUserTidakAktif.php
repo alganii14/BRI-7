@@ -20,5 +20,6 @@ class QlolaUserTidakAktif extends Model
         'balance',
         'nama_nasabah',
         'keterangan',
+        'tanggal_posisi_data',
     ];
 }

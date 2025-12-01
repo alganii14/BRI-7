@@ -15,5 +15,6 @@ class PotensiPayroll extends Model
         'perusahaan',
         'jenis_pipeline',
         'estimasi_pekerja',
+        'tanggal_posisi_data',
     ];
 }

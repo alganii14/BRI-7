@@ -22,5 +22,6 @@ class Layering extends Model
         'saldo_last_eom',
         'saldo_terupdate',
         'delta',
+        'tanggal_posisi_data',
     ];
 }

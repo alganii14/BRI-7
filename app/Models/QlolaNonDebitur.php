@@ -20,5 +20,6 @@ class QlolaNonDebitur extends Model
         'balance',
         'nama_nasabah',
         'keterangan',
+        'tanggal_posisi_data',
     ];
 }

@@ -177,6 +177,9 @@ class PenurunanPrioritasRitelMikroController extends Controller
 
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
+        
+        $tanggalPosisiData = $request->input('tanggal_posisi_data');
+        $tanggalUploadData = $request->input('tanggal_upload_data');
 
         try {
             DB::beginTransaction();
@@ -210,6 +213,8 @@ class PenurunanPrioritasRitelMikroController extends Controller
                         'saldo_last_eom' => $saldoLastEom,
                         'saldo_terupdate' => $saldoTerupdate,
                         'delta' => $delta,
+                        'tanggal_posisi_data' => $tanggalPosisiData,
+                        'tanggal_upload_data' => $tanggalUploadData,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

@@ -120,7 +120,8 @@ class NasabahDowngradeController extends Controller
         try {
             $file = $request->file('file');
             $path = $file->getRealPath();
-            $tanggalPosisiData = $request->tanggal_posisi_data;
+            $tanggalPosisiData = $request->input('tanggal_posisi_data');
+            $tanggalUploadData = $request->input('tanggal_upload_data');
             
             // Read CSV file
             $csv = array_map(function($line) {
@@ -149,6 +150,7 @@ class NasabahDowngradeController extends Controller
                     'nomor_rekening' => trim($row[9] ?? ''),
                     'aum' => trim($row[10] ?? ''),
                     'tanggal_posisi_data' => $tanggalPosisiData,
+                    'tanggal_upload_data' => $tanggalUploadData,
                 ]);
                 
                 $imported++;

@@ -113,6 +113,9 @@ class ExistingPayrollController extends Controller
 
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
+        
+        $tanggalPosisiData = $request->input('tanggal_posisi_data');
+        $tanggalUploadData = $request->input('tanggal_upload_data');
 
         try {
             DB::beginTransaction();
@@ -137,6 +140,8 @@ class ExistingPayrollController extends Controller
                         'nama_perusahaan' => trim($row[3]) ?: null,
                         'jumlah_rekening' => trim($row[4]) ?: null,
                         'saldo_rekening' => trim($row[5]) ?: null,
+                        'tanggal_posisi_data' => $tanggalPosisiData,
+                        'tanggal_upload_data' => $tanggalUploadData,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

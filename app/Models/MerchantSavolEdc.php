@@ -21,5 +21,6 @@ class MerchantSavolEdc extends Model
         'jumlah_trx',
         'sales_volume',
         'saldo_posisi',
+        'tanggal_posisi_data',
     ];
 }

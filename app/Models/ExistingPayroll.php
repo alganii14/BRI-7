@@ -18,5 +18,6 @@ class ExistingPayroll extends Model
         'nama_perusahaan',
         'jumlah_rekening',
         'saldo_rekening',
+        'tanggal_posisi_data',
     ];
 }

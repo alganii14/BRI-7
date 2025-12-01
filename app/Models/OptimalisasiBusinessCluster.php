@@ -18,5 +18,6 @@ class OptimalisasiBusinessCluster extends Model
         'nomor_rekening',
         'nama_usaha_pusat_bisnis',
         'nama_tenaga_pemasar',
+        'tanggal_posisi_data',
     ];
 }

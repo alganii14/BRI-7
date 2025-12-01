@@ -22,5 +22,6 @@ class MerchantSavol extends Model
         'cif',
         'savol_bulan_lalu',
         'casa_akhir_bulan',
+        'tanggal_posisi_data',
     ];
 }

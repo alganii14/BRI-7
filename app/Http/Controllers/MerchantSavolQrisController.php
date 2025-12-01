@@ -117,6 +117,9 @@ class MerchantSavolQrisController extends Controller
             $file = $request->file('file');
             $path = $file->getRealPath();
             
+            $tanggalPosisiData = $request->input('tanggal_posisi_data');
+            $tanggalUploadData = $request->input('tanggal_upload_data');
+            
             $csv = array_map(fn($line) => str_getcsv($line, ';'), file($path));
             
             $header = array_shift($csv);
@@ -140,6 +143,8 @@ class MerchantSavolQrisController extends Controller
                     'akumulasi_sv_total' => trim($row[9] ?? ''),
                     'posisi_sv_total' => trim($row[10] ?? ''),
                     'saldo_posisi' => trim($row[11] ?? ''),
+                    'tanggal_posisi_data' => $tanggalPosisiData,
+                    'tanggal_upload_data' => $tanggalUploadData,
                 ]);
                 
                 $imported++;

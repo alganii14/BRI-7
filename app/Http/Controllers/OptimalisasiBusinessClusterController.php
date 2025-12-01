@@ -171,6 +171,9 @@ class OptimalisasiBusinessClusterController extends Controller
 
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
+        
+        $tanggalPosisiData = $request->input('tanggal_posisi_data');
+        $tanggalUploadData = $request->input('tanggal_upload_data');
 
         try {
             DB::beginTransaction();
@@ -193,6 +196,8 @@ class OptimalisasiBusinessClusterController extends Controller
                         'nomor_rekening' => trim($row[5]) ?: null,
                         'nama_usaha_pusat_bisnis' => trim($row[6]) ?: null,
                         'nama_tenaga_pemasar' => trim($row[7]) ?: null,
+                        'tanggal_posisi_data' => $tanggalPosisiData,
+                        'tanggal_upload_data' => $tanggalUploadData,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

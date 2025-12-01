@@ -123,6 +123,9 @@ class QlolaNonaktifController extends Controller
         $file = $request->file('file');
         $path = $file->getRealPath();
         
+        $tanggalPosisiData = $request->input('tanggal_posisi_data');
+        $tanggalUploadData = $request->input('tanggal_upload_data');
+        
         DB::beginTransaction();
         try {
             // Auto-detect delimiter using CsvHelper
@@ -184,6 +187,8 @@ class QlolaNonaktifController extends Controller
                     'plafon' => $cleanedRow[9] ?: null,
                     'pn_pengelola_1' => $cleanedRow[10] ?: null,
                     'keterangan' => $cleanedRow[11] ?? null,
+                    'tanggal_posisi_data' => $tanggalPosisiData,
+                    'tanggal_upload_data' => $tanggalUploadData,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];

@@ -123,6 +123,9 @@ class QlolaUserTidakAktifController extends Controller
 
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
+        
+        $tanggalPosisiData = $request->input('tanggal_posisi_data');
+        $tanggalUploadData = $request->input('tanggal_upload_data');
 
         try {
             DB::beginTransaction();
@@ -148,6 +151,8 @@ class QlolaUserTidakAktifController extends Controller
                         'balance' => trim($row[7]) ?: null,
                         'nama_nasabah' => trim($row[8]) ?: null,
                         'keterangan' => trim($row[9]) ?: null,
+                        'tanggal_posisi_data' => $tanggalPosisiData,
+                        'tanggal_upload_data' => $tanggalUploadData,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

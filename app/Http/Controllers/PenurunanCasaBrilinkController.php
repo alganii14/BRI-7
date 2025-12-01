@@ -174,6 +174,9 @@ class PenurunanCasaBrilinkController extends Controller
 
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
+        
+        $tanggalPosisiData = $request->input('tanggal_posisi_data');
+        $tanggalUploadData = $request->input('tanggal_upload_data');
 
         try {
             DB::beginTransaction();
@@ -207,6 +210,8 @@ class PenurunanCasaBrilinkController extends Controller
                         'saldo_last_eom' => trim($row[8]) ?: null,
                         'saldo_terupdate' => trim($row[9]) ?: null,
                         'delta' => trim($row[10]) ?: null,
+                        'tanggal_posisi_data' => $tanggalPosisiData,
+                        'tanggal_upload_data' => $tanggalUploadData,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

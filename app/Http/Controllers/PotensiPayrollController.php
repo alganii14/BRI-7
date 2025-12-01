@@ -187,6 +187,9 @@ class PotensiPayrollController extends Controller
 
         $file = $request->file('csv_file');
         $path = $file->getRealPath();
+        
+        $tanggalPosisiData = $request->input('tanggal_posisi_data');
+        $tanggalUploadData = $request->input('tanggal_upload_data');
 
         try {
             DB::beginTransaction();
@@ -211,6 +214,8 @@ class PotensiPayrollController extends Controller
                         'perusahaan' => trim($row[2]) ?: null,
                         'jenis_pipeline' => trim($row[3]) ?: null,
                         'estimasi_pekerja' => trim($row[4]) ?: null,
+                        'tanggal_posisi_data' => $tanggalPosisiData,
+                        'tanggal_upload_data' => $tanggalUploadData,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

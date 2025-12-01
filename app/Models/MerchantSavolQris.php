@@ -22,5 +22,6 @@ class MerchantSavolQris extends Model
         'akumulasi_sv_total',
         'posisi_sv_total',
         'saldo_posisi',
+        'tanggal_posisi_data',
     ];
 }
