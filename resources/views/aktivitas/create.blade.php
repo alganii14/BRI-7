@@ -480,7 +480,7 @@
     // Kategori per strategi sesuai dengan dropdown Pull of Pipeline
     const kategoriPerStrategi = {
         'Strategi 1': ['MERCHANT QRIS SAVOL BESAR CASA KECIL', 'MERCHANT EDC SAVOL BESAR CASA KECIL', 'PENURUNAN CASA BRILINK', 'BRILINK SALDO < 10 JUTA', 'Qlola Non Debitur', 'Non Debitur Memiliki Qlola Namun User Tdk Aktif', 'Non Debitur Vol Besar CASA Kecil'],
-        'Strategi 2': ['Qlola (Belum ada Qlola / ada namun nonaktif)', 'User Aktif Casa Kecil'],
+        'Strategi 2': ['Qlola (Belum ada Qlola / ada namun nonaktif)', 'Debitur Belum Memiliki Qlola', 'User Aktif Casa Kecil'],
         'Strategi 3': ['Optimalisasi Business Cluster'],
         'Strategi 4': ['Existing Payroll', 'Potensi Payroll'],
         'Strategi 6': ['List Perusahaan Anak'],
@@ -1050,6 +1050,7 @@
         const isPotensiPayroll = kategori === 'Potensi Payroll';
         const isPerusahaanAnak = kategori === 'List Perusahaan Anak';
         const isQlolaNonaktif = kategori === 'Qlola (Belum ada Qlola / ada namun nonaktif)';
+        const isDebiturBelumMemilikiQlola = kategori === 'Debitur Belum Memiliki Qlola';
         const isMerchantQris = kategori === 'MERCHANT QRIS SAVOL BESAR CASA KECIL';
         const isMerchantEdc = kategori === 'MERCHANT EDC SAVOL BESAR CASA KECIL';
         const isPenurunanMerchant = kategori === 'PENURUNAN CASA MERCHANT (QRIS & EDC)';
@@ -1153,8 +1154,8 @@
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px;">VOL QCASH</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px;">VOL QIB</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo</th>';
-        } else if (isQlolaNonaktif) {
-            // Kolom khusus untuk Qlola (Belum ada Qlola / ada namun nonaktif)
+        } else if (isQlolaNonaktif || isDebiturBelumMemilikiQlola) {
+            // Kolom khusus untuk Qlola (Belum ada Qlola / ada namun nonaktif) dan Debitur Belum Memiliki Qlola
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Kanca</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Unit</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">CIFNO</th>';
@@ -1170,15 +1171,15 @@
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Kanca</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Uker</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Uker</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px;">Nama Nasabah</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px;">Nama Debitur</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">CIFNO</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Norek Pinjaman</th>';
-            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Bulan Lalu</th>';
-            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Bulan Berjalan</th>';
-            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px;">Delta Saldo</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Nama RM Pemrakarsa</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">QCash</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">QIB</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Balance</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Volume</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Plafon</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">PN Pengelola</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Norek Simpanan</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px;">Keterangan</th>';
         } else if (isPenurunanPrioritasRitelMikro) {
             // Kolom khusus untuk Penurunan Prioritas Ritel & Mikro
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Cabang Induk</th>';
@@ -1329,6 +1330,7 @@
             const isPotensiPayroll = kategori === 'Potensi Payroll';
             const isPerusahaanAnak = kategori === 'List Perusahaan Anak';
             const isQlolaNonaktif = kategori === 'Qlola (Belum ada Qlola / ada namun nonaktif)';
+            const isDebiturBelumMemilikiQlola = kategori === 'Debitur Belum Memiliki Qlola';
             const isMerchantQris = kategori === 'MERCHANT QRIS SAVOL BESAR CASA KECIL';
             const isMerchantEdc = kategori === 'MERCHANT EDC SAVOL BESAR CASA KECIL';
             const isPenurunanMerchant = kategori === 'PENURUNAN CASA MERCHANT (QRIS & EDC)';
@@ -1458,8 +1460,8 @@
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${volQcashFormatted}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${volQibFormatted}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600;">${saldoFormatted}</td>`;
-            } else if (isQlolaNonaktif) {
-                // Tampilan untuk Qlola (Belum ada Qlola / ada namun nonaktif)
+            } else if (isQlolaNonaktif || isDebiturBelumMemilikiQlola) {
+                // Tampilan untuk Qlola (Belum ada Qlola / ada namun nonaktif) dan Debitur Belum Memiliki Qlola
                 const parseValue = (value) => {
                     if (!value || value === '-') return 0;
                     if (typeof value === 'number') return value;
@@ -1474,11 +1476,11 @@
                 html += `<td style="padding: 10px;">${nasabah.cabang_induk || nasabah.kanca || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.unit_kerja || nasabah.unit || nasabah.uker || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek_pinjaman || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek_simpanan || '-'}</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || nasabah.nama_debitur || '-'}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600;">${plafonFormatted}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.pn_pengelola || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.pn_pengelola || nasabah.pn_pengelola_1 || '-'}</td>`;
                 html += `<td style="padding: 10px; max-width: 250px; white-space: normal; font-size: 12px;">${nasabah.keterangan || '-'}</td>`;
             } else if (isUserAktifCasaKecil) {
                 // Tampilan untuk User Aktif Casa Kecil
@@ -1490,28 +1492,27 @@
                     return isNaN(parsed) ? 0 : parsed;
                 };
                 
-                const saldoBulanLalu = parseValue(nasabah.saldo_bulan_lalu);
-                const saldoBulanBerjalan = parseValue(nasabah.saldo_bulan_berjalan);
-                const deltaSaldo = parseValue(nasabah.delta_saldo);
+                const balance = parseValue(nasabah.balance);
+                const volume = parseValue(nasabah.volume);
+                const plafon = parseValue(nasabah.plafon);
                 
-                const saldoBulanLaluFormatted = new Intl.NumberFormat('id-ID').format(saldoBulanLalu);
-                const saldoBulanBerjalanFormatted = new Intl.NumberFormat('id-ID').format(saldoBulanBerjalan);
-                const deltaSaldoFormatted = new Intl.NumberFormat('id-ID').format(deltaSaldo);
-                const deltaColor = deltaSaldo < 0 ? '#d32f2f' : '#2e7d32';
+                const balanceFormatted = new Intl.NumberFormat('id-ID').format(balance);
+                const volumeFormatted = new Intl.NumberFormat('id-ID').format(volume);
+                const plafonFormatted = new Intl.NumberFormat('id-ID').format(plafon);
                 
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_cabang_induk || nasabah.kode_kanca || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.cabang_induk || nasabah.kanca || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_kanca || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.kanca || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.unit_kerja || nasabah.uker || '-'}</td>`;
-                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.uker || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_debitur || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
-                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${saldoBulanLaluFormatted}</td>`;
-                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${saldoBulanBerjalanFormatted}</td>`;
-                html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600; color: ${deltaColor};">${deltaSaldoFormatted}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.nama_rm_pemrakarsa || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.qcash || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.qib || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek_pinjaman || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${balanceFormatted}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${volumeFormatted}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600;">${plafonFormatted}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.pn_pengelola_1 || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.norek_simpanan || '-'}</td>`;
+                html += `<td style="padding: 10px; max-width: 250px; white-space: normal; font-size: 12px;">${nasabah.keterangan || '-'}</td>`;
             } else if (isPenurunanPrioritasRitelMikro) {
                 // Tampilan untuk Penurunan Prioritas Ritel & Mikro
                 const parseValue = (value) => {
@@ -2131,6 +2132,7 @@
                 'MERCHANT QRIS SAVOL BESAR CASA KECIL',
                 'MERCHANT EDC SAVOL BESAR CASA KECIL',
                 'Qlola (Belum ada Qlola / ada namun nonaktif)',
+                'Debitur Belum Memiliki Qlola',
                 'Qlola Non Debitur',
                 'Non Debitur Memiliki Qlola Namun User Tdk Aktif',
                 'Non Debitur Vol Besar CASA Kecil',
