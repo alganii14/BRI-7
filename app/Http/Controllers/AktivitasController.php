@@ -228,9 +228,11 @@ class AktivitasController extends Controller
         
         // Daftar kategori yang tidak memerlukan CIFNO/norek
         $kategoriBebas = [
-            'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)',
+            'MERCHANT QRIS SAVOL BESAR CASA KECIL',
+            'MERCHANT EDC SAVOL BESAR CASA KECIL',
             'Qlola (Belum ada Qlola / ada namun nonaktif)',
             'Qlola Non Debitur',
+            'Non Debitur Memiliki Qlola Namun User Tdk Aktif',
             'Non Debitur Vol Besar CASA Kecil',
             'AUM>2M DPK<50 juta',
             'User Aktif Casa Kecil',
@@ -238,7 +240,8 @@ class AktivitasController extends Controller
             'PENURUNAN CASA MERCHANT (QRIS & EDC)',
             'Existing Payroll',
             'Potensi Payroll',
-            'List Perusahaan Anak'
+            'List Perusahaan Anak',
+            'BRILINK SALDO < 10 JUTA'
         ];
         
         $isPipelineData = in_array($request->kategori_strategi, $kategoriBebas) || 

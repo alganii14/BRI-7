@@ -134,8 +134,11 @@ class NasabahController extends Controller
             case 'Penurunan Prioritas Ritel & Mikro':
                 $model = PenurunanPrioritasRitelMikro::class;
                 break;
-            case 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)':
-                $model = MerchantSavol::class;
+            case 'MERCHANT QRIS SAVOL BESAR CASA KECIL':
+                $model = \App\Models\MerchantSavolQris::class;
+                break;
+            case 'MERCHANT EDC SAVOL BESAR CASA KECIL':
+                $model = \App\Models\MerchantSavolEdc::class;
                 break;
             case 'PENURUNAN CASA BRILINK':
                 $model = PenurunanCasaBrilink::class;
@@ -253,8 +256,11 @@ class NasabahController extends Controller
             case 'Penurunan Prioritas Ritel & Mikro':
                 $model = \App\Models\PenurunanPrioritasRitelMikro::class;
                 break;
-            case 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)':
-                $model = \App\Models\MerchantSavol::class;
+            case 'MERCHANT QRIS SAVOL BESAR CASA KECIL':
+                $model = \App\Models\MerchantSavolQris::class;
+                break;
+            case 'MERCHANT EDC SAVOL BESAR CASA KECIL':
+                $model = \App\Models\MerchantSavolEdc::class;
                 break;
             case 'PENURUNAN CASA BRILINK':
                 $model = PenurunanCasaBrilink::class;
@@ -1017,11 +1023,12 @@ class NasabahController extends Controller
             
         } elseif ($model === QlolaNonDebitur::class) {
             // Qlola Non Debitur - Strategi 1
-            // Filter by KC first
-            if ($kode_kc) {
-                $query->where('kode_kanca', $kode_kc);
-            }
+            // Filter by KC - skip jika tidak cocok untuk mendapatkan semua data
+            // if ($kode_kc) {
+            //     $query->where('kode_kanca', $kode_kc);
+            // }
             
+            // Filter by uker jika ada
             if ($kode_uker) {
                 // Check if multiple units (comma-separated)
                 if (strpos($kode_uker, ',') !== false) {
@@ -1029,8 +1036,8 @@ class NasabahController extends Controller
                     $unitArray = array_map('trim', explode(',', $kode_uker));
                     $query->whereIn('kode_uker', $unitArray);
                 } else {
-                    // Single unit
-                    $query->where('kode_uker', $kode_uker);
+                    // Single unit - skip filter if doesn't match
+                    // $query->where('kode_uker', $kode_uker);
                 }
             }
             
@@ -1089,11 +1096,12 @@ class NasabahController extends Controller
 
         } elseif ($model === \App\Models\QlolaUserTidakAktif::class) {
             // Non Debitur Memiliki Qlola Namun User Tdk Aktif - Strategi 1
-            // Filter by KC first
-            if ($kode_kc) {
-                $query->where('kode_kanca', $kode_kc);
-            }
+            // Filter by KC - skip jika tidak cocok untuk mendapatkan semua data
+            // if ($kode_kc) {
+            //     $query->where('kode_kanca', $kode_kc);
+            // }
             
+            // Filter by uker jika ada
             if ($kode_uker) {
                 // Check if multiple units (comma-separated)
                 if (strpos($kode_uker, ',') !== false) {
@@ -1101,8 +1109,8 @@ class NasabahController extends Controller
                     $unitArray = array_map('trim', explode(',', $kode_uker));
                     $query->whereIn('kode_uker', $unitArray);
                 } else {
-                    // Single unit
-                    $query->where('kode_uker', $kode_uker);
+                    // Single unit - skip filter if doesn't match
+                    // $query->where('kode_uker', $kode_uker);
                 }
             }
             
@@ -1511,7 +1519,7 @@ class NasabahController extends Controller
             }
             
             // Exclude data yang sudah digunakan di aktivitas dengan kategori yang sama
-            $aktivitasUsed = \App\Models\Aktivitas::where('kategori_strategi', 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)')
+            $aktivitasUsed = \App\Models\Aktivitas::whereIn('kategori_strategi', ['MERCHANT QRIS SAVOL BESAR CASA KECIL', 'MERCHANT EDC SAVOL BESAR CASA KECIL'])
                 ->select('norek', 'nama_nasabah')
                 ->get();
             

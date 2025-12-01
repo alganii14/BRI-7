@@ -761,32 +761,7 @@ class PipelineController extends Controller
         $kategori = $request->get('kategori');
         $pnRmft = $request->get('pn_rmft'); // PN RMFT yang sedang login/dipilih
         
-        // Cek apakah kategori ini harus langsung ambil dari tabel sumber
-        $searchDirectFromSource = in_array($kategori, [
-            'MERCHANT QRIS SAVOL BESAR CASA KECIL',
-            'MERCHANT EDC SAVOL BESAR CASA KECIL',
-            'PENURUNAN CASA MERCHANT (QRIS & EDC)',
-            'PENURUNAN CASA BRILINK',
-            'BRILINK SALDO < 10 JUTA',
-            'Qlola Non Debitur',
-            'Non Debitur Vol Besar CASA Kecil',
-            'Qlola (Belum ada Qlola / ada namun nonaktif)',
-            'User Aktif Casa Kecil',
-            'Optimalisasi Business Cluster',
-            'Existing Payroll',
-            'Potensi Payroll',
-            'List Perusahaan Anak',
-            'Penurunan Prioritas Ritel & Mikro',
-            'AUM>2M DPK<50 juta',
-            'Nasabah Downgrade',
-            'Wingback Penguatan Produk & Fungsi RM',
-            'Winback'
-        ]);
-        
-        if ($searchDirectFromSource) {
-            return $this->searchDirectFromSourceTable($request, $kodeKc, $kodeUker, $kategori, $search);
-        }
-        
+        // Semua kategori mengambil dari tabel pipelines (bukan dari pull of pipelines)
         // Get list nasabah dari pipelines
         $query = Pipeline::query();
         
@@ -902,6 +877,9 @@ class PipelineController extends Controller
             case 'Qlola Non Debitur':
                 $model = \App\Models\QlolaNonDebitur::class;
                 break;
+            case 'Non Debitur Memiliki Qlola Namun User Tdk Aktif':
+                $model = \App\Models\QlolaUserTidakAktif::class;
+                break;
             case 'Non Debitur Vol Besar CASA Kecil':
                 $model = \App\Models\NonDebiturVolBesar::class;
                 break;
@@ -970,6 +948,7 @@ class PipelineController extends Controller
                 'PENURUNAN CASA BRILINK',
                 'BRILINK SALDO < 10 JUTA',
                 'Qlola Non Debitur',
+                'Non Debitur Memiliki Qlola Namun User Tdk Aktif',
                 'Non Debitur Vol Besar CASA Kecil',
                 'Qlola (Belum ada Qlola / ada namun nonaktif)',
                 'User Aktif Casa Kecil',
@@ -1055,6 +1034,9 @@ class PipelineController extends Controller
                 break;
             case 'Qlola Non Debitur':
                 $model = \App\Models\QlolaNonDebitur::class;
+                break;
+            case 'Non Debitur Memiliki Qlola Namun User Tdk Aktif':
+                $model = \App\Models\QlolaUserTidakAktif::class;
                 break;
             case 'Non Debitur Vol Besar CASA Kecil':
                 $model = \App\Models\NonDebiturVolBesar::class;

@@ -352,10 +352,13 @@
     // Mapping kategori berdasarkan strategy
     const kategoriMap = {
         'Strategi 1': [
-            'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)',
+            'MERCHANT QRIS SAVOL BESAR CASA KECIL',
+            'MERCHANT EDC SAVOL BESAR CASA KECIL',
             'PENURUNAN CASA MERCHANT (QRIS & EDC)',
             'PENURUNAN CASA BRILINK',
+            'BRILINK SALDO < 10 JUTA',
             'Qlola Non Debitur',
+            'Non Debitur Memiliki Qlola Namun User Tdk Aktif',
             'Non Debitur Vol Besar CASA Kecil'
         ],
         'Strategi 2': [
@@ -575,8 +578,10 @@
         infoHtml += `</div>`;
         
         // Deteksi jenis strategi - SEMUA STRATEGI
-        const isMerchantSavol = kategori === 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)';
+        const isMerchantQris = kategori === 'MERCHANT QRIS SAVOL BESAR CASA KECIL';
+        const isMerchantEdc = kategori === 'MERCHANT EDC SAVOL BESAR CASA KECIL';
         const isQlolaNonDebitur = kategori === 'Qlola Non Debitur';
+        const isQlolaUserTidakAktif = kategori === 'Non Debitur Memiliki Qlola Namun User Tdk Aktif';
         const isQlolaNonaktif = kategori === 'Qlola (Belum ada Qlola / ada namun nonaktif)';
         const isPotensiPayroll = kategori === 'Potensi Payroll';
         const isExistingPayroll = kategori === 'Existing Payroll';
@@ -585,6 +590,7 @@
         const isPenurunanMerchant = kategori === 'PENURUNAN CASA MERCHANT (QRIS & EDC)';
         const isNonDebiturVolBesar = kategori === 'Non Debitur Vol Besar CASA Kecil';
         const isUserAktifCasaKecil = kategori === 'User Aktif Casa Kecil';
+        const isBrilinkSaldoKurang = kategori === 'BRILINK SALDO < 10 JUTA';
         const isPenurunanPrioritasRitelMikro = kategori === 'PENURUNAN PRIORITAS RITEL MIKRO' || kategori === 'Penurunan Prioritas Ritel & Mikro';
         const isAumDpk = kategori === 'AUM>2M DPK<50 juta';
         const isStrategi8 = kategori === 'Wingback Penguatan Produk & Fungsi RM' || strategy === 'Strategi 8';
@@ -594,27 +600,50 @@
         let html = '<table style="width: 100%; border-collapse: collapse; font-size: 13px;"><thead><tr style="background: #f8f9fa; position: sticky; top: 0; z-index: 1;">';
         
         // Build header berdasarkan strategi - LENGKAP SEMUA STRATEGI
-        if (isMerchantSavol) {
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Jenis Merchant</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">TID / Store ID</th>';
+        if (isMerchantQris) {
+            // Kolom khusus untuk Merchant QRIS Savol
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Nama Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Nama Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Store ID</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Merchant</th>';
-            @if(auth()->user()->isAdmin())
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">No. Rekening</th>';
-            @endif
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">No Rek</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIF</th>';
-            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Savol Bulan Lalu</th>';
-            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">CASA Akhir Bulan</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Akumulasi SV</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Posisi SV</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Posisi</th>';
+        } else if (isMerchantEdc) {
+            // Kolom khusus untuk Merchant EDC Savol
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Nama Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Nama Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Merchant</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">No Rek</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Jumlah TID</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Jumlah TRX</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Sales Volume</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Posisi</th>';
         } else if (isPenurunanMerchant || isPenurunanBrilink) {
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Cabang Induk</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Last EOM</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Saldo Terupdate</th>';
-        } else if (isQlolaNonDebitur) {
+        } else if (isQlolaNonDebitur || isQlolaUserTidakAktif) {
+            // Kolom khusus untuk Qlola Non Debitur dan Non Debitur Memiliki Qlola Namun User Tdk Aktif
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Uker</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Norek Simpanan</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Norek Pinjaman</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px; border-bottom: 2px solid #dee2e6;">Balance</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Nama Nasabah</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">Segmentasi</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px; border-bottom: 2px solid #dee2e6;">Keterangan</th>';
         } else if (isNonDebiturVolBesar) {
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px; border-bottom: 2px solid #dee2e6;">Kode Kanca</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px; border-bottom: 2px solid #dee2e6;">CIFNO</th>';

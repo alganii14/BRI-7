@@ -479,7 +479,7 @@
 <script>
     // Kategori per strategi sesuai dengan dropdown Pull of Pipeline
     const kategoriPerStrategi = {
-        'Strategi 1': ['MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)', 'PENURUNAN CASA BRILINK', 'PENURUNAN CASA MERCHANT (QRIS & EDC)', 'BRILINK SALDO < 10 JUTA', 'Qlola Non Debitur', 'Non Debitur Vol Besar CASA Kecil'],
+        'Strategi 1': ['MERCHANT QRIS SAVOL BESAR CASA KECIL', 'MERCHANT EDC SAVOL BESAR CASA KECIL', 'PENURUNAN CASA BRILINK', 'PENURUNAN CASA MERCHANT (QRIS & EDC)', 'BRILINK SALDO < 10 JUTA', 'Qlola Non Debitur', 'Non Debitur Memiliki Qlola Namun User Tdk Aktif', 'Non Debitur Vol Besar CASA Kecil'],
         'Strategi 2': ['Qlola (Belum ada Qlola / ada namun nonaktif)', 'User Aktif Casa Kecil'],
         'Strategi 3': ['Optimalisasi Business Cluster'],
         'Strategi 4': ['Existing Payroll', 'Potensi Payroll'],
@@ -1050,11 +1050,13 @@
         const isPotensiPayroll = kategori === 'Potensi Payroll';
         const isPerusahaanAnak = kategori === 'List Perusahaan Anak';
         const isQlolaNonaktif = kategori === 'Qlola (Belum ada Qlola / ada namun nonaktif)';
-        const isMerchantSavol = kategori === 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)';
+        const isMerchantQris = kategori === 'MERCHANT QRIS SAVOL BESAR CASA KECIL';
+        const isMerchantEdc = kategori === 'MERCHANT EDC SAVOL BESAR CASA KECIL';
         const isPenurunanMerchant = kategori === 'PENURUNAN CASA MERCHANT (QRIS & EDC)';
         const isPenurunanBrilink = kategori === 'PENURUNAN CASA BRILINK';
         const isBrilinkSaldoKurang = kategori === 'BRILINK SALDO < 10 JUTA';
         const isQlolaNonDebitur = kategori === 'Qlola Non Debitur';
+        const isQlolaUserTidakAktif = kategori === 'Non Debitur Memiliki Qlola Namun User Tdk Aktif';
         const isNonDebiturVolBesar = kategori === 'Non Debitur Vol Besar CASA Kecil';
         const isUserAktifCasaKecil = kategori === 'User Aktif Casa Kecil';
         const isPenurunanPrioritasRitelMikro = kategori === 'Penurunan Prioritas Ritel & Mikro';
@@ -1064,19 +1066,32 @@
         const isLayeringWinback = kategori === 'Winback';
         const isOptimalisasiBusinessCluster = kategori === 'Optimalisasi Business Cluster';
         
-        if (isMerchantSavol) {
-            // Kolom khusus untuk Merchant Savol Besar Casa Kecil (Qris & EDC)
+        if (isMerchantQris) {
+            // Kolom khusus untuk Merchant QRIS Savol Besar Casa Kecil
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Kanca</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Nama Kanca</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Uker</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Uker</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">Jenis Merchant</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">TID / Store ID</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Nama Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">Store ID</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px;">Nama Merchant</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">No. Rekening</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">No Rek</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">CIF</th>';
-            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Savol Bulan Lalu</th>';
-            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">CASA Akhir Bulan</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px;">Akumulasi SV</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px;">Posisi SV</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Posisi</th>';
+        } else if (isMerchantEdc) {
+            // Kolom khusus untuk Merchant EDC Savol Besar Casa Kecil
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Nama Kanca</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Nama Uker</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px;">Nama Merchant</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">No Rek</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">CIFNO</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 100px;">Jumlah TID</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 100px;">Jumlah TRX</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 120px;">Sales Volume</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Saldo Posisi</th>';
         } else if (isPenurunanMerchant) {
             // Kolom khusus untuk Penurunan CASA Merchant (QRIS & EDC)
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Cabang Induk</th>';
@@ -1113,19 +1128,17 @@
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kelas</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">No. Rekening</th>';
             html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">CASA</th>';
-        } else if (isQlolaNonDebitur) {
-            // Kolom khusus untuk Qlola Non Debitur
+        } else if (isQlolaNonDebitur || isQlolaUserTidakAktif) {
+            // Kolom khusus untuk Qlola Non Debitur dan Non Debitur Memiliki Qlola Namun User Tdk Aktif
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Kanca</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Kanca</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 100px;">Kode Uker</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Uker</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">CIFNO</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">No. Rekening</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Norek Simpanan</th>';
+            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 150px;">Norek Pinjaman</th>';
+            html += '<th style="padding: 10px; text-align: right; font-size: 13px; min-width: 150px;">Balance</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px;">Nama Nasabah</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">Segmentasi</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">Cek QCash</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">Cek CMS</th>';
-            html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 120px;">Cek IB</th>';
             html += '<th style="padding: 10px; text-align: left; font-size: 13px; min-width: 200px;">Keterangan</th>';
         } else if (isNonDebiturVolBesar) {
             // Kolom khusus untuk Non Debitur Vol Besar CASA Kecil
@@ -1316,11 +1329,13 @@
             const isPotensiPayroll = kategori === 'Potensi Payroll';
             const isPerusahaanAnak = kategori === 'List Perusahaan Anak';
             const isQlolaNonaktif = kategori === 'Qlola (Belum ada Qlola / ada namun nonaktif)';
-            const isMerchantSavol = kategori === 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)';
+            const isMerchantQris = kategori === 'MERCHANT QRIS SAVOL BESAR CASA KECIL';
+            const isMerchantEdc = kategori === 'MERCHANT EDC SAVOL BESAR CASA KECIL';
             const isPenurunanMerchant = kategori === 'PENURUNAN CASA MERCHANT (QRIS & EDC)';
             const isPenurunanBrilink = kategori === 'PENURUNAN CASA BRILINK';
             const isBrilinkSaldoKurang = kategori === 'BRILINK SALDO < 10 JUTA';
             const isQlolaNonDebitur = kategori === 'Qlola Non Debitur';
+            const isQlolaUserTidakAktif = kategori === 'Non Debitur Memiliki Qlola Namun User Tdk Aktif';
             const isNonDebiturVolBesar = kategori === 'Non Debitur Vol Besar CASA Kecil';
             const isUserAktifCasaKecil = kategori === 'User Aktif Casa Kecil';
             const isPenurunanPrioritasRitelMikro = kategori === 'Penurunan Prioritas Ritel & Mikro';
@@ -1332,19 +1347,32 @@
             
             html += '<tr style="border-bottom: 1px solid #eee; transition: background 0.2s;" onmouseenter="this.style.background=\'#f8f9fa\'" onmouseleave="this.style.background=\'white\'">';
             
-            if (isMerchantSavol) {
-                // Tampilan untuk Merchant Savol Besar Casa Kecil (Qris & EDC)
+            if (isMerchantQris) {
+                // Tampilan untuk Merchant QRIS Savol Besar Casa Kecil
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_kanca || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.kanca || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.nama_kanca || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.uker || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.jenis_merchant || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.tid_store_id || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.nama_uker || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.storeid || '-'}</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_merchant || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.no_rek || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cif || '-'}</td>`;
-                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.savol_bulan_lalu || '-'}</td>`;
-                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.casa_akhir_bulan || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.akumulasi_sv_total || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.posisi_sv_total || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.saldo_posisi || '-'}</td>`;
+            } else if (isMerchantEdc) {
+                // Tampilan untuk Merchant EDC Savol Besar Casa Kecil
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_kanca || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.nama_kanca || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
+                html += `<td style="padding: 10px;">${nasabah.nama_uker || '-'}</td>`;
+                html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_merchant || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.cifno || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.jumlah_tid || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.jumlah_trx || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.sales_volume || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.saldo_posisi || '-'}</td>`;
             } else if (isPenurunanMerchant) {
                 // Tampilan untuk Penurunan CASA Merchant (QRIS & EDC)
                 const deltaValue = nasabah.delta || 0;
@@ -1387,19 +1415,17 @@
                 html += `<td style="padding: 10px;"><span style="padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 600; background-color: ${nasabah.kelas === 'JAWARA' ? '#d1ecf1' : '#fff3cd'}; color: ${nasabah.kelas === 'JAWARA' ? '#0c5460' : '#856404'};">${nasabah.kelas || '-'}</span></td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek || '-'}</td>`;
                 html += `<td style="padding: 10px; text-align: right; font-family: monospace; font-weight: 600;">${nasabah.casa || '-'}</td>`;
-            } else if (isQlolaNonDebitur) {
-                // Tampilan untuk Qlola Non Debitur
+            } else if (isQlolaNonDebitur || isQlolaUserTidakAktif) {
+                // Tampilan untuk Qlola Non Debitur dan Non Debitur Memiliki Qlola Namun User Tdk Aktif
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_kanca || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.kanca || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace;">${nasabah.kode_uker || '-'}</td>`;
                 html += `<td style="padding: 10px;">${nasabah.uker || '-'}</td>`;
                 html += `<td style="padding: 10px; font-family: monospace; font-weight: 600;">${nasabah.cifno || '-'}</td>`;
-                html += `<td style="padding: 10px; font-family: monospace;">-</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek_simpanan || '-'}</td>`;
+                html += `<td style="padding: 10px; font-family: monospace;">${nasabah.norek_pinjaman || '-'}</td>`;
+                html += `<td style="padding: 10px; text-align: right; font-family: monospace;">${nasabah.balance || '-'}</td>`;
                 html += `<td style="padding: 10px; font-weight: 500;">${nasabah.nama_nasabah || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.segmentasi || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.cek_qcash || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.cek_cms || '-'}</td>`;
-                html += `<td style="padding: 10px;">${nasabah.cek_ib || '-'}</td>`;
                 html += `<td style="padding: 10px; max-width: 250px; white-space: normal; font-size: 12px;">${nasabah.keterangan || '-'}</td>`;
             } else if (isNonDebiturVolBesar) {
                 // Tampilan untuk Non Debitur Vol Besar CASA Kecil
@@ -1948,7 +1974,8 @@
         const kategori = document.getElementById('kategori_strategi').value;
         const isPotensiPayroll = kategori === 'Potensi Payroll';
         const isExistingPayroll = kategori === 'Existing Payroll';
-        const isMerchantSavol = kategori === 'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)';
+        const isMerchantQris = kategori === 'MERCHANT QRIS SAVOL BESAR CASA KECIL';
+        const isMerchantEdc = kategori === 'MERCHANT EDC SAVOL BESAR CASA KECIL';
         const isPerusahaanAnak = kategori === 'List Perusahaan Anak';
         const isBrilinkSaldoKurang = kategori === 'BRILINK SALDO < 10 JUTA';
         
@@ -1957,9 +1984,12 @@
             document.getElementById('norek').value = nasabah.perusahaan || '';
         } else if (isExistingPayroll) {
             document.getElementById('norek').value = nasabah.cifno || '';
-        } else if (isMerchantSavol) {
-            // Untuk Merchant Savol, hide nomor rekening
-            document.getElementById('norek').value = '-';
+        } else if (isMerchantQris) {
+            // Untuk Merchant QRIS, gunakan no_rek
+            document.getElementById('norek').value = nasabah.no_rek || '-';
+        } else if (isMerchantEdc) {
+            // Untuk Merchant EDC, gunakan norek
+            document.getElementById('norek').value = nasabah.norek || '-';
         } else if (isBrilinkSaldoKurang) {
             // Untuk Brilink, gunakan norek
             document.getElementById('norek').value = nasabah.norek || '-';
@@ -1968,13 +1998,15 @@
             document.getElementById('norek').value = '-';
         }
         
-        // Set nama nasabah - untuk Potensi Payroll gunakan perusahaan, untuk Perusahaan Anak gunakan nama_partner_vendor, untuk Brilink gunakan nama_agen
+        // Set nama nasabah - untuk Potensi Payroll gunakan perusahaan, untuk Perusahaan Anak gunakan nama_partner_vendor, untuk Brilink gunakan nama_agen, untuk Merchant gunakan nama_merchant
         if (isPotensiPayroll) {
             document.getElementById('nama_nasabah').value = nasabah.perusahaan || '';
         } else if (isPerusahaanAnak) {
             document.getElementById('nama_nasabah').value = nasabah.nama_partner_vendor || '';
         } else if (isBrilinkSaldoKurang) {
             document.getElementById('nama_nasabah').value = nasabah.nama_agen || '';
+        } else if (isMerchantQris || isMerchantEdc) {
+            document.getElementById('nama_nasabah').value = nasabah.nama_merchant || '';
         } else {
             document.getElementById('nama_nasabah').value = nasabah.nama_nasabah || '';
         }
@@ -2096,9 +2128,11 @@
             
             // Daftar kategori yang tidak memerlukan CIFNO karena menggunakan pipeline data
             const kategoriBebas = [
-                'MERCHANT SAVOL BESAR CASA KECIL (QRIS & EDC)',
+                'MERCHANT QRIS SAVOL BESAR CASA KECIL',
+                'MERCHANT EDC SAVOL BESAR CASA KECIL',
                 'Qlola (Belum ada Qlola / ada namun nonaktif)',
                 'Qlola Non Debitur',
+                'Non Debitur Memiliki Qlola Namun User Tdk Aktif',
                 'Non Debitur Vol Besar CASA Kecil',
                 'AUM>2M DPK<50 juta',
                 'Nasabah Downgrade',
@@ -2107,7 +2141,8 @@
                 'PENURUNAN CASA MERCHANT (QRIS & EDC)',
                 'Existing Payroll',
                 'Potensi Payroll',
-                'List Perusahaan Anak'
+                'List Perusahaan Anak',
+                'BRILINK SALDO < 10 JUTA'
             ];
             
             const isPipelineData = kategoriBebas.includes(kategori) || 
