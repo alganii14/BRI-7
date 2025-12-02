@@ -433,7 +433,30 @@
         </div>
         
         <div style="padding: 20px; display: flex; flex-direction: column; overflow: hidden; flex: 1;">
-            <input type="text" id="searchNasabah" placeholder="Cari nasabah berdasarkan nama atau nomor rekening dari Pipeline..." style="width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; flex-shrink: 0;" onkeyup="searchNasabahList()">
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="searchNasabah" placeholder="Cari nasabah berdasarkan nama atau nomor rekening dari Pipeline..." style="flex: 1; min-width: 200px; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;" onkeyup="searchNasabahList()">
+                <select id="filterMonth" style="padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; min-width: 120px;" onchange="filterByMonthYear()">
+                    <option value="">Semua Bulan</option>
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">Agustus</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+                <select id="filterYear" style="padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; min-width: 100px;" onchange="filterByMonthYear()">
+                    <option value="">Semua Tahun</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                </select>
+            </div>
             
             <div id="nasabahList" style="flex: 1; overflow-y: auto; overflow-x: hidden;">
                 <div style="text-align: center; padding: 40px; color: #0066CC;">
@@ -932,8 +955,10 @@
         const isUnitRmft = document.getElementById('is_unit_rmft').value;
         const strategy = document.getElementById('strategy_pipeline').value;
         const kategori = document.getElementById('kategori_strategi').value;
+        const filterMonth = document.getElementById('filterMonth')?.value || '';
+        const filterYear = document.getElementById('filterYear')?.value || '';
         
-        console.log('Load Nasabah from Pipeline - Params:', {kodeKc, strategy, kategori, page});
+        console.log('Load Nasabah from Pipeline - Params:', {kodeKc, strategy, kategori, page, filterMonth, filterYear});
         
         // Save current state
         currentPage = page;
@@ -974,6 +999,12 @@
         let url = `{{ route('api.aktivitas.search-from-pipeline') }}?search=&kode_kc=${kodeKc}&kode_uker=${kodeUkerParam}&strategy=${encodeURIComponent(strategy)}&pn_rmft=${pnRmft}&page=${page}`;
         if (kategori) {
             url += `&kategori=${encodeURIComponent(kategori)}`;
+        }
+        if (filterMonth) {
+            url += `&month=${filterMonth}`;
+        }
+        if (filterYear) {
+            url += `&year=${filterYear}`;
         }
         
         console.log('Fetching URL:', url);
@@ -1736,6 +1767,11 @@
         document.getElementById('filterMonth').value = '';
     }
     
+    function filterByMonthYear() {
+        currentPage = 1;
+        loadAllNasabahFromPipeline(1);
+    }
+
     // Unit Modal Functions
     let allUnits = [];
     let selectedUnits = [];

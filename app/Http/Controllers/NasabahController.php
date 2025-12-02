@@ -2049,6 +2049,8 @@ class NasabahController extends Controller
             $strategy = $request->get('strategy');
             $kategori = $request->get('kategori');
             $pnRmft = $request->get('pn_rmft'); // PN RMFT untuk filter
+            $bulan = $request->get('bulan');    // Filter bulan
+            $tahun = $request->get('tahun');    // Filter tahun
             $page = $request->get('page', 1);
             $perPage = 50;
         
@@ -2212,6 +2214,20 @@ class NasabahController extends Controller
                 // Default untuk kategori lain yang punya field kode_uker
                 if (\Schema::hasColumn($model::make()->getTable(), 'kode_uker')) {
                     $query->where('kode_uker', $kodeUker);
+                }
+            }
+        }
+        
+        // Filter by bulan dan tahun berdasarkan tanggal upload (created_at)
+        $tableName = $model::make()->getTable();
+        if ($bulan || $tahun) {
+            // Gunakan created_at sebagai tanggal upload
+            if (\Schema::hasColumn($tableName, 'created_at')) {
+                if ($bulan) {
+                    $query->whereMonth('created_at', $bulan);
+                }
+                if ($tahun) {
+                    $query->whereYear('created_at', $tahun);
                 }
             }
         }

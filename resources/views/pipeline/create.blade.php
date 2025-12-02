@@ -379,8 +379,29 @@
         </div>
         
         <div style="padding: 20px; display: flex; flex-direction: column; overflow: hidden; flex: 1;">
-            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center;">
-                <input type="text" id="searchNasabah" placeholder="Cari nasabah berdasarkan nama, CIFNO, atau nomor rekening..." style="flex: 1; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;" onkeyup="searchNasabahList()">
+            <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="searchNasabah" placeholder="Cari nasabah berdasarkan nama, CIFNO, atau nomor rekening..." style="flex: 1; min-width: 200px; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px;" onkeyup="searchNasabahList()">
+                <select id="filterBulan" style="padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; min-width: 120px;" onchange="filterByBulanTahun()">
+                    <option value="">Semua Bulan</option>
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli</option>
+                    <option value="8">Agustus</option>
+                    <option value="9">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+                <select id="filterTahun" style="padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; min-width: 100px;" onchange="filterByBulanTahun()">
+                    <option value="">Semua Tahun</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                </select>
                 <div id="selectedCount" style="padding: 8px 16px; background: #e3f2fd; border-radius: 6px; color: #1976d2; font-weight: 600; font-size: 13px; white-space: nowrap;">
                     0 dipilih
                 </div>
@@ -788,8 +809,15 @@ function openNasabahModal() {
 function closeNasabahModal() {
     document.getElementById('nasabahModal').style.display = 'none';
     document.getElementById('searchNasabah').value = '';
+    document.getElementById('filterBulan').value = '';
+    document.getElementById('filterTahun').value = '';
     selectedNasabahList = [];
     updateSelectedCount();
+}
+
+function filterByBulanTahun() {
+    currentPage = 1;
+    loadNasabahList();
 }
 
 function updateSelectedCount() {
@@ -860,6 +888,8 @@ function loadNasabahList(append = false) {
     const kategori = document.getElementById('kategori_strategi')?.value || '';
     const search = document.getElementById('searchNasabah').value;
     const pnRmft = document.getElementById('pn_rmft').value; // Ambil PN RMFT
+    const bulan = document.getElementById('filterBulan')?.value || '';
+    const tahun = document.getElementById('filterTahun')?.value || '';
     
     // Gunakan single unit yang dipilih
     const kodeUkerParam = document.getElementById('kode_uker').value;
@@ -872,6 +902,12 @@ function loadNasabahList(append = false) {
     let url = `{{ route('api.pipeline.search-from-pull') }}?search=${encodeURIComponent(search)}&kode_kc=${kodeKC}&kode_uker=${kodeUkerParam}&strategy=${encodeURIComponent(strategy)}&pn_rmft=${pnRmft}&page=${currentPage}&_t=${Date.now()}`;
     if (kategori) {
         url += `&kategori=${encodeURIComponent(kategori)}`;
+    }
+    if (bulan) {
+        url += `&bulan=${bulan}`;
+    }
+    if (tahun) {
+        url += `&tahun=${tahun}`;
     }
     
     fetch(url)

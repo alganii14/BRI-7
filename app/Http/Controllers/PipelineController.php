@@ -761,6 +761,8 @@ class PipelineController extends Controller
         $strategy = $request->get('strategy');
         $kategori = $request->get('kategori');
         $pnRmft = $request->get('pn_rmft'); // PN RMFT yang sedang login/dipilih
+        $month = $request->get('month');    // Filter bulan
+        $year = $request->get('year');      // Filter tahun
         
         // Semua kategori mengambil dari tabel pipelines (bukan dari pull of pipelines)
         // Get list nasabah dari pipelines
@@ -786,6 +788,14 @@ class PipelineController extends Controller
         // FILTER: Hanya tampilkan pipeline untuk RMFT yang sama
         if ($pnRmft) {
             $query->where('pn_rmft', $pnRmft);
+        }
+        
+        // Filter by bulan dan tahun berdasarkan tanggal pipeline
+        if ($month) {
+            $query->whereMonth('tanggal', $month);
+        }
+        if ($year) {
+            $query->whereYear('tanggal', $year);
         }
         
         if ($search) {
