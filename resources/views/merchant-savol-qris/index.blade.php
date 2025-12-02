@@ -127,8 +127,65 @@
     </table>
 </div>
 
-<div style="margin-top: 30px; text-align: center;">
-    {{ $merchants->links() }}
+@if($merchants->hasPages())
+<div class="pagination-wrapper" style="text-align: center; margin-top: 30px;">
+    <p style="color: #666; font-size: 14px; margin: 0 0 15px 0;">Showing {{ $merchants->firstItem() }} to {{ $merchants->lastItem() }} of {{ $merchants->total() }} results</p>
+    
+    <div style="display: flex; justify-content: center; align-items: center; gap: 5px; flex-wrap: wrap;">
+        {{-- Previous Button --}}
+        @if ($merchants->onFirstPage())
+            <span style="padding: 8px 16px; background: #e9ecef; color: #6c757d; border: 1px solid #dee2e6; border-radius: 4px; cursor: not-allowed; font-size: 14px;">← Previous</span>
+        @else
+            <a href="{{ $merchants->appends(request()->query())->previousPageUrl() }}" style="padding: 8px 16px; background: white; color: #007bff; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s;">← Previous</a>
+        @endif
+
+        {{-- Page Numbers --}}
+        @php
+            $currentPage = $merchants->currentPage();
+            $lastPage = $merchants->lastPage();
+            
+            // Hitung range halaman yang akan ditampilkan (maksimal 5)
+            $maxPages = 5;
+            $halfMax = floor($maxPages / 2);
+            
+            if ($lastPage <= $maxPages) {
+                // Jika total halaman <= 5, tampilkan semua
+                $startPage = 1;
+                $endPage = $lastPage;
+            } else {
+                // Jika lebih dari 5 halaman
+                if ($currentPage <= $halfMax) {
+                    // Di awal (halaman 1-3)
+                    $startPage = 1;
+                    $endPage = $maxPages;
+                } elseif ($currentPage >= ($lastPage - $halfMax)) {
+                    // Di akhir
+                    $startPage = $lastPage - $maxPages + 1;
+                    $endPage = $lastPage;
+                } else {
+                    // Di tengah
+                    $startPage = $currentPage - $halfMax;
+                    $endPage = $currentPage + $halfMax;
+                }
+            }
+        @endphp
+
+        @for ($page = $startPage; $page <= $endPage; $page++)
+            @if ($page == $currentPage)
+                <span style="padding: 8px 14px; background: #007bff; color: white; border: 1px solid #007bff; border-radius: 4px; font-size: 14px; font-weight: 600; min-width: 40px; text-align: center;">{{ $page }}</span>
+            @else
+                <a href="{{ $merchants->appends(request()->query())->url($page) }}" style="padding: 8px 14px; background: white; color: #007bff; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s; min-width: 40px; text-align: center;">{{ $page }}</a>
+            @endif
+        @endfor
+
+        {{-- Next Button --}}
+        @if ($merchants->hasMorePages())
+            <a href="{{ $merchants->appends(request()->query())->nextPageUrl() }}" style="padding: 8px 16px; background: white; color: #007bff; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s;">Next →</a>
+        @else
+            <span style="padding: 8px 16px; background: #e9ecef; color: #6c757d; border: 1px solid #dee2e6; border-radius: 4px; cursor: not-allowed; font-size: 14px;">Next →</span>
+        @endif
+    </div>
 </div>
+@endif
 
 @endsection

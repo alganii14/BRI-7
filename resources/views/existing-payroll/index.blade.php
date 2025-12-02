@@ -267,11 +267,58 @@
 </div>
 
 @if($existingPayrolls->hasPages())
-<div class="pagination-wrapper">
-    {{ $existingPayrolls->links() }}
-    <p class="pagination-info">
-        Menampilkan {{ $existingPayrolls->firstItem() }} - {{ $existingPayrolls->lastItem() }} dari {{ number_format($existingPayrolls->total(), 0, ',', '.') }} data
-    </p>
+<div class="pagination-wrapper" style="text-align: center; margin-top: 30px;">
+    <p style="color: #666; font-size: 14px; margin: 0 0 15px 0;">Showing {{ $existingPayrolls->firstItem() }} to {{ $existingPayrolls->lastItem() }} of {{ $existingPayrolls->total() }} results</p>
+    
+    <div style="display: flex; justify-content: center; align-items: center; gap: 5px; flex-wrap: wrap;">
+        {{-- Previous Button --}}
+        @if ($existingPayrolls->onFirstPage())
+            <span style="padding: 8px 16px; background: #e9ecef; color: #6c757d; border: 1px solid #dee2e6; border-radius: 4px; cursor: not-allowed; font-size: 14px;">← Previous</span>
+        @else
+            <a href="{{ $existingPayrolls->appends(request()->query())->previousPageUrl() }}" style="padding: 8px 16px; background: white; color: #007bff; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s;">← Previous</a>
+        @endif
+
+        {{-- Page Numbers --}}
+        @php
+            $currentPage = $existingPayrolls->currentPage();
+            $lastPage = $existingPayrolls->lastPage();
+            
+            // Hitung range halaman yang akan ditampilkan (maksimal 5)
+            $maxPages = 5;
+            $halfMax = floor($maxPages / 2);
+            
+            if ($lastPage <= $maxPages) {
+                $startPage = 1;
+                $endPage = $lastPage;
+            } else {
+                if ($currentPage <= $halfMax) {
+                    $startPage = 1;
+                    $endPage = $maxPages;
+                } elseif ($currentPage >= ($lastPage - $halfMax)) {
+                    $startPage = $lastPage - $maxPages + 1;
+                    $endPage = $lastPage;
+                } else {
+                    $startPage = $currentPage - $halfMax;
+                    $endPage = $currentPage + $halfMax;
+                }
+            }
+        @endphp
+
+        @for ($page = $startPage; $page <= $endPage; $page++)
+            @if ($page == $currentPage)
+                <span style="padding: 8px 14px; background: #007bff; color: white; border: 1px solid #007bff; border-radius: 4px; font-size: 14px; font-weight: 600; min-width: 40px; text-align: center;">{{ $page }}</span>
+            @else
+                <a href="{{ $existingPayrolls->appends(request()->query())->url($page) }}" style="padding: 8px 14px; background: white; color: #007bff; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s; min-width: 40px; text-align: center;">{{ $page }}</a>
+            @endif
+        @endfor
+
+        {{-- Next Button --}}
+        @if ($existingPayrolls->hasMorePages())
+            <a href="{{ $existingPayrolls->appends(request()->query())->nextPageUrl() }}" style="padding: 8px 16px; background: white; color: #007bff; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; font-size: 14px; transition: all 0.2s;">Next →</a>
+        @else
+            <span style="padding: 8px 16px; background: #e9ecef; color: #6c757d; border: 1px solid #dee2e6; border-radius: 4px; cursor: not-allowed; font-size: 14px;">Next →</span>
+        @endif
+    </div>
 </div>
 @endif
 
