@@ -241,6 +241,7 @@ class PipelineController extends Controller
             'MERCHANT QRIS SAVOL BESAR CASA KECIL',
             'MERCHANT EDC SAVOL BESAR CASA KECIL',
             'Qlola (Belum ada Qlola / ada namun nonaktif)',
+            'Debitur Belum Memiliki Qlola',
             'Qlola Non Debitur',
             'Non Debitur Vol Besar CASA Kecil',
             'AUM>2M DPK<50 juta',
@@ -887,8 +888,13 @@ class PipelineController extends Controller
                 $model = \App\Models\QlolaNonaktif::class;
                 $nameField = 'nama_debitur';
                 break;
+            case 'Debitur Belum Memiliki Qlola':
+                $model = \App\Models\DebiturBelumMemilikiQlola::class;
+                $nameField = 'nama_debitur';
+                break;
             case 'User Aktif Casa Kecil':
                 $model = \App\Models\UserAktifCasaKecil::class;
+                $nameField = 'nama_debitur';
                 break;
             case 'Optimalisasi Business Cluster':
                 $model = \App\Models\OptimalisasiBusinessCluster::class;
@@ -1045,8 +1051,13 @@ class PipelineController extends Controller
                 $model = \App\Models\QlolaNonaktif::class;
                 $nameField = 'nama_debitur';
                 break;
+            case 'Debitur Belum Memiliki Qlola':
+                $model = \App\Models\DebiturBelumMemilikiQlola::class;
+                $nameField = 'nama_debitur';
+                break;
             case 'User Aktif Casa Kecil':
                 $model = \App\Models\UserAktifCasaKecil::class;
+                $nameField = 'nama_debitur';
                 break;
             case 'AUM>2M DPK<50 juta':
                 $model = \App\Models\AumDpk::class;

@@ -231,6 +231,7 @@ class AktivitasController extends Controller
             'MERCHANT QRIS SAVOL BESAR CASA KECIL',
             'MERCHANT EDC SAVOL BESAR CASA KECIL',
             'Qlola (Belum ada Qlola / ada namun nonaktif)',
+            'Debitur Belum Memiliki Qlola',
             'Qlola Non Debitur',
             'Non Debitur Memiliki Qlola Namun User Tdk Aktif',
             'Non Debitur Vol Besar CASA Kecil',
